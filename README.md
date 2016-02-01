@@ -1,2 +1,0 @@
-# HFJava
-Notes and business
