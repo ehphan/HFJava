@@ -1,0 +1,391 @@
+Ch 10 Notes
+
+Math methods: as close as you'll ever get to a global method
+	Methods in the math class don't use any IV values. And because the methods are 'static' you don't need to have an instance of Math. All you need is the Math class.
+
+The difference between regular (non-static) and static methods
+	Java is Obj Oriented, but once in a while you have a special case, typically a utility method, where there is no need to have an instance of the class.
+	The keyword static lets a method run without any instance of the class.
+	A static method means " behavior not dependent on an IV, so no instance/obj is required. Just the class."
+
+regular(non static) method
+
+	public class Song {
+		String title;	// IV value affects the behavior of the play() method.
+		public Song(String t)
+			title = t;
+	}
+	public void play() {
+		SoundPlayer player = new SoundPlayer();
+		player.playSound(title); 	//the current value of the 'title' IV is the song that plays when you 
+									//call play()
+	}
+
+static method
+
+	public stati int min (int a, int b) {
+		//returns lesser of a and b
+	}
+	absolutely no objects involved
+	Call a static method using a class name ex: Math.min(88,86);
+	Call a non-static method using a refvar name
+		Song t2 = new Song();
+		t2.play();
+
+What it means to have a class with static methods.
+	Often, classes with static methods are not meant to be instantiated.
+	This does not mean that a class with one or more static methods should never be instantiated. In fact, every class you put a main() method in is a class with a static method in it.
+
+Static methods can't use non-static IVs
+	Static methods run without knowing about any particular instance of the static method's class
+
+Static methods can't use non-static methods either
+	Non-static methods usually use IV state to affect the behavior of a method.
+
+Static variable:
+value is the same for all instances of the class
+Static variable gives you a value shared by all instances of a class, one value per class instead of per instance
+
+public class Duck {
+	private int size;
+	private static int duckCount = 0;	//the static duckCount var is init only when the class is first 
+										//loaded, not each time a new inst is made.
+	public Duck() {
+		duckCount++						//Now it will keep incrementing each time the duck constructor
+	}									//runs b/c duckCount is static and won't reset to 0
+
+
+}
+
+Static variables are shared.
+
+All instances of the same class share a single copy of static variables
+Instance variables: 1 per instance
+Static variables: 1 per class
+
+Initializing a static variable
+	There are two guarantees about static initialization
+	1. Static variables in a class are initialized before any object of that class can be created
+	2. Static variables in a class are initialized before any static method of the class runs.
+
+	class Player {
+		static int playerCount = 0;		//playerCount is init when the class is loaded
+		private String name;
+		public Player(String n) {
+			name = n;
+			playerCount++;
+		}
+	}
+
+	public class PlayerTestDrive {
+		public static void main (String[] args) {
+			System.out.println(Player.playercount);	//0 players
+			Player one = new player ("Tiger Woods");// add player
+			System.out.println(Player.playerCount);	//1 player
+		}
+	}
+
+Static final variables are constants
+	A variable marked final means that once initialized, it can never change.
+	Constant variable names should be in all caps like PI
+
+Initialize a final static variable:
+1. At the time you declare it:
+	public class Foo {
+		public static final int FOO_X = 25;
+	}	//note naming convention. static final variables are constants, so name should be all uppercase w/ underscores separating words
+or
+2. In a static initializer:
+	public class Bar {
+		public static final double BAR_SIGN;
+
+		static {	//this code runs as soon as the class is loaded, befoer any static method is called, and before any static variable can be used
+			BAR_SIGN = (double) Math.random();
+		}
+	}
+
+Final isn't just for static variables.
+	You can use the keyword final to modify non-static variables too, including IVs LVs and even method parameters. But you can also use final to stop someone from overriding a method or making a subclass.
+	A final variable means you can't change its value
+	A final method means you can't override th method.
+	A final class means you can't extend the class (ie make subclass)
+/////////////////
+//BULLET POINTS//
+/////////////////
+- A static method should be called using the class name rather than an object refvar:
+	Math.random() vs. myFoo.go()
+- A static method can be invoked without any instances of the method's class on the heap.
+- A static method is good for a utility method that does not ( and will never) depend on a particular IV value
+- A static method is not associated with a particular instance-only the class- so it cannot access any IV values of its class. It wouldn't know which IVs to use.
+- A static method cannot access a non-static method, since non-static methods are usually associated with IV state
+- If you have a class with only static methods, and you do not want the class to be instantiated, you can mark the constructor private.
+- A static variable is a variable shared by all members of a given class. There is only one copy of a static variable in a class, rather than one copy per each individual instance for IVs.
+- A static method can access a static variable.
+- To make a constant in Java, mark a variable as both static and final.
+- A final static variable must be assigned a value either at the time it is declared, or in a static initializer.
+	static {
+		DOG_CODE = 420;
+	}
+- The naming convention for constants ( final static variables) is to make the name all uppercase.
+- A final variable value cannot be changed once it has been assigned.
+- Assigning a value to a final IV must be either at the time it is declared, or in the constructor.
+- A final method cannot be overridden.
+- A final class cannot be extended (subclassed)
+
+Math methods
+Now that we know how static methods work, let's look at some static methods in class Math
+
+Math.random()
+	Returns a double btwn 0.0 through (but not including) 1.0
+		double r1 = Math.random();
+		int r2 = (int)(Math.random() * 5);
+
+Math.abs()
+	Returns a double that is the absolute value of the argument. (method is overloaded int=int)
+		int x = Math.abs(-240);	//returns 240
+		double d = Math.abs(240.45);	//returns 240.45
+
+Math.round()
+	Returns an int or a long (depending on arg being float or double) rounded to nearest int value.
+		int x = Math.round(-24.8f); // returns -25
+		int y = Math.round(24.45f); // returns 24
+
+Math.min()
+	Returns a value that is the minimum of the two args, overloaded for floats longs ints doubles
+		int x = Math.min(24,240); //returns 24
+		double y = Math.min(90876.5, 90876.49); // returns 90876.49
+
+Math.max()
+	Returns a value that is the maximum of the two args, overloaded like min
+		int x = Math.max (24,240); // returns 240
+
+Wrapping a primitive
+	Sometimes you want to treat a primitive like an object. There's a wrapper class for every primitive type, and since the wrapper classes are in java.lang package, you don't need to import them.
+
+	When you need to treat a primitive like an object, wrap it. you'll do this when you need to store a primitive value inside a collection like ArrayList or HashMap. 
+
+	Wrapping a value
+		int i = 288;
+		Integer iWrap = new Integer(i);	//give the primitive to the wrapper constructor
+
+	Unwrapping a value
+		int unWrapped = iWrap.intValue();
+
+Autoboxing: blurring the line between primitive and object
+	The autoboxing feature does the conversion from pirimitive to wrapper object automatically!
+
+	An ArrayList of primitive ints
+	with autoboxing
+
+	public void doNumsNewWay() {
+		ArrayList<Integer> listOfNumbers = new ArrayList<Integer>(); //make ArrayList of type Integer.
+		listOfNumbers.add(3); //just add it
+		int num = listOfNumbers.get(0);
+		//the compiler automatically unwraps the Integer object so you can assign the int value directly to a primitive without having to call the intValue() method on the Integer object
+	}
+
+So why not declare an ArrayList<int> if you want to hold ints?
+	You can't, the rule for generic types is that you can specify only class or interface types, not primitives. So ArrayList<int> will not compile. But as soon as you see the code above, it doesn't really matter, since the compiler lets you put ints into the ArrayList<Integer> 
+
+Autoboxing works almost everywhere
+	Method arguments
+		If a method takes a wrapper type, you can pass a reference to a wrapper or a primitive of the matching type. And of course the reverse is true- if a method takes a primitive, you can pass in either a compatible primitive or a reference to a wrapper of that primitive type.
+		void takeNumber(Integer i){} //Integer object is 3, passes in an int of value 3
+	Return values
+		If a method declares a primitive return type, you can return either a compatible primitive or a reference to the wrapper of that primitive type. And if a method declares a wrapper return type, you can return either a reference to the wrapper type or a primitive of the matching type.
+		int giveNumber() {
+			return x;	//X can be an Integer object or int
+		}
+	Boolean expressions
+		Any place a boolean value is expected, you can use either an expression that evaluates to a boolean(4>2), or a primitive boolean, or a reference to a Boolean wrapper.
+		if (bool) {
+			System.out.println("true");
+		}
+	Operations on numbers
+		This is probably the strangest one-yes, you can now use a wraper type as an operand in operations where the primitive type is expected. That means you can apply, say, the increment operator against a reference to an Integer object.
+	Assignments
+		You can assign either a wrapper or primitive to a variable declared as a matching wrapper or primitive. For example, a primitive int variable can be assigned to an Integer refvar, and vice-versa-- a reference to an Integer obj can be assigned to a variable declared as an int primitive
+
+Wrappers have static utility methods too
+	Converting a String to a primitive value is easy:
+		String s = "2";
+		int x = Integer.parseInt(s);
+		double d = Double.parseDouble("420.24");
+
+		boolean b = new Boolean("true").booleanValue();
+		//There is no Boolean.parseBoolean(). Instead there's a boolean constructor that takes and parses a string, and tehn you get the primitive value by unwrapping it.
+
+	But if you try to do this:
+		String t = "two";
+		int y = Integer.parseInt(t);	// compiles fine, but blows up at runtime. Anything that can't be parsed as a number will cause a NumberFormatException
+
+	Every method or constructor that parses a String can throw a NumberFormatException. It's a runtime exception, so you don't have to handle or declare it. But you might want to.
+
+And now in reverse turning a primitive number into a Sting
+	There are several ways to turn a number into a String. The easiest way is to simply concatenate the number to an existing string.
+		double d = 42.5;
+		String doubleString = "" + d;	// the + operator is overloaded in Java. anything added to a string becomes stringified.
+
+		double d = 42.5;
+		String doubleString = Double.toString(d);
+
+Number formatting
+	Formatting a number to use commas
+		public class TestFormats {
+			public static void main (String[] args) {
+				String s = String.format("%, d", 1000000000);
+				System.out.println(s);
+			}
+		}
+		OUTPUT: 1,000,000,000//now we get commas inserted into the number
+
+Formatting deconstructed
+	At the most basic level, formatting consists fo two main parts:
+		1. Formatting instructions.
+			You use special format specifiers to describe how the argument should be formatted.
+		2. The argument to be formatted.
+			Although there can be more than one argument, we'll start with just one. The argument type can't be just anything... it has to be something that can be formatted using the format specifiers in the formatting instructions. For example, if your formatting instructions specify a floating point number, you can't pass in a Dog or even a String that looks like a floating point number.
+			
+			Do this...	   to this.
+			format("%, d", 1000000000);
+			
+			These instructions say Take the second argument in this method, and format it as a decimal integer and insert commas.
+
+			Any time you see the percent sign % in a format String(which is always the first argument to a format() method), think of it as representing a variable, and the variable is the other argument to the method.
+
+The percent % says "insert argument here"(and format it using these instructions)
+	The first argument to a a format() method is called the format String, and it can actually include characters that you want printed as-is, without extra formatting. When you see the % sign, though, think of the percent sign as a variable that represents the other argument to the method.
+
+	format ("I have %.2f bugs to fix.", 474624.23642);
+	OUTPUT: I have 87642.23 bugs to fix.
+
+	The % sign tells the formatter to insert the other method argument, and format it using the ".2f" characters after the percent sign.
+
+Adding a comma
+	format("I have %,.2f bugs to fix.", 123456.12345)
+	OUTPUT: I have 123,456.12 bugs to fix
+
+The format String uses its own little language syntax
+	%,d means "insert commas and format the number as a decimal integer"
+	%.2f means "format the number as a floating point with a precision of two decimal places."
+
+The format specifier
+	Everything after the % up to and including the type indicator are part of the formatting instructions. After the type indicator, the formatter assumes the next set of characters are meant to be part of the output String, until or unless it hits another %.
+
+	A format specifier can have up to five different parts (not including the %). Everything in brackets is optional, so only the % and the type are required. But the order is also mandatory, so any parts you DO use must go in this order.
+
+	%[argument number][flags][width][.precision]type
+	argument number: We'll get to this later, it lets you say which argument if there's more thano ne.
+	flags: These are for special formatting options like inserting commas, or putting negative numbers in parentheses, or to make the numbers left justified.
+	width: This defines the minimum number of characters that will be used. That's *minimum* not TOTAL. If the number is longer than the width, it'll still be used in full, but if its less than the width, it'll be padded with zeroes
+	.precision: This one defines the precision, it sets the number of decimal places. dont' forget the .
+	type: Type is mandatory
+
+The only required specifier is for TYPE
+	%d decimal byte,short,int, and char
+	%f floating point float,double
+	%x hexadecimal byte,short,int,long
+	%c character byte,short,char, or int
+
+What about dates? 
+	Complete date and time %tc
+		String.format("%tc", new Date());
+		OP: Sun Nov 28 14:52:42 MST 2004
+	Just the time %tr
+		String.format("%tr", new Date());
+		OP: 03:01:47 PM
+	Day of the week, month and day %tA %tB %td
+		Date today = new Date();
+		String.format("%tA, %tB %td", today,today,today);
+		OP: Sunday, November 28
+	OR
+		Date today = new Date();
+		String.format("%tA, %<tB %td", today);
+		//The angle bracket is just another flag in the specifier that tells the formatter to use the previous argument again.
+
+Getting an object that extends Calendar
+	How do you get an instance of an abstract class?
+	Calendar cal = Calendar.getInstance(); // this syntax should look familiar at thsi point, we're invoking a static method
+	You can't get an instance of Calendar, but you can get an instance of a concrete Calendar subclass.
+	You're still free to call static methods on Calendar, since static methods are called on the class, rather than on a particular instance.
+	So you call the static getInstance() on Calendar and it gives you back an instance of a concrete subclass. Something that extends Calendar(which means it can be polymorphically assigned to Calendar) and which by contract can respond to the methods of class Calendar.
+
+Working with Calendar objects
+	There are several key concepts you'll need to understand in order to work with Calendar objects:
+	- Fields hold state: A calendar object has many fields that are used to represent aspects of its ultimate state, its date and time. For instance, you can get and set a Calendar's year or month.
+	- Dates and Times can be incremented: The Calendar class has methods that allow you to add and subtract values from various fields, for example "add one to the month", or "subtract three years".
+	- Dates and Times can be represented in milliseconds: The Calendar class lets you convert yoru dates into and out of a millisecond representation. This allows you to perform precise calculations such as "elapsed time between two times" or "add 63 hours and 23 minutes and 12 seconds to this time".
+
+An example of working with a Calendar object:
+	Calendar c = Calendar.getInstance();
+	c.set(2004,0,7,15,40);	//set time to jan 7 2004 at 15:40 notice month is zero-based
+
+	long day1 = c.getTimeInMillis();
+	day1 += 1000*60*60;	// converts this to an amount of milliseconds
+
+	c.setTimeInMillis(day1);
+	System.out.println("new hour " + c.get(c.HOUR_OF_DAY));
+
+	c.add(c.DATE, 35);
+	System.out.println("Add 35 days " + c.getTime()); //Add 35 days to the date
+
+	c.roll(c.DATE, 35);
+	System.out.println("roll 35 days " + c.getTime()); //rolls the date 
+
+Highlights of the Calendar API
+	Key Calendar Methods
+		add (int field, int amount)
+			Adds or subtracts time from the calendar's field.
+		get (int field)
+			Returns the value of the given calendar field.
+		getInstance()
+			Returns a Calendar, you can specify a locale.
+		getTimeInMillis()
+			Returns this Calendar's time in millis, as a long.
+		roll(int field, boolean up)
+			Adds or subtracts time without changing larger fields.
+		set(int field, int value)
+			Sets the value of a given Calendar field
+		set(year,month,day,hour,minute)(all ints)
+			A common variety of set to set a complete time
+		setTimeInMillis(long millis)
+			Sets a Calendar's time based ona a long milli-time
+	Key Calendar Fields
+		DATE / DAY_OF_MONTH
+			Get/set the day of the month
+		HOUR / HOUR_OF_DAY
+			Get/set the 12 hour or 24 hour value
+		MILLISECOND
+			Get/set the milliseconds
+		MONTH
+			Get/set the month
+		YEAR
+			Get/set the year
+		ZONE_OFFSET
+			Get/set raw offset of GMT in millis.
+
+Even more Statics! static imports
+	Static imports exist only to save you some typing.
+	The basic idea is that whenever you're using a static class, a static variable, or an enum, you can import them and save yourself some typing.
+
+	OLD CODE:
+
+	import java.lang.Math;
+	class NoStatic {
+		public static void main (String[] args) {
+			System.out.println("sqrt " + Math.sqrt(2.0));
+			System.out.println("tan " + Math.tan(60));
+		}
+	}
+
+	NEW CODE:
+
+	import static java.lang.System.out;	// The syntax to use when declaring static imports
+	import static java.lang.Math.*;		// Same
+	class WithStatic {
+		public static void main (String[] args) {
+			out.println("sqrt " + sqrt(2.0));
+			out.println("tan " + tan(60));
+		}
+	}
+
