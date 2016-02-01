@@ -1,0 +1,102 @@
+Ch 12 Notes CK
+
+We're going to make a music video, using Java-generated random graphics that keep time with the music beats.
+
+Listening for non-GUI events is just like listening for GUI events: you implement a listener interface, register the listener with an event source, then sit back and wait for the event source to call your event-handler method (the method defined in the listener interface).
+
+The simplest way to listen for the beat of the music would be to register and listen for the actual MIDI events, so that whenever the sequencer gets the event, our code will get it too and can draw the graphic. But there's a problem, a bug actually, that won't let us listen for the MIDI events we're making (the ones for NOTE ON)
+
+So we have to do a little work-around. There is another type of MIDI event we can listen for, called a ControllerEvent. Our solution is to register for ControllerEvents, and then make sure that for every NOTE ON event, there's a matching ControllerEvent fired at the same 'beat'. How do we make sure the ControllerEvent is fired at the same time? We add it to the track just like the other events! In other words, our music sequence goes like this:
+
+BEAT 1 - NOTE ON, CONTROLLER EVENT
+BEAT 2 - NOTE OFF
+BEAT 3 - NOTE ON, CONTROLLER EVENT
+BEAT 4 - NOTE OFF
+and so on
+
+Before we dive into the full program, though, let's make it a little easier to make and add MIDI messages/events since in this program, we're gonna make a lot of them.
+
+What the music art program needs to do:
+	1. Make a series of MIDI messages/events to play random notes on a piano
+	2. Register a listener for the events
+	3. Start the sequencer playing
+	4. Each time the listener's event handler method is called, draw a random rectangle on the drawing panel, and call repaint.
+
+We'll build it in three iterations:
+	v1. Code that simplifies making and adding MIDI events, since we'll be making a lot of them.
+	v2. Register and listen for the events, but without graphics. Prints a message at the command-line with each beat.
+	v3. The real deal. Adds graphics to v2
+
+Things that have to happen for each event:
+
+	1. Make a message instance
+		ShortMessage first = new ShortMessage();
+
+	2. Call setMessage() with the instructions
+		first.setMessage(192, 1, instrument, 0)
+
+	3. Make a MidiEvent instance for the message
+		MidiEvent noteOn = new MidiEvent(first, 1);
+
+	4. Add the event to the track
+		track.add(noteOn);
+
+Let's build a static utility method that makes a message and returns a MidiEvent
+
+	public static MidiEvent makeEvent (int comd, int chan, int one, int two, int tick) {
+								//the 4 args for the message
+								//The event 'tick' for WHEN this message should happen
+		MidiEvent event = null;
+		try {
+			ShortMessage a = new ShortMessage();
+			a.setMessage(comd, chan, one, two);
+			event = new MidiEvent(a, tick);
+		}	catch (Exception e) {}
+		return event;
+		//return the event (a MidiEvent all loaded up with the message)
+	}
+
+Example: how to use the new static makeEvent() method
+This code is here simply to learn how to use our new makeEvent() method. The code for the next two versions is much smaller and simpler thanks to this method.
+
+	import javax.sound.midi.*;
+
+	public class MiniMusicPlayer1 {
+
+		public static void main (String[] args) {
+
+			try {
+
+				Sequencer sequencer = MidiSystem.getSequencer();
+				sequencer.open();
+				//make and open a sequencer
+
+				Sequence seq = new Sequence(Sequence.PPQ, 4);
+				Track track = seq.createTrack();
+				//make a sequence and a track
+
+			for (int i = 5; i < 61 ; i+= 4) {
+
+				track.add(makeEvent(144,1,i,100,i));
+				track.add(makeEvent(128,1,i,100,i+2));
+			}//end forloop
+			}	catch (Exception ex) {ex.printStackTrace();}
+		}//close main
+
+		public static MidiEvent makeEvent(int comd, int chan, int one, int two, int tick) {
+			MidiEvent event = null;
+			try {
+				ShortMessage a = new ShortMessage();
+				a.setMessage(comd,chan,one,two);
+				event = new MidiEvent(a, tick);
+			}	catch (Exception e) {}
+			return event;
+		}
+	}
+
+Version Three: drawing graphics in time with the music
+
+This final version builds in v2 by adding the GUI parts. We build a frame, add a drawing panel to it, and each time we get an event, we draw a new rectangle and repaint the screen. The only other change from v2 is that the notes play randomly as opposed to simply moving up the scale
+
+The most important change to the code (besides building a simple GUI) is that we make the drawing panel implement the ControllerEventListener rather than the program itself. So when the drawing panel (an inner class) gets the event, it knows how to take care of itself by drawing the rectangle.
+

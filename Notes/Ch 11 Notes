@@ -1,0 +1,396 @@
+Ch 11 Notes
+
+Making a beatbox
+Before we get down to it we need to learn a few things.
+- Building a Swing GUI
+- How to connect to another machine via networking
+- A little I/O so we can send something to another machine
+- JavaSound API
+
+The JavaSound API
+	The JavaSound API is split into two parts. MIDI and Sampled, we only use MIDI in this book (Musical Instrument Digital Interface)
+	A MIDI file does not have sound to it, but rather instructions on how to sound to be played through a MIDI capable instrument
+
+First we need a Sequencer
+	Before we can get any sound to play, we need a Sequencer object.
+	The sequencer is the object that takes all the MIDI data and sends it to the right instruments. It's the thing that plays the music.
+	While a sequencer can do a lot of different things, in this book, we're using it strictly as a playback device
+
+What happens when a method you want to call is risky?
+	1. Let's say you want to call a method in a class that you didn't write.
+	2. That method does something risky, something that might not work at runtime.
+	3. You need to know that the method you're calling is risky.
+	4. You then write code taht can handle the failure if it does happen. You need to be prepared, just in case.
+
+Methods in Java use exceptions to tell the calling code "i fucked up, my b"
+	Java's exception-handling mechanism is a clean way to handle exceptional situations at runtime. It lets you put all your error-handling code in one easy to read place. It's based on you knowing that the method you're calling is risky, so you can write code to deal with that possibility.
+	So how od you know if a method throws an exception? You find a throws clause in the risky method's declaration.
+
+	The getSequencer() method takes a risk. It can fail at runtime. So it msut 'declare' the risk you take when you call it
+
+	The API docs tell you that getSequencer() can throw an exception MidiUnavailableException. A method has to declare the exceptions it might throw.
+
+The compiler needs to know that YOU know you're calling a risky method.
+	If you wrap the risky code in something caled a try/catch, the compiler will relax
+	A try/catch block tells the compiler that you know an exceptional thing could happen in the method you're calling, and that you're prepared to handle it. That compiler doesn't care how you handle it; it cares only that you say you're taking care of it.
+
+An exception is an object of type Exception.
+	Because the exception is an object, what you catch is an object. In the following code, the catch arg is declared as type Exception, and the parameter refvar is ex.
+
+		try {
+			//do risky
+		} catch (Exception ex) {
+			//try to fix
+		}
+	What you write in the catch block depends on the exception that was thrown. For example, if a server is down you might use the catch block to try anotehr server. If the file isn't tehre, you might ask the user for help finding it.
+
+If it's your code that catches the exception, then whose code throws it?
+	When your code calls a risky method - a method that declares an exception - it's the risky method that throws the exception back at you, the caller.
+	When somebody writes code that could throw an exception, they must declare the exception.
+
+1. Risky exception throwing code:
+	public void takeRisk() throws BadException {	//this method MUST declare that it throws a BadException
+		if (abandonAllHope) {
+			throw new BadException();	// create a new exception obj and throw it
+		}
+	}
+
+2. Your code that calls the risky method:
+	public void crossFingers() {
+		try {
+			anObject.takeRisk();
+		}	catch (BadException ex) {
+			System.out.println("AAARGH");
+			ex.printStackTrace();
+			//If you can't recover from the exception, at least get a stack trace using the printStackTrace() method that all exceptions inherit
+		}
+	}
+
+One method will catch whatever another method throws. An exception is always thrown back to the caller.
+The method that throws has to declare that it might throw the exception.
+
+The compiler checks for everything except RuntimeExceptions.
+
+The compiler guarantees:
+1. If you throw an exception in your code you must declare it using the throws keyword in your method declaration.
+2. If you call a method that throws an exception (in other words, a method that declares it throws an exception), you must acknowledge that you're aware of the exception possibility. One way to satisfy the compiler is to wrap the call in a try/catch.(we'll look at a second way in a bit)
+
+Exceptions that are not subclasses of RuntimeException are checked for by the compiler. They're called "checked exceptions"
+
+RuntimeExceptions are not checked by the compiler. They're known as "unchecked exceptions". You can throw, catch, and declare RuntimeExceptions, but you don't have to, and the compiler won't check.
+CHECKED:
+Exception
+	IOException
+	InterruptedException
+UNCHECKED:
+	RuntimeException
+		ClassCastException
+		NullPointerException
+/////////////////
+//Bullet Points//
+/////////////////
+- A method can throw an exception when soemthing fails at runtime.
+- An exception is always an object of type Exception. (Which as you remember from the polymorphism chapters means the object is from a class that has Exception somewhere up its inheritance tree.)
+- The compiler does NOT pay attention to exceptions that are of the type RuntimeException. A RuntimeException does not have to be declared or wrapped in a try/catch (although you're free to do either or both of those things)
+- All Exceptions the compiler cares about are called 'checked exceptions' which really means compiler-checked exceptions. Only RuntimeExceptions are excluded from compiler checking. All other exceptions must be acknowledged in your code, according to the rules.
+- A method throws an exception with the keyword throw, followed by a new exception object:
+	throw new NoCaffeineException();
+- Methods that might throw a checked exception must announce it with a throws Exception declaration.
+	public void dotaGame() throws WeFuckingLost {}
+- If your code calls a checked-exception-throwing method, it must reassure the compiler that precautions have been taken.
+- If you're prepared to handle the exception, wrap the call in a try/catch, and put your exception handling/recovery code in the catch block.
+- If you're not prepared to handle the exception, you can still make the compiler happy by officially 'ducking' the exception. We'll talk about ducking in a quack bit.
+
+Flow control in try/catch blocks
+	When you call a risky method, one of two things can happen. The risky method either succeeds, and the try block completes, or the risky method throws an exception back to your calling method.
+
+	If the try succeeds (doRiskyThing() does not throw an exception)
+		First the try block runs, then the code BELOW the catch runs
+
+	If the try fails (because doRiskyThing() does throw an exception)
+		The try block runs, but the call to doRiskyThing() throws an exception, so the rest of the try block doesn't run.
+		The catch block runs, then the method continues on.
+		The rest of the try block never runs, which is a good thing because the rest of the try depends on the success of the call to doRiskyThing()
+
+Finally: for the things you want to do no matter what.
+	If you try to cook something, you start by turning on the stove.
+	If the thing you try is a complete failure, you have to turn off the stove.
+	If the thing you try is a success, you have to turn off the stove.
+	You have to turn off the stove no matter what.
+
+	A finally block is where you put code that must run regardless of an exception.
+		try {
+			turnOvenOn();
+			x.bake();
+		}	catch (BakingException ex) {
+				ex.printStackTrace();
+		}	finally {
+			turnOvenOff();
+		}
+
+	Without finally, you have to put the turnOvenOff() in both the try and the catch because you have to turn off the oven no matter what.
+
+	If the try block fails(an exception), flow control immediately moves to the catch block. When the catch block completes, the finally block runs. When the finally block completes, the rest of the method continues on
+
+	If the try block succeeds(no exception), flow control skips over the catch block and moves to the finally block. When the finally block completes, the rest of the method continues on.
+
+	If the try or catch block has a return statement, finally will still run! Flow jumps to the finally, then back to the return.
+
+Did we mention that a method can throw more than one exception?
+	A method can throw multiple exceptions if it darn well needs to. But a method's declaration must declare all the checked exceptions it can throw (although if two or more exceptions have a common superclass, the method can declare just the superclass)
+
+Catching multiple exceptions
+	The compiler will make sure that you've handled all the checked exceptions thrown by the method you're calling. Stack the catch blocks under the try, one after the other. Sometimes the order in which you stack the catch block matters, but we'll get to that a little later.
+
+public class Laundry {
+	
+	public void doLaundry() throws PantsException, LingerieException {
+		//code that could throw either
+	}
+}
+
+public class Foo {
+	
+	public void go() {
+		Laundry laundry = new Laundry();
+
+		try {
+			laundry.doLaundry();
+		}	catch (PantsException pex) {
+			//code to unfuck this
+		}	catch (LingerieException lex) {
+			//code to unfuck lex :wink:
+		}
+	}
+}
+
+Exceptions are polymorphic
+	Exceptions are objects remember! There's nothing all that special about one, except that it is a thing that can be thrown. So like all good objects, Exceptions can be referred to polymorphically. A LingerieException object, for example, could be assigned to a ClothingException reference. You get the idea. The benefit for exceptions is that a method doesn't have to explicitly declare every possible exception it might throw; it can declare a superclass of the exceptions. Same thing with catch blocks - you don't ahve to write a catch for each possible exception as long as the catch ( or catches) you have can handle any exception thrown.
+
+	1. You can DECLARE exceptions using a supertype of the exceptions you throw.
+		public void doLaundry() throws ClothingException {}
+		//Declaring a ClothingException lets you throw any subclass of ClothingException. That means doLaundry() can throw a pex, a lex, shirt ex whatever without explicitly declaring individually.
+
+	2. You can CATCH exceptions using a supertype of the exception thrown.
+
+		try {
+			laundry.doLaundry();
+		}	catch (ClothingException cex) {
+			//recovery code
+		}
+
+		try {
+			laundry.doLaundry();
+		}	catch (ShirtException sex) {
+			//recovery code
+		}
+
+Just because you CAN catch everything with one big super polymorphic catch, doesn't mean you SHOULD.
+	try {
+		laundry.doLaundry();
+	}	catch (Exception ex) { // recover from what? this catch block will catch ANY and all exceptions, so you won't automatically know what went wrong.
+		//recovery code
+	}
+
+Write a different catch block for each exception that you need to handle uniquely.
+	for example. if your code deals with a TeeShirtException differently than it handles a LingerieException, write a catch block for each. But if you treat all other types of ClothingException in the same way, then add a ClothingException catch to handle the rest.
+
+	try {
+		laundry.doLaundry();
+	}	catch (TeeShirtException tex) {
+		//recovery from tex. for specific exceptions
+	}	catch (LingerieException lex) {
+		//recovery from lex
+	}	catch (ClothingException cex) {
+		//recovery from cex. all other cex are caught here
+	}
+
+Multiple catch blocks must be ordered from ssmallest to biggest
+
+	ClothingException
+		PantsException
+		LingerieException
+		UniformException
+		ShirtException
+			TeeShirtException
+			DressShirtException
+
+	catch (TeeShirtException tex) //TeeShirtExceptions are caught here, but no other exceptions will fit
+	catch (ShirtException sex) // TeeShirtExceptions will never get here, but all other ShirtException subclasses are caught here
+	catch (ClothingException cex) //All ClothingExceptions are caught here, although TeeShirtException and ShirtException will never get this far.
+
+	The higher up the inheritance tree, the bigger the catch 'basket'. As you move cdown the inheritance tree, toward more and more specialized Exception classes, the catch 'basket' is smaller. It's just plain old polymorphism
+
+	A ShirtException is big enough to take a TeeShirtException or a DressShirtException. A ClothingException is even bigger.
+
+You can't put bigger baskets above smaller baskets.
+	Well you can, but it won't compile. Catch blocks are not like overloaded methods where the best match is picked. With catch blocks, the JVM simply starts at the first one and works its way down until it finds a catch that's broad enough to handle the exception. If your first catch block is catch(Exception ex), the compiler knows tehre's no point in adding any others- they'll never be reached.
+
+//WHAT NOT TO DO//
+	try {
+		laundry.doLaundry();
+	}	catch(ClothingException cex) {
+		//recovery code from ClothingException
+	}	catch(LingerieException lex) {
+		//recovery code from LingerieException
+	}	catch (ShirtException sex) {
+		//recovery code from ShirtException
+	}
+
+	Size matters when you have multiple catch blocks. The one with the biggest basket has to be on the bottom. Otherwise, the ones with smaller baskets are useless.
+
+	You could put ShirtException above LingerieException and nobody would mind, because they can't catch each other.
+
+When you don't want to handle an exception... just duck it
+	If you don't want to handle an exception, you can duck it by declaring it.
+
+	When you call a risky method, the compiler needs you to acknowledge it. Most of the time, that means wrapping the risky call in a try/catch. But you have another alternative, simply duck it and let the method that called you catch the exception.
+
+	It's easy, all you have to do is declare that you throw the exceptions. Even though, technically, you aren't the one doing the throwing, it doesn't matter. You're still the one letting the exception whiz right on by.
+
+	But if you duck an exception, then you don't have to try/catch, so what happens when the risky method (doLaundry()) does throw the exception?
+
+	When a method throws an exception, that method is popped off the stack immediately, and the exception is thrown to the next method down the stack- the caller. But if the caller is a ducker, then there's no catch for it so the caller pops off the stack immediately, and the exception is thrown to the next method and so on.
+
+	public void foo() throws ReallyBadException { //you don't really throw it, but since you don't have a try/catch for the risky method you call, YOU are now the "risky method". Because now, whoever calls YOU has to deal with the exception.
+		//call risy method without a try/catch
+		laundry.doLaundry();
+	}
+
+Ducking (by declaring) only delays the inevitable
+	Sooner or later, somebody has to deal with it. But what if main() ducks the exception?
+
+	public class Washer {
+		Laundry laundry = new Laundry();
+
+		public void foo() throws ClothingException {
+			laundry.doLaundry();
+		}
+		//both methods duck the exception (by declaring it) so there's nobody to handle it!! This compiles just fine
+		public static void main (String[] args) throws ClothingException {
+			Washer a = new Washer();
+			a.foo();
+		}
+	}
+
+	1. doLaundry() throws a ClothingException
+		main() calls foo()
+		foo() calls doLaundry()
+		doLaundry() is running and throws a ClothingException
+	2. foo() ducks the exception.
+		doLaundry() pops off the stack immediately and the exception is thrown back to foo().
+		But foo() doesn't have a try/catch so...
+	3. main() ducks the exception
+		foo() pops off the stack immediately and the exception is thrown back to who?
+	4. the JVM shuts down.
+
+Handle or Declare. It's the law.
+	So now we've sen both ways to satisfy the compiler when you call a risky(exception-throwing) method.
+	1. HANDLE
+		WRAP the risky call in a try/catch
+
+		try {
+			laundry.doLaundry();
+		}	catch (ClothingException cex) { //This had better be a big enough catch to handle all exceptions that doLaundry() might throw. Or else the compiler will still complain that you're not catching all of the exceptions
+			//recovery code
+		}
+
+	2. DECLARE(duck it)
+		Declare that YOUR method throws the same exceptions as the risky method you're calling.
+
+		void foo() throws ClothingException { //The doLaundry() method throws a ClothingException, but by declaring the exception, the foo() method gets to duck the exception. No try/catch.
+			laundry.doLaundry();
+		}
+
+		But now this means that whoever calls the foo() method has to follow the Handle or Declare law. If foo() ducks the exception (by declaring it), and main() calls foo(), then main() has to deal with the exception.
+
+		public class Washer {
+			Laundry laundry = new Laundry();
+
+			public void foo() throws ClothingException {
+				laundry.doLaundry();
+			}
+
+			public static void main (String[] args) {//TAI-HEN!!~! Now main() won't compile, and we get an "unreported exception" error. As far as the compiler's concerned, the foo() method throws an exception.
+				Washer a = new Washer();
+				a.foo();
+			}
+		}
+
+Getting back to our music code...
+	We created a sequencer object but it wouldn't compile because the method Midi.getSequencer() declares a checked exception (MidiUnavailableException). But now we can fix that with try/catch.
+
+	public void play() {
+		try {
+			Sequencer sequencer = MidiSystem.getSequencer();
+			//no problem calling getSequencer(), now that we've wrapped it in a try/catch block
+			System.out.println("Successfully got a sequencer");
+		}	catch (MidiUnavailableException ex) {
+		//The catch parameter has to be the 'right' exception. IF we said catch(shittything ex), the code would not compile, because polymorphically a MidiUnavailableException won't fit into a shittything. Remember, its not enough to have the catch block... you have to catch the thing being thrown!
+			System.out.println("Bummer");
+		}
+	}//close play
+
+Exception RULES! 
+	1. You cannot have a catch or finally without a try
+		void go() {
+			Foo f = new Foo();
+			f.foof();
+			catch(FooException fex) {}
+		}
+		Not legal, where's the try?
+
+	2. You cannot put code between the try and the catch
+		try {
+			x.doStuff();
+		}
+		int y = 43;
+		} catch (Exception ex) {}
+		Not legal, You can't put code between the try and the catch.
+
+	3. A try MUST be followed by either a catch or a finally
+		try {
+			x.doStuff();
+		}	finally {
+			//cleanup
+		}
+		Legal, because you have a finally, even though there's no catch. But you cannot have a try by itself.
+
+	4. A try with only a finally (no catch) must still declare the exception.
+		void go() throws FooException {
+			try {
+				x.doStuff();
+			}	finally {}
+		}
+		A try without a catch doesn't satisfy the Handle or Declare law.
+
+Making actual sound.You need four things:
+	1. The thing that plays the music
+	2. The music to be played, a song
+	3. The part of the Sequence that holds the actual information.
+	4. The actual music information: notes to play, how long, etc.
+
+	Sequencer plays
+	//The Sequencer is the thing that actually causes a song to be played. Think of it like a music CD player.
+		Sequence has a
+		//The Sequence is the song, the musical piece that the Sequencer will play. For this book, think of the Sequence as a music CD, but the whole CD plays just one song.
+			Track which holds
+			//Track is a single song on the CD
+				Midi Events
+				//A MIDI event is a message that the Sequencer can understand. A MIDI event might say play this note at this time and hold it for this long.
+
+And you need five steps:
+	1. Get a Sequencer and open it
+		Sequencer player = MidiSystem.getSequencer();
+		player.open();
+	2. Make a new Sequence
+		Sequence seq = new Sequence(timing,4);
+	3. Get a new Track from the Sequence
+		Track t = seq.createTrack();
+	4. Fill the Track with MidiEvents and give the Sequence to the Sequencer
+		t.add(myMidiEvent1);
+		player.setSequence(seq);
+	5. Push the play buton
+		player.start();
+
+		
