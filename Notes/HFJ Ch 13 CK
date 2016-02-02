@@ -1,0 +1,12 @@
+Ch 13 Notes CK
+
+Making the BeatBox
+	This is the full code listing for this version of the BeatBox, with buttons for starting, stopping, and changing the tempo. The code listing is complete, and fully annotated, but here's the overview:
+
+	1. Build a GUI that has 256 checkboxes (JCheckBox) that start out unchecked, 16 labels(Jlabel) for the instrument names, and four buttons.
+
+	2. Register an ActionListener for each of the four buttons. We don't need listeners for the individual checkboxes, because we aren't trying to change the pattern sound dynamically(i.e. as soon as the user checks a box). Instead, we wait until the user hits the 'start' button and then walk through all 256 checkboxes to get their state and make a MIDI track.
+
+	3. Set-up the MIDI system(you've done this before) including getting a Sequencer, making a Sequence, and creating a track. We are using a sequencer method that's new to Java 5.0, setLoopCount(). This method allows you to specify how many times you want a sequence to loop. We're also using the sequence's tempo factor to adjust the tempo up or down, and maintain the new tempo from one iteration of the loop to the next.
+
+	4. When the user hits 'start', the real action begins. The event-handling method for the 'start' button calls the buildTrackAndStart() method. In that method, we walk through all 256 checkboxes(one row at a time, a single instrument across all 16 beats) to get their state, then use teh information to build a MIDI track (using the handy makeEvent() method we used in the previous chapter). Once the track is built, we start the sequencer, which keeps playing(because we're looping it) until the user hits 'stop'.

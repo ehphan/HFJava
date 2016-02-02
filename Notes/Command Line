@@ -1,0 +1,118 @@
+Basic Command line
+	ls : lists files and shit
+		-a : list all including hidden the files and directories starting with a (.). files started with a dot are hidden, and don't appear when using ls alone.
+		-l : lists all contents of a directory in long format
+		-t : order files and directories by the last time they were modified.
+
+	ls -alt : will do all of these things
+
+	pwd: print working directory, gives you the name of the directory you are currently in.
+
+	cd: change directory
+		../../directory : go up 2 directories to destination
+
+	mkdir <foldername> : make directory
+
+	touch <filename.type> : creates a new file inside the working directory
+
+	cp <source1> <source2> <destination> : copies files or directories
+		cp m*.txt destinationFolder : copies all text files starting with m into the destinationFolder
+		cp * : * is a wildcard, selects all files in the working directory
+
+	mv <filename> <directoryDestination> : moves file to destination
+		mv <filename1> <filename2> : renames filename1 as filename2
+
+	rm <filename> : removes the file
+		rm -r <directory> : recursive, used to delete a directory and all of its child directories.
+
+	echo "Hello" : echo command accepts the string "Hello" as standard input, and echoes the string "Hello" back to the terminal as standard output.
+		standard input stdin: is information inputted into the terminal through the keyboard or input device.
+		standard output stdout : is the information outputted after a process is run.
+		standard error stderr : is an error message outputted by a failed process.
+		Redirection reroutes stdin,stdout,stderr to or from a different location.
+
+		echo "Hello" > hello.txt : puts hello in a hello.txt file
+			> : redirects the stdout of a file. 
+
+			Here "Hello" is entered as a stdin.
+
+		cat : outputs the contents of a file to the terminal
+			cat source.txt > destination.txt : copies
+
+		> :  takes the stdout of the command on the left, and redirects it to the file on the right. so the stdout of cat oceans.txt is redirected to continents.txt . > overwrites all original content
+
+		>> : takes the stdout of the command on the left and appends it to the file on the right
+			cat glaciers.txt >> rivers.txt : appends glaciers to rivers
+
+		< : takes the stdin from the file on the right and inputs it into the program on the left.
+			cat < lakes.txt : here lakes.txt is the standard input for the cat command.
+
+		| : is a "pipe". The | takes the standard output of the command on the left, and pipes it as standard input to the command on the right. You can think of this as "command to command" redirection.
+
+			cat volcanoes.txt | wc | cat > islands.txt
+			Here the stdout of cat volcanoes.txt is piped to the wc command. The stdout of wc is then piped to cat. Finally the stdout of cat is redirected to islands.txt
+
+			cat lakes.txt | sort > sorted-lakes.txt
+			Here the stdout of lakes.txt is sent to the sort command, which is then redirected to a new text file.
+
+		sort : takes the stdin and orders it alphabetically for the stdout
+
+		uniq : stands for unique and filters out adjacent, duplicate lines in a file.
+			uniq deserts.txt : filters out duplicates that are adjacent.
+			sort deserts.txt | uniq : alphabetically organizes deserts then uniqs it.
+			sort deserts.txt | uniq > uniq-deserts.txt : sorts it, uniq's it, outputs it to a uniq-deserts.txt
+
+		grep : stands for Global Regular Expression Print. It searches files for lines that match a pattern and return the results. It is also case sensitive.
+			grep Mount mountains.txt : searches for "Mount" in mountains.txt
+			grep -i Mount mountains.txt : grep -i enables the command to be case insensitive
+			grep -R : searches all files in a directory and outputs filenames and lines containing matched results. -R stands for "recursive".
+				grep -R Arctic /home/yada/geography : Here grep -R searches the directory for the string "Arctic" and outputs filenames and lines with matched results.
+				grep -Rl Arctic /home/yada/geography : searches all files in a directory and outputs only filenames with matched results. l stands for "files with matches" here grep -Rl searches the directory for the string "Arctic" and outputs filenames with matched results.
+
+		sed : stands for stream editor. It accepts stdin and modifies it based on an expression, before displaying it as output data. It is simlar to "find and replace"
+			sed 's/snow/rain/' forests.txt
+				s : stands for "substitution" it is always used when using sed for substitution.
+				snow : the search string, the text to find.
+				rain: the replacement string, the text to add in place.
+				In this case, sed searches forests.txt for the word 'snow' and replaces it with 'rain'. Importantly the above command will only replace the first instance of 'snow' on a line.
+			sed 's/snow/rain/g' forests.txt
+				g : global. Here sed searches forests.txt for the word 'snow' and replaces it with 'rain' globally. all instances of 'snow' are changed to 'rain'.
+
+
+Command Line Environment
+
+	nano : is a command line text editor
+	nano hello.txt : opens a new text file named hello.txt in the nano text editor.
+
+	nano ~/.bash_profile : use nano to open up ~/.bash_profile. it is the name of the file used to store environment settings. It is commonly called the "bash profile". When a session starts, it will load the contents of the absh profile before executing commands.
+		~ : represents the users home directory.
+		. : indicates a hidden file.
+		The name ~/.bash_profile is important, since this is how the command line recognizes the bash profile
+		source ~/.bash_profile : activates the changes in the bash profile for the current session. Instead of closing the terminal and needing to start a new session, source makes the changes available right away in the session we are in.
+
+		Storing shit in your bash profile
+			alias pd ="pwd" : instead of typing pwd to print working directory, use pd.
+			The alias command allows you to create keybaord shortcuts or aliases for commonly used commands.
+			export USER="NAME HERE"
+				Environment variables are variables that can be used across commands and programs and hold information about the environment.
+				This command sets the envivar USER to a name "NAME HERE". Usually the USER variable is set to the name of the computer's owner.
+				export : makes the variable to be available to all child sessions initiated from the session you are in. This is a way to make the variable persist across programs
+				At the command line, the command echo $USER returns the value of the variable. Note that $ is always used when returning a variable's value.
+
+			export PS1=">> "
+				this sets the command prompt variable and exports the variable. Here we change the default command prompt from $ to >>.
+				PS1 : is a variable tha defines the makeup and style of the command prompt.
+
+			echo $HOME
+				the terminal displays the path /home/ccuser as output
+				HOME : is an envar that displays the path of the home directory.
+
+			echo $PATH
+				PATH: is an envar that stores a list of directories separated by a colon :.
+				Each directory contains scripts for the command line to execute. The PATH variable simply lists which directories contain scripts.
+
+			env
+				stands for environment, and returns a list of the envar's for the current user. Here, the env command returns a number of variables, including PATH, PWD, PS1, and HOME.
+
+			env | grep PATH
+				this command displays the value of a single envar. Here the stdout of env is piped to the grep command. grep then searches for the value of the variable PATH and outputs it to the terminal.

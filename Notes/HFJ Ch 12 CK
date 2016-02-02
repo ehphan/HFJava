@@ -10,8 +10,8 @@ So we have to do a little work-around. There is another type of MIDI event we ca
 
 BEAT 1 - NOTE ON, CONTROLLER EVENT
 BEAT 2 - NOTE OFF
-BEAT 3 - NOTE ON, CONTROLLER EVENT
-BEAT 4 - NOTE OFF
+BEAT 3 - NOTE ON, CONTROLLER EVEN
+TBEAT 4 - NOTE OFF
 and so on
 
 Before we dive into the full program, though, let's make it a little easier to make and add MIDI messages/events since in this program, we're gonna make a lot of them.

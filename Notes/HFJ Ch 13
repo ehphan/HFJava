@@ -1,0 +1,342 @@
+Ch 13 Notes
+
+Swing components
+	Component is the more correct term for what we've been calling a widget. The things you put in a GUI. The things a user sees and interacts with. Text fields, buttons, scrollable lists, radio buttons, etc. are all components. In fact, they all extend javax.swing.JComponent.
+
+	A widget is a technically a Swing Component. Almost everything you can stick in a GUI extends from javax.swing.JComponent.
+
+Components can be nested.
+	In Swing, virtually all components are capable of holding other components. In other words, you can stick just about anything into anything else. But most of the time, you'll add user interactive components such as buttons and lists into background components such as frames and panels. Although it's possible to put, say, a panel inside a button, that's pretty weird, and won't win you any usability awards.
+
+	With the exception of JFrame, though, the distinction between interactive components, and background components is artificial. A JPanel, for example, is usually used as a background for grouping other components, but even a JPanel can be interactive. Just as with other components, you can register for the JPanel's events using mouse clicks and keystrokes.
+
+Four steps to making a GUI(Review)
+	1. Make a window (a JFrame)
+		JFrame frame = new JFrame();
+	2. Make a component(button,text field, etc.)
+		JButton button = new JButton("Kaboom");
+	3. Add the component to the frame
+		frame.getContentPane().add(BorderLayout.EAST,button);
+	4. Display it(give it a size and make it visible)
+		frame.setSize(300,300);
+		frame.setVisible(true);
+
+Layout managers
+	A layout manager is a Java object associated with a particular component, almost always a background component. The layout manager controls the components contained within the component the layout manager is associated with. In other words, if a frame holds a panel, and the panel holds a button, the panel's layout manager controls the size and placement of the button, while the frame's layout manager controls the size and placement of the panel. The button on the other hand, doesn't need a layout manager because the button isn't holding other components.
+
+	Layout managers come in several flavors, and each background component can have its own layout manager. Layout managers have their own policies to follow when building a layout. For example, one layout manager might insist that all components in a panel must be the same size, arranged in a grid, while other alyout managers might let each component choose its own size, but stack them vertically. Here's an example of nested layouts:
+
+		JPanel panelA = new JPanel();
+		JPanel panelB = new JPanel();
+		panelB.add(new JButton("button 1"));
+		panelB.add(new JButton("button 2"));
+		panelB.add(new JButton("button 3"));
+		panelA.add(panelB);
+
+		Panel B's layout manager controls the size and placement of the three buttons.
+		Panel A's layout manager controls the size and placement of panel B.
+		Panel A's layout manager has nothing to say about the three buttons. The hierarchy of control is only one level-Panel A's layout manager controls only the things added directly to Panel A, and does not control anything nested within those added components.
+
+How does the layout manager decie?
+	Different layout managers have different policies for arranging components(like, arrange in a grid, make them all the same size, stack them vertically, etc) but the components being layed out do get at least some small say in the matter. In general, the process of laying out a background component looks something like this:
+
+	A layout scenario:
+	1. Make a panel and add three buttons to it.
+	2. The panel's layout manager asks each button how big that button prefers to be.
+	3. The panel's layout manager uses its layout policies to decide whether it should respect all, part, or none of the buttons' preferences.
+	4. Add the panel to a frame.
+	5. The frame's layout manager asks the panel how big the panel prefers to be.
+	6. The frame's layout manager uses its layout policies to decide whether it should respect all, part, or none of the panel's preferences.
+
+Different layout managers have different policies
+	Some layout managers respect the preference of only the largest of the components being layed out. and the rest of the components in that panel are all made that same size. In some cases, the work of the layout manager can get very complex, but most of the time you can figure out what the layout manager will probably do, once you get to know the layout manager's policies.
+
+The Big Three layout managers: border, flow, and box.
+
+BorderLayout: DEFAULT FOR A FRAME.
+	A BorderLayout manager divides a background component into five regions. You can add only one component per region to a background controlled by a BorderLayout manager. Components laid out by this manager usually don't get to have their preferred size. BorderLayout is the default layout manager for a a frame!
+
+FlowLayout: DEFAULT FOR A PANEL.
+	A FlowLayout manager acts kind of like a word processor, except with components instead of words. Each component is the size it wants to be, and they're laid out left to right in the order that they're added, with "word-wrap" turned on. So when a component won't fit horizontally, it drops to the next "line" in the layout. FlowLayout is the default layout manager for a panel!
+
+BoxLayout
+	A BoxLayout manager is like FlowLayout in that each component gets to have its own size, and the components are placed in the order in which they're added. But, unlike FlowLayout, a BoxLayout manager can stack teh components vertically(or horizontally, but usually we're just concerned with vertically). It's like a FlowLayout but instead of having automatic 'component wrapping', you can insert a sort of 'component return key' and force the components to start a new line.
+
+BorderLayout cares about five regions: east,west,north,south, and center
+
+	Adding a button to the east region:
+	
+	import javax.swing.*;
+	import java.awt.*;
+
+	public class Button1 {
+
+		public static void main (String[] args) {
+			Button1 gui = new Button1();
+			gui.go();
+		}
+
+		public void go () {
+			JFrame frame = new JFrame();
+			JButton button = new JButton("click me");
+			frame.addContentPane().add(BorderLayout.EAST, button);
+			frame.setSize(200,200);
+			frame.setVisible(true);
+		}
+	}
+
+	If we add more characters to the button, the button becomes wider.
+	The button is created at maximum height. but the width gets treated with preference.
+
+	North region:
+
+	public void go() {
+		JFrame fr = new JFrame();
+		JButton butt = new JButton("Chunga chunga wampa nar nar");
+		fr.getContentPane().add(BorderLayout.NORTH, butt);
+		fr.setSize(200,200);
+		fr.setVisible(true);
+	}
+
+	The button is as tall as it wants to be, but as wide as the frame.
+
+	Let's make the button ask to be taller
+		The button is as wide as it can ever be, but we can make it taller with font.
+
+	public void go() {
+		JFrame fr = new JFrame();
+		JButton jb = new JButton("Click This!");
+		Font bigFont = new Font("serif", Font.BOLD, 28);
+		jb.setFont(bigFont);
+		fr.getContentPane().add(BorderLayout.NORTH, jb);
+		fr.setSize(200,200);
+		fr.setVisible(true);
+	}
+
+	The north region stretches to accomodate the height of the font
+
+	The center region gets whatever's left! (pg 407) has a diagram
+
+	EAST/WEST: width: preferred. height: manager dictates
+	NORTH/SOUTH: width: manager. height: preferred
+
+FlowLayout cares about the flow of the components: left to right, top to bottom, in the order they were added.
+
+	A JPanel's layout manager is FlowLayout, by default. When we add a panel to a frame, the size and placement of the panel is still under the BorderLayout manager's control. But anything inside the panel (in other words, components added to the panel by calling panel.add(aComponent)) are under the panel's FlowLayout manager's control. We'll start by putting an empty panel in the frame's east region, and on the next pages we'll add things to the panel.
+
+	import javax.swing.*;
+	import java.awt.*;
+
+	public class Panel1 {
+
+		public static void main (String[] args) {
+			Panel1 gui = new Panel1();
+			gui.go();
+		}
+
+		public void go() {
+			JFrame frame = new JFrame();
+			JPanel panel = new JPanel();
+			panel.setBackground(Color.darkGray);
+
+			JButton button = new JButton("shock me");
+
+			panel.add(button);
+			frame.getContentPane().add(BorderLayout.EAST, panel);
+			//Add the button to the panel and add the panel to the frame. The panel's layout manager (flow) controls the button, and the frame's layout manager (border) controls the panel.
+
+			frame.setSize(200,200);
+			frame.setVisible(true);
+		}
+	}
+
+	Frame = BorderLayout manager
+		Needs to know how big the panel wants to be
+
+	Panel = FlowLayout manager
+		Needs to know how big the button wants to be
+
+	What happens if we add two buttons to the panel?
+
+		public void go() {
+			JFrame frame = new JFrame();
+			JPanel panel = nwe JPanel();
+			panel.setBackground(Color.darkGray);
+
+			JButton button = new JButton("shock me");
+			JButton button2 = new JButton("bliss");
+
+			panel.add(button);
+			panel.add(button2);
+
+			frame.getContentPane().add(BorderLayout.EAST, panel);
+			frame.setSize(250,200);
+			frame.setVisible(true);
+		}
+
+BoxLayout to the rescue
+
+	It keeps components stacked, even if there's room to put them side by side.
+
+	Unlike FlowLayout, BoxLayout can force a 'new line' to make the components wrap to the next line, even if there's room for them to fit horizontally.
+
+	But now you'll have to change the panel's layout manager from the default FlowLayout to BoxLayout.
+
+	public void go() {
+		JFrame frame = new JFrame ();
+		JPanel panel = new Jpanel ();
+		panel.setBackground(Color.darkGray);
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		JButton b1 = new JButton("shock me");
+		JButton b2 = new JButton("bliss");
+		panel.add(b1);
+		panel.add(b2);
+		frame.getContentPane().add(BorderLayout.EAST, panel);
+		frame.setSize(250,200);
+		frame.setVisible(true);
+	}
+
+	Now the panel is narrower as the components are stacked on top of each other, with width enough for the largest button.
+
+How come you can't add directly to a frame the way you can to a panel?
+	A Jframe is special because it's where the rubber meets the road in making something appear on the screen. While all your Swing components are pure Java, a JFrame has to connect to the underlying OS in order to access the display. Think of the content pane as a 100% pure Java layer that sits on top of the JFrame. Or think of it as though JFrame is the window frame and the content pane is the... glass. you know the window pane. And you can even swap the content pane with your own JPanel, to make your JPanel the frame's content pane, using,
+		myFrame.setContentPane(myPanel);
+
+Can't I just put things where I want them? Can I turn the layout managers off?
+	Yep. On a component by component basis, you can call setLayou(null) and then it's up to you to hard-code the exact screen locations and dimensions. In the long run, though, it's almost always easier to use layout managers.
+
+/////////////////
+//Bullet Points//
+/////////////////
+
+- Layout managers control the size and location of components nested within other components.
+- When you add a component to another component (sometimes referred to as a background component, but that's not a technical distinction), the added component is controlled by the layout manager of the background component.
+- A layout manager asks components for their preferred size, before making a decision about the layout. Depending on the layout manager's policies, it might respect all, some, or none of the component's wishes.
+- The BorderLayout manager lets you add a component to one of five regions. You must specify the region when you add the component, using the following syntax:
+	add(BorderLayout.EAST, panel);
+- With BorderLayout, components in the north and south get their preferred height, but not width. Components in the east or west get their preferred width, but not height. The component in the center gets whatever is left over(unless you use pack())
+- The pack() method is like shrink-wrap for the components; it uses the full preferred size of the center component, then determines the size of the frame using the center as a starting point, building the rest based on what's in the other regions.
+- FlowLayout places components left to right, top to bottom, in the order they were added, wrapping to a new line of components only when the components won't fit horizontally.
+- FlowLayout gives components their preferred size in both dimensions.
+- BoxLayout lets you alignt components stacked vertically, even if they could fit side-by-side. Like FlowLayout, BoxLayout uses the preferred size of the components in both dimensions.
+- BorderLayout is the default layout manager for a frame; FlowLayout is the default for a panel.
+- If you want a panel to use something other than flow, you have to call setLayout() on the panel.
+	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+
+
+Playing with Swing Components
+	You've learned the basics of layout managers, so now let's try out a few of the most common components: a text field, scrolling text area, checkbox, and list. We won't show you the whole darn API for each of these, just a few highlights to get you started.
+
+JTextField
+	Constructors:
+
+	JTextField field = new JTextField(20);
+	//20 means 20 columns, not 20 pixels. This defines the preferred width of the text field
+
+	JTextField field = new JTextField("Your name");
+
+	How to use it
+	1. Get text out of it
+		System.out.println(field.getText());
+
+	2. Put text in it
+		field.setText("whatever");
+		field.setText(""); // this clears the field
+
+	3. Get an ActionEvent when the user presses return or enter
+		field.addActionListener(myActionListener);
+		//you can also register for key events if you really want to hear about it every time the user presses a key.
+
+	4. Select/Highlight the text in the field
+		field.selectAll();
+
+	5. Put the cursor back in the field(so the user can just start typing)
+		field.requestFocus();
+
+JTextArea
+	Unlike JTextField, JTextArea can have more than one line of text. It takes a little configuration to make one, because it doesn't come out of the box with scroll bars or line wrapping. To make a JTextArea scroll, you have to stick it in a Scrollpane. A ScrollPane is an object that really loves to scroll, and will take care of the text area's scrolling needs.
+
+	Constructor
+	JTextArea text = new JTextArea(10,20);
+	//10 means 10 lines(preferred height), 20 means 20 columns(pref width)
+
+	How to use it
+	1. Make it a vertical scrollbar only
+
+		JScrollPane scroller = new JScrollPane(text);
+		//make a JScrollPane and give it the text area it's going to scroll for
+		text.setLineWrap(true);
+		//turns on line wrapping
+		scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+		panel.add(scroller);
+		//IMPORTANT. You give teh text area to the scroll pane(through teh scroll pane constructor), then add the scroll pane to the panel. You don't add the scroll area directly to the panel
+
+	2. Replace the text that's in it
+		text.setText("Not all who are lost are wandering");
+
+	3. Append to the text that's in it (Append: add something as an attachment)
+		text.append("button clicked");
+
+	4. Select/Highlight the text in the field
+		text.selectAll();
+
+	5. Put the cursor back in the field (so the user can just start typing)
+		text.requestFocus();
+
+JCheckBox
+	Constructor
+		JCheckBox check = new JCheckBox("Goes to 11");
+
+	How to use it
+	1. Listen for an item event(when it's selected or deselected)
+		check.addItemListener(this);
+
+	2. Handle the event(and find out whether or not it's selected)
+		public void itemStateChanged(ItemEvent ev) {
+			String onOrOff = "off";
+			if (check.isSelected()) onOrOff = "on";
+			System.out.println("Check box is "+ onOrOff);
+		}
+
+	3. Select or deselect it in code
+		check.setSelected(true);
+		check.setSelected(false);
+
+JList
+	Constructor
+		String [] listEntries = {"alpha","beta","gamma","delta",
+		"epsilon","zeta","eta","theta"};
+		list = new JList(listEntries);
+
+	How to use it
+	1. Make it have a vertical scrollbar
+		JScrollPane scroller = new JScrollPane(list);
+		scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scroller.setHorizontalBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+		panel.add(scroller);
+		//add scroller, not list
+
+	2. Set the number of lines to show before scrolling
+		list.setVisibleRowCount(4);
+
+	3. Restrict the user to selecting only ONE thing at a time
+		list.setSelectionMode(ListSelectionMode1.SINGLE_SELECTION);
+
+	4. Register for list selection events
+		list.addListSelectionListener(this);
+
+	5. Handle events(find out which thing in the list was selected)
+		public void valueChanged(ListSelectionEvent lse) {
+		//you'll get the event twice if you don't put in this if test
+			if (!lse.getValueIsAdjusting()) {
+				String selection = (String) list.getSelectedValue();
+				//getSelectedValue actually returns an object. A list isn't limited to only String objects
+				System.out.println(selection);
+			}
+		}
