@@ -1,0 +1,13 @@
+HFJ Ch 14 CK
+
+Saving a BeatBox pattern
+
+	Remember, in the BeatBox, a drum pattern is nothign more than a bunch of checkboxes. When it's time to play the sequence, the code walks through the checkboxes to figure out which drums sounds are playing at each of the 16 beats. So to save the pattern, all we need to do is save the states of the checkboxes.
+
+	We can make a simple boolean array, holding the state of each of the 256 checkboxes. An array object is serializable as long as the things in the array are serializable, so we'll have no trouble saving an array of booleans.
+
+	To load a pattern back in, we read a single boolean array object (deserialize it) and restore the checkboxes. Most of the cod you'ev already seen, in the code Kitchen where we built hte BeatBox GUI, so in this chapter, we look at only the save and restore code.
+
+	This CodeKitchen gets us ready for the next chapter, where instead of writing the pattern to a file, we send it over the network to the server. And instead of loading a pattern in the file, we get patterns from teh server, each time a participant sends on to the server.
+
+	We create a boolean array called checkboxState, with 256 indexes. We walk through a forloop to check each checkbox from our checkboxList ArrayList. for every box that is checked, we create a corresponding 'true' in our boolean array. then we output our checkboxState boolean array to an object.

@@ -1,0 +1,522 @@
+Ch 14 Notes
+
+serialization and file I/O
+
+You have lots of options for how to save the state of yoru Java program, and what you choose will probably depend on how you plan to use the saved state.
+
+If your data will be used by only the Java program that generated it:
+1. Use serialization:
+	Write a file that holds flattened(serialized) objects. Then have your program read the serialized objects from the file and inflate them back into living, breathing, heap-inhabiting objects.
+
+If your data will be used by other programs:
+2. Write a plan text file
+	Write a file, with delimiters tha other programs can parse. For example, a tab-delimited file that a spreadsheet or database application can use.
+
+These aren't the only options of course. You can save data in any format you choose. INstead of writing characters, for example, you can write your data as bytes. Or you can write out any kind of Java primitive as a Java primitive-there are methods to write ints, longs, booleans, etcs. But regardless of the methdo you use, the fundamental I/O techniques are pretty much the same: write some data to something, and usually that something is either a file on a disk, or stream coming from a network connection. Reading the data is the same process in reverse: read some data from either a file on a disk or a network connection. And of couse everythign we talk about in this part is for times when you aren't using an actual database.
+
+Saving State (imagine you have 3 game character to save)
+	1. Write the three serialized character objects to a file.
+		Create a file and write three serialized character objects. The file won't make sense if you try to read it as text.
+
+	2. Write a plain text file
+		Create a file and write three lines of text, one per character, separating the pieces of state with commas:
+			50,Elf,bow,sword,dust
+			200,Troll,bare hands, big ax
+			120,Magician,spells,invisibility
+
+	The serialized file is much harder for humans to read, but it's much easier(and safer) for your program to restor the three objects from serialization than from reading in the object's variable values that were saved to a text file. For example, imagine all the ways in which you could accidentally read back the values in the wrong order! The type might become dust instead of elf.
+
+Writing a serialized object to a file
+	1. Make a FileOutputStream
+
+		FileOutputStream fileStream = new FileOutputStream("MyGame.ser");
+
+			Make a FileOutputStream object. it knows how to connect to and create a file. If the file "MyGame.ser" doesn't exist, it will be created automatically.
+
+	2. Make an ObjectOutputStream
+
+		ObjectOutputStream os = new ObjectOutputStream(fileStream);
+
+			ObjectOutputStream lets you write objects, but it can't directly connect to a file. It needs to be fed a 'helper'. This is actually called 'chaining' one stream to another.
+
+	3. Write the object
+
+		os.writeObject(characterOne);
+		os.writeObject(characterTwo);
+		os.writeObject(characterThree);
+
+			serializes the objects referenced by characterOne... writes them to file "MyGame.ser".
+
+	4. Close the ObjectOutputStream
+		
+		os.close();
+
+			Closing the stream at the top closes the ones underneath, so the FileOutputStream (and the file) will close automatically.
+
+Data moves in streams from one place to another.
+
+	Connection streams represent a connection to a source or destination (file,socket,etc)
+
+	Chain streams can't connect on their own and must be chained to a connection stream.
+
+	The Java i/o API has connection streams, that represent connections to destinations and sources such as files or network sockets, and chain streams that work only if chained to other streams.
+
+	Often it takes at least two streams hooked together to do something useful-one to represent the connection and another to call methods on. Why two? Because connection streams are usually too low-level. FileOutputStream (a connection stream), for example, has methods for writing bytes. But we don't want to write bytes! We want to write objects, so we need a higher-level chain stream.
+
+	OK, then why not have just a single stream that does exactly what you want? One that lets you write objects but underneath converts them to bytes? Think good OO. Each class does one thing well. FileOutputStreams write bytes to a file. ObjectOutputSTreams turn objects into data that can be written to a stream. So we make a FileOutputStream that lets us write to a file, and we hook an ObjectOutputStream (a chain stream) on the end of it. When we call writeObject() on the ObjectOutputStream, the object gets pumped into the stream and then moves to the FileOutputStream where it ultimately gets written as bytes to a file.
+
+	The ability to mix and match different combinations of connection and chain streams gives you trememndous flexibility! If you were forced to use only a single stream class, you'd be at the mercy of the API designers, hoping they'd though fo everything you might ever want to do. But with chaining, you can patch together your own custom chains.
+
+What really happens to an object when it's serialized?
+
+	1. Object on the heap
+
+		Objects on the heap have state-the value of the object's IVs. These values make one instance of a class different from another instance of the same class.
+
+	2. Object serialized
+
+		Serialized objects save the values of the IVs, so that an identical instance(object) can be brought back to life on the heap.
+
+	Foo myFoo = new Foo();
+	myFoo.setWidth(37);
+	myFoo.setHeight(70);
+
+	FileOutputStream fs = new FileOutputStream("foo.ser");
+	ObjectOutputStream os = new ObjectOutputStream(fs);
+	os.writeObject(myFoo);
+
+		The IV values for width/height are saved to the file, along with a little more info the JVM needs to restore the object(like what its class type is)
+
+		Make a FileOutputStream that connects to the file "foo.ser", then chain an ObjectOutputStream to it, and tell the ObjectOutputStream to write the object.
+
+But what exactly IS an object's state? What needs to be saved?
+
+	Now it starts to get interesting. Easy enough to save the primitive values 37 and 70. But what if an object has an IV that's an object reference? What about an objecct that has five IVs that are object references? What if those object IVs themselves have IVs?
+
+	Think about it. What part of an object is potentially unique? Imagine what needs to be restored in order to get an object that's identical to the one that was saved. It will have a different memory location, of course, but we don't care about that. All we care about si that out there on the heap, we'll get an object that has the same state the object had when it was saved.
+
+	When an object is serialized, all the objects it refers to from IVs are also serialized. And all the objects those objects refer to are serialized. And all the objects those objects refer to are serialized... and the best part is, it happens automatically.
+
+	Serialization saves the entire object graph. All objects referenced by IVs, starting with the object being serialized.
+
+If you want your class to be serializable, implement Serializable.
+	
+	The Serializable interface is known as a marker or tag interface, because the interface doesn't have any methods to implement. Its sole purpose is to announce that the class implementing it is, well, serializable. In other words, objects of that type are saveable through the serialization mechanism. If any superclass of a class is serializable, the subclass is automatically serializable even if the subclass doesn't explicitly declare implements Serializable.
+
+		objectOutputStream.writeObject(myBox);  
+		myBox MUST implement Serializable, or else it will fail at runtime.
+
+	import java.io.*;
+	//Serializable is in the java.io package
+
+	public class Box implements Serializable {
+	//No methods to implement, but when you say "implements Serializable", it says to the JV, that its okay to serialize objs of this type.
+
+		private int width;
+		private int height;
+
+		public void setWidth(int w) {
+			width = w;
+		}
+
+		public void setHeight(int h) {
+			height = h;
+		}
+
+		public static void main (String[] args) {
+
+			Box myBox = new Box();
+			myBox.setWidth(50);
+			myBox.setHeight(20);
+
+			try {
+				FileOutputStream fs = new FileOutputStream("foo.ser");
+				//connect to a file name foo.ser, or make one if it doesn't exist
+				ObjectOutputStream os = new ObjectOutputStream(fs);
+				//Make an ObjectOutputStream chained to the connection stream.
+				os.writeObject(myBox);
+				//Tell it to write the object.
+				os.close();
+			}	catch (Exception ex) {
+					ex.printStackTrace();
+			}
+		}
+	}
+
+Serialization is all or nothing.
+
+	Either the entire object graph is serialized correctly or serialization fails.
+
+	You can't serialize a Pond object if its Duck IV refuses to be serialized (by not implementing Serializable).
+
+import java.io.*;
+
+public class Pond implements Serializable {
+	
+	private Duck duck = new Duck();
+
+	public static void main (String[] args) {
+		Pond myPond = new Pond();
+		try {
+			FileOutputStream fs = new FileOutputStream("Pond.ser");
+			ObjectOutputStream os = new ObjectOutputStream(fs);
+
+			os.wrietObject(myPond);
+			//When you serialize myPond (a Pond object), its Duck IV automatically gets serialized.
+			os.close();
+		}	catch(Exception ex) {
+				ex.printStackTrace();
+		}
+	}
+}
+
+public class Duck {
+	//quacking code goes here
+}
+//whuh oh Duck is not serializable, since it doesn't implement Serializable. so when you try to serialize a pond object, it fails because the pond's duck IV can't be saved.
+
+Mark an IV as transient if it can't (or shouldn't) be saved.
+
+	If you want an IV to be skipped by the serialization process, mark the variable with the transient keyword.
+
+	import java.net.*;
+	class Chat implements Serializable {
+		transient String currentID;
+		//transient says, "don't save this variable during serialization, just skip it."
+
+		String userName;
+		//userName will be saved as part of the object's state during serialization
+
+		//more code
+	}
+
+	If you have an IV that can't be saved because it isn't serializable, you can mark that variable with the transient keyword and the serialization process will skip right over it.
+
+	So why would a variable not be serializable? It could be that the class designer simply forgot to make the class implement Serializable. Or ti might be because the object relies on runtime-specific information that simply can't be saved. Although most things in the Java class libraries are serializable, you can't save things like network connections, threads, or file objects. They're all dependent on (and specific to) a particular runtime 'experience'. In other words, they're instantiated in a way that's unique to a particular run of your program. on a particular platform, in a particular JVM. Once the program shuts down, there's no way to bring those things back to life in any meaningful way; they have to be created from scratch every time.
+
+Deserialization: restoring an object
+
+	The whole point of serializing an object is so that you can restore it back to its original state at some later date, in a different 'run' of the JVM. Deserialization is a lot like serialization in reverse.
+
+	1. Make a FileInputStream
+
+		FileInputStream fileStream = new FileInputStream("MyGame.ser");
+			Make a FileInputStream object. The FileInputStream knows how to connect to an existing file
+			If the file MyGame.ser doesn't exist, you'll get an exception.
+
+	2. Make an ObjectInputStream
+
+		ObjectInputStream os = new ObjectInputStream(fileStream);
+			ObjectInputStream lets you read objects, but it can't directly connect to a file. It needs to be chained to a connection stream, in this case a FileInputStream.
+
+	3. Read the objects
+
+		Object one = os.readObject();
+		Object two = os.readObject();
+		Object three = os.readObject();
+			Each time you say readObject(), you get the next object in the stream. So you'll read them back in the same order in which they were written. You'll get a big fat exception if you try to read more objects than you wrote.
+
+	4. Cast the objects
+
+		GameCharacter elf = (GameCharacter) one;
+		GameCharacter troll = (GameCharacter) two;
+		GameCharacter magician = (GameCharacter) three;
+			The return value of readObject() is type Objcet (just like with ArrayList), so you have to cast it back to the type you know it really is.
+
+	5. Close the ObjectInputStream
+
+		os.close();
+			Closing the stream at the top closes the ones underneath, so the FileInputStream (and the file) will close automatically.
+
+What happens during deserialization?
+
+1. The object is read from the stream.
+
+2. The JVM determines (through info stored with the serialized object) the object's class type.
+
+3. The JVM attempts to find and load the object's class. If the JVM can't find and/or load the class, the JVM throws an exception and the deserialization fails.
+
+4. A new object is given space on the heap, but the serialized object's constructor does NOT run! Obviously, if the constructor ran, it would restore the state of the object back to its original 'new' state, and that's not what we want. We want the object to be restored to the state it had when it was serialized, not when it was first created.
+
+5. If the object has a non-serializable class somewhere up its inheritance tree, the constructor for that non-serializable class will run along with any constructors above that (even if they're serializable). Once the constructor chaining begins, you can't stop it, which means all superclasses, beginning with the first non-serializable one, will reinitialize their state.
+
+6. The object's IVs are given the values from the serialized state. Transient variabels are given the value of null for object references and defaults for primitives.
+
+Static variables are not saved, and when an object is deserialized, it will have whatever static variable its class currently has. The moral: don't make serializable objects dependent on a dynamically-changing static variable. IT might not be the same when the object comes back.
+
+/////////////////
+//BULLET POINTS//
+/////////////////
+
+- You can save an object's state by serializing the object.
+- To serialize an object, you need an ObjectOutputStream (from the java.io package)
+- Streams are either connection streams or chain streams
+- Connection streams can represent a connection to a source or destination, typically a file, network socket connection, or the console.
+- Chain streams cannot connect to a source or destination and must be chained to a connection(or other) stream.
+- To serialize an object to a file, make a FileOutputStream and chain it into an ObjectOutputStream.
+- To serialize an object, call writeObject(theObject) on the ObjectOutputStream. You do not need to call methods on the FileOutputStream.
+- To be serialized, an object must implement the Serializable interface. If a superclass of the class implements Serializable, the subclass will automatically be serializable even if it does not specifically declare implements Serializable.
+- When an object is serialized, its entire object graph is serialized. That means any objects reference by the serialized object's instance variables are serialized, and any objets referenced by those objects... and so on.
+- If any object in the graph is not serializable, an exception will be thrown at runtime, unless the IV referring to the object is skipped.
+- Mark an IV with the transient keyword if you want serialization to skip that variable. The variable will be restored as null (for obj ref) or default values for primitives.
+- During deserialization, the class of all objects in the graph must be available to the JVM.
+- You read objects (using readObject()) in the order in which they were originally written.
+- The return type of readObject() is type Object, so deserialized objects must be cast to their real type.
+- Static variables are not serialized! It doesn't make sense to save a static variable value as part of a specific object's state, since all objects of that type share only a single value-the one in the class.
+
+Writing a String to a text file
+	
+	Saving objects, through serialization, is the easiest way to save and restore data between runnings of a Java program. But sometimes you need to save data to a play old text file. Imagine your Java program has to write data to a simple text file that some ther (perhaps non-Java) program needs to read. You might, for example, have a servlet (Java code running within your web server) that takes form data the user typed into a browser, and writes it to a text file taht somebody else loads into a spreadsheet for analysis.
+
+	Writing a text data (a String, actually) is similar to writing an object, except you write a String instead of an object, and you use a FileWriter instead of a FileOutputStream (and you don't chain it to an ObjectOutputStream).
+
+	To write a serialized object:
+		objectOutputStream.writeObject(someObject);
+
+	To write a String:
+		fileWriter.write("My first String to save");
+
+		import java.io.*;
+
+		class WriteAFile {
+			public static void main (String[] args) {
+
+				try{
+					FileWriter writer = new FileWriter("Foo.txt");
+
+					writer.write("hello foo!");
+					//the write() method takes a String
+
+					writer.close();
+				}	catch (IOException ex) {
+						ex.printStackTrace();
+				}
+			}
+		}
+
+Text File Example: e-Flashcards
+
+	1. QuizCardBuilder, a simple authoring tool for creating and saving a set of e-Flashcards.
+		Has a File menu with a 'save' option for saving the current set of cards to a text file.
+
+	2. QuizCardPlayer, a playback engine that can load a flashcard set and play it for the user.
+		Has a File menu with a 'load' option for loading a set of cards from a text file.
+
+	3. QuizCard, a simple class representing card data. We'll walk through the code for the builder and the player, and have you make the QuizCard class yourself, using this.
+
+
+Quiz Card Builder (code Outline)
+
+	public class QuizCardBuilder {
+
+		public void go(){
+			//build and display GUI, including making and registering event listeners
+		}
+
+		private class NextCardListener implements ActionListener {
+		//Inner class
+			public void actionPerformed(ActionEvent ev) {
+				//add the current card to the list and clear the text areas. This is triggered when user hits 'next card' button; means the user wants to store that card in the list and start a new card
+			}
+		}
+
+		private class SaveMenuListener implements ActionListener {
+			public void actionPerformed(ActionEvent ev) {
+				//bring up a file dialog box
+				//let the user name and save the set
+				//Triggered when use choose 'save' from the File menu; means the user wants to save all the cards in the current list as a 'set'.
+			}
+		}
+
+		private class NewMenuListener implements ActionListener {
+			public void actionPerformed(ActionEvent ev) {
+				//clear out the card list, and clear out the text areas.
+				//Triggered by choosing 'New' from teh File menu; means the user wants to start a brand new set (so we clear out the card list and the text areas).
+			}
+		}
+
+		private void saveFile(File file) {
+			//iterate through the list of cards, and write each one out to a text file in a parseable way (in other words, with clear separations between parts)
+		}
+	}
+
+The java.io.File class
+
+	The java.io.File class represents a file on disk, but doesn't actually represent the contents of the file. Think of a File object as something more like a pathname of a file (or even a directory) rather than The Actual File Itself. The File class does not, for example, have methods for reading and writing. One VERY useful thing about a File object is that it offers a much safer way to represent a file than just using a String file name. For example, most classes that take a String file name in their constructor (like FileWriter or FileInputStream) can take a File object instead. You can construct a File object, verify that you've got a valid path, etc. and then give that File object to teh FileWriter or FileInputStream.
+
+	A File object represents the name and path of a file or directory on disk, for example: /Users/Hieu/Data/GameFile.txt
+	But it does NOT represent, or give you access to, the data in the file.
+
+Some things you can do with a File object:
+
+	1. Make a File object representing an existing file
+		File f = new File ("MyCode.txt");
+
+	2. Make a new directory
+		File dir = new File("Chapter7");
+		dir.mkdir();
+
+	3. List the contents of a directory
+		if (dir.isDirectory()) {
+			String[] dirContents = dir.list();
+			for (int i = 0; i < dirContents.length; i++) {
+				System.out.println(dirContents[i]);
+			}
+		}
+
+	4. Get the absolute path of a file or directory
+		System.out.println(dir.getAbsolutePath());
+
+	5. Delete a file or directory (returns true if successful)
+		boolean isDeleted = f.delete();
+
+The beauty of buffers.
+	If there were no buffers, it would be like shopping without a cart. You'd have to carry each thing out to your car, one soup can or toilet paper roll at a time.
+
+	Buffers give you a temporary holding place to group things until the holder is full. You get to make far fewer trips when you use a buffer.
+
+		BufferedWriter writer = new BufferedWriter (new FileWriter(aFile));
+			Notice that we dont' even need to keep a reference to the FileWriter object. The only thing we care about is the BufferedWriter, because that's the object we'll call methods on, and when we close the BufferedWriter, it will take care of the rest of the chain.
+
+	Buffers are much more efficient than working without them. You can write to a file using FileWriter alone, but calling write(someString), but FileWriter writes each and every thing you pass to the file each and every time. That's overhead you don't want or need, since every trip to the disk is a Big Deal compared to manipulating data in memory. By chaining a BufferedWriter onto a FileWriter, the BufferedWriter will hold all the stuff you write it to until it's full. Only when teh buffer is full will the FileWriter actually be told to write to the file on disk.
+
+	If you do want to send data before the buffer is full, you do have control. Just Flush It. Calls to writer.flush() say, "Send whatever's in the buffer, now!"
+
+Reading from a Text File
+
+	Reading text from a file is simple, but this time we'll use a File object to represent the file, a FileReader to do the actual reading, and a BufferedReader to make the reading more efficient.
+
+	The read happens by reading lines in a while loop, ending the loop when the result of a readLine() is null. That's the most common style for reading data (pretty much anything that's not a Serialized object): read stuff in a while loop (actually a while loop test), terminating when there's nothing left to read (which we know because the result of whatever read method we're using is null).
+
+import java.io.*;
+
+class ReadAFile {
+	public static void main (String[] args) {
+
+		try {
+			File myFile = new File ("MyText.txt");
+			FileReader fileReader = new FileReader(myFile);
+			//A FileReader is a connection stream for characters, that connects to a text file.
+
+			BufferedReader reader = new BufferedReader(fileReader);
+			//Chain the FileReader to a BufferedReader for more efficient reading. It'll go back to the file to read only when the buffer is empty(because the program has read everything in it).
+
+			String line = null;
+			//Make a String variable to hold each line as the line is read
+
+			while ((line = reader.readLine())!= null) {
+				System.out.println(line);
+			}
+			reader.close
+		}	catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+}
+
+Quiz Card Player (code outline)
+
+public class QuizCardPlayer {
+		
+		public void go() {
+			//build and display gui
+		}
+
+		class NextCardListener implements ActionListener {
+			public void actionPerformed(ActionEvent ev) {
+				//if this is a question, show the answer, otherwise show next question set a flag for whether we're viewing a question or answer
+			}
+		}
+
+		class OpenMenuListener implements ActionListener {
+			public void actionPerformed(ActionEvent ev) {
+				//brings up a file dialog box, let the user navigate to and choose a card set to open
+			}
+		}
+
+		private void loadFile(File file) {
+			//must build an ArrayList of cards, by reading them from a text file called from the OpenMenuListener event handler, reads the file one line at a time and tells the makeCard() method to make a new card out of the line (one line in the file holds both the question and the answer, separated by a "/")
+		}
+
+		private void makeCard(String lineToParse) {
+			//called by the loadFile method, takes a line from the text file and parses into two pieces, question and answer, and creates a new QuizCard and adds it to the ArrayList called cardList
+		}
+}
+
+Parsing with String split()
+
+	How do you separate the question and answer?
+		When you read the file, the question and answer are smooshed together in one line, separated by a forward slash "/" (because that's how we wrote the file in the QuizCardBuilder code).
+
+	String split() lets you break a String into pieces.
+		The split() method says "giev me a separator, and I'll break out all the pieces of this String fo you and put them in a String array."
+
+	String toTest = "What is blue + yellow?/green";
+		In the QuizCardPlayer app, this is what a single line looks like when it's read in from the file.
+
+	String[] result = toTest.split("/");
+		The split() method takes the "/" and uses it to break apart the String into (in this case) two pieces. (Note: split() is FAR more powerful than what we're using it for here. It can do extremely complex parsing with filters,wildcards,etc.)
+
+	for (String token : result) {
+		System.out.println(token);
+	}
+		Loop through the array and print each token (piece). In this example, there are only two tokens.
+
+/////////////////
+//Bullet Points//
+/////////////////
+- To write a text file, start with a FileWriter connection stream.
+- Chain the FileWriter to a BufferedWriter for efficiency.
+- A File object represents a file at a particular path, but does not represent the actual contents of the file.
+- With a File object you can create, traverse, and delete directories.
+- Most streams that can use a String filename can use a File object as well, and a File object can be safer to use.
+- To read a text file, start with a FileReader connection stream.
+- Chain the FileReader to a BufferedReader for efficiency.
+- To parse a text file, you need to be sure the file is written with some way to recognize the different elements. A common approach is to use some kind of character to separate the individual pieces.
+- Use the String split() method to split a String up into individual tokens. A String with one separator will have two tokens, one on each side of the separator. The separator doesn't count as a token.
+
+Version ID: A Big Serialization Gotcha
+
+Version Control is crucial!
+	If you serialize an object, you must have the class in order to deserialize and use the object. OK, that's obvious. But what might be less obvious is what happens if you change the class in the meantime? Yikes. Imagine trying to bring back a Dog object when one of its IVs has changed from a double to a String. That violates Java's type-safe sensibilities in a Big Way. But that's not the only change that might hurt compatability. Think about the following.
+
+	Changes to a class that can hurt deserialization:
+		- Deleting an instance variable
+		- Changing the declared type of an IV
+		- Changing a non-transient instance variable to transient
+		- Moving a class up or down the inheritance hierarchy
+		- Changing a class (anywhere in the object graph) from Serializable to not Serializable (by removing 'implements Serializable' from a class declaration)
+		- Changing an IV to static
+
+	Changes to a class that are usually OK:
+		- Adding new IVs to the class (existing objects will deserialize with default values for the IVs they didn't have when they were serialized)
+		- Adding classes to the inheritance tree
+		- Removing classes from the inheritance tree
+		- Changing the access level of an IV has no affect on the ability of deserialization to assign a value to the variable
+		- Changing an IV from transient to non-transient (previously-serialized objects will simply have a default value for the previously-transient variables)
+
+Using the serialVersionUID
+	
+	Each time an object is serialized, the object(including every object in its graph) is 'stamped' with a version ID number for the object's class. The ID is called the serialVersionUID, and it's computed based on information about the class structure. As an object is being deserialized, if the class has changed since the object was serialized, the class could have a different serialVersionUID, and deserialization will fail! But you can control this.
+
+	If you think there is ANY possibility that your class might evolve, put a serial version ID in your class.
+
+	When Java tries to deserialize an object, it compares the serialized object's serialVersionUID with that of the class the JVM is uing for desrializing the object. For example, if a Dog instance was serialized with an ID of, say 23, when the JVM deserializes the Dog object it will first compare the dog object serialVersionUID with the Dog class serialVersionUID. If the two numbers don't match, the JVM assumes the class is not compatible with the perviously-serialized object, and you'll get an exception during deserializtion.
+
+	So, the solution is to put a serialVersionUID in your class, and then as teh calss evolves, the serialVersionUID will remain the same and the JVM will say they are compatible.
+
+	to get a serialVersionUID for a class, use the serialver tool that ships with the Java development kit.
+
+	When you think your class might evolve after someone has serialized objects from it...
+
+		1. Use the serialver command-line tool to get the versionID for your class:
+			% serialver Dog
+
+		2. Paste the output into your class
+			public class Dog {
+				static final long serialVersionUID = yadayada;
+			}
+
+		3. Be sure that when you make changes to the class, you take responsibility in your code for the consequences of the changes you made to the class! For example, be sure that your new Dog class can deal with an old Dog being deserialized with default values for IVs added to the class after the Dog was serialized.
+
+		

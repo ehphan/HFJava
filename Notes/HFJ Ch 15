@@ -1,0 +1,375 @@
+Notes Ch 15
+
+Networking and Threads
+
+Chat Program Overview
+
+	1. Client connects to server
+	2. The server makes a connection and adds the client to the list of participants.
+	3. Another client connects
+	4. Client A sends a message to the chat service
+	5. The server distributes the message to ALL participants (including the original sender)
+
+Connecting, Sending, and Receiving
+
+	The three things we have to learn to get the client working are:
+
+		1. How to establish the initial connection between the client and server
+
+		2. How to SEND messages to the server
+
+		3. How to receive messages from the server.
+
+	Lurking within the simple chat client is a problem we haven't faced so far in this book: doing two things at the same time. Establishing a connection is a one-time operation(that either works or fails). But after that, a chat participant wants to send outgoing messages and simultaneously receive incoming messages from the other participants (via the server).
+
+Make a network Socket connection
+
+	To connect to another machine, we need a Socket connection. A Socket (java.net.Socket class) is an object that represents a network connection between two machines. What's a connection? A relationship between two machines, where two pieces of software know about each other. Most importantly, those two pieces of software know how to communicate with each other. In other words, how to send bits to each other.
+
+	We don't care about the low-level details, thankfully, because they're handled at a much lower place in the 'networking stack'. If you don't know what the 'networking stack' is, don't worry about it. It's just a way of looking at the layers the information (bits) must travel through to get from a Java program in a JVM on some OS, to physical hardware (ethernet cables, for example), and back again on some other machine. Somebody has to take care of all the dirty details. But not you. That somebody is a combination of OS-specific software and the Java networking API. The part that you have to worry about is high-level--make that very high level-- and shockingly simple.
+
+	To make a socket connection, you need to know two things about the server: who it is, and which port it's running on.
+		In other words, IP address and TCP port number.
+
+	Socket chatSocket = new Socket ("196.164.1.103",5000);
+		//IP address for the server, and TCP port number
+
+	A Socket connection means two machines have information about each other, including network location (IP address) and TCP port.
+
+	A TCP port is just a number, A 16-bit number that identifies a specific program on the server.
+
+	Think of port numbers as unique identifiers. They represent a logical connection to a particular piece of software running on a server. That's it. They're just numbers which represent applications.
+
+	Without port numbers, the server would have no way of knowing which application a client wanted to connect to. And since each application might have its own unique protocol, think of the trouble you'd have without these identifiers. 
+
+	When you write a server program, you'll include code that tells the program which port number you want it to run on (you'll see how to do this in Java a little later in this chapter). In the Chat program we're writing in this chapter, we picked 5000. Just because we wanted to.
+
+	And if you're writing services (server programs) to run on a company network, you should check with the sys-admins to find out which ports are already taken. Your sys-admins might tell you, for example, that you can't use any port number below, say, 3000. In any case, if you value your limbs, you won't assign port numbers with abandon. Unless it's your home network. In which case you just have to check with your kids.
+
+	The TCP Port numbers from 0-1023 are reserved for well-known services. Don't use them for your own server programs.
+
+To read data from a Socket, use a BufferedReader
+
+	To communicate over a Socket connection, you use streams. Regular old I/O streams, just like we used in the last chapter. One of the coolest features in Java is that most of your I/O work won't care what your high-level chain stream is actually connected to. In other words, you can use a BufferedReader just like you did when you were writing to a file, the difference is that the underlying connection stream is connected to a Socket rather than a File.
+
+	1. Make a Socket connection to the server
+
+		Socket chatSocket = new Socket("127.0.0.1", 5000);
+
+			127 is the IP address for localhost, in other words, the one this code is running on. You can use this when you're testing your client and server on a single, stand-alone machine.
+
+	2. Make an InputStreamReader chained to the Socket's low-level(connection)input stream
+
+		InputStreamReader stream = new InputStreamReader(chatSocket.getInputStream());
+
+			InputStreamReader is a 'bridge' between a low-level byte stream (like the one coming from the Socket) and a high-level character stream (like the BufferedReader we're after as our top of the chain stream)
+
+			All we have to do is ASK the socket for an input stream. It's a low level connection stream, but we're just gonna chain it to something more text-friendly
+
+	3. Make a BufferedReader and read
+
+		BufferedReader reader = new BufferedReader(stream);
+		String message = reader.readLine();
+
+			Chain the BufferedReader to the InputStreamReader(which was chained to the low-level connection stream we got from the Socket)
+
+To write data to a Socket, use a PrintWriter
+
+	We didn't use PrintWriter in the last chapter, we used BufferedWriter. We have a choice her, but when you're writing one String at a time, PrintWriter is the standard choice. And you'll recognize teh two key methods in PrintWriter, print() and println().
+
+	1. Make a Socket connection to the server
+
+		Socket chatSocket = new Socket ("127.0.0.1", 5000);
+
+	2. Make a PrintWriter chained to the Socket's low-level output stream.
+
+		PrintWriter writer = new PrintWriter(chatSocket.getOutputStream());
+
+			PrintWriter actas as its own bridge between character dta and the bytes it gets from the Socket's low-level output stream. By chaining a PrintWriter to the Socket's output stream, we can write Strings to the Socket connection.
+
+	3. Write (print) something
+
+		writer.println("message to send");
+		writer.print("another message");
+
+			println() adds a new line at the end of what it sends
+			print() doesn't add the new line.
+
+The DailyAdviceClient
+
+	1. Connect
+		Client connects to the server and gets an input stream from it.
+
+	2. Read
+		Client reads a message from the server
+
+/////////////////
+//Bullet Points//
+/////////////////
+- Client and server applications communicate over a Socket connection.
+- A Socket represents a connection between two applications which may(or may not) be running on two different physical machines.
+- A client must know the IP address (or domain name) and TCP port number of the server application.
+- A TCP port is a 16-bit unsigned number assigned to a specific server application. TCP port numbers allow different clients to connect to the same machine but communicated with different applications running on that machine.
+- The port numbers from 0-1023 are reserved for 'well known services' including HTTP, FTP, SMTP, etc.
+- A client connects to a server by making a Server socket:
+	Socket sock = new Socket ("127.0.0.1", 4200);
+- Once connected, a client can get input and output streams from the socket. These are low-level 'connection' streams.
+	sock.getInputStream();
+- To read text data from the server, create a BufferedReader, chained to an InputStreamReader, which is chained to the input stream from the Socket.
+- InputStreamReader is a 'bridge' stream that takes in bytes and converts them to text (character) data. It's used primarily to act as the middle chain between the high-level BufferedReader and the low-level Socket input stream.
+- To write text data to the server, create a PrintWriter chained directly to the Socket's output stream. Call the print() or println() methods to send Strings to the server.
+- Servers use a ServerSocket that waits for client requests on a particular port number.
+- When a ServerSocket gets a request, it 'accepts' the request by making a Socket connection with the client.
+
+Writing a Chat Client
+	
+	We'll write the Chat client application in two stages. First we'll make a send-only version that sends messages to the server but doesn't get to read any of the messages from other participants.
+
+v1 send-only
+
+outline
+
+public class SimpleChatClientA {
+	
+	JTextField outgoing;
+	PrintWriter writer;
+	Socket sock;
+
+	public void () {
+		//make a gui and register a listener with the send button
+		//call the setUpNetworking() method
+	}
+
+	private void setUpNetworking() {
+		Make a socket, then make a printwriter
+		assign the printwriter to writer IV
+	}
+
+	public class SendButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			get the text from the text field
+			send it to the server using the writer (a PrintWriter)
+		}
+	}
+}
+
+Multithreading in Java
+
+	Java has multiple threading built right into the fabric of the language. And it's a snap to make a new thread of execution:
+		Thread t = new Thread();
+		t.start();
+
+	That's it, by creating a new Thread object, you've launched a separate thread of execution, with its very own call stack.
+
+	Multiple threading in Java means we have to look at both the thread and the job that's run by the thread. And we'll also have to look at the Thread class in the java.lang package.
+
+Java has multiple threads but only one Thread class
+
+	A thread is a separate 'thread of execution' In other words, a separate call stack.
+
+	A Thread is a Java class that represents a thread.
+
+	To make a thread, make a Thread.
+
+What does it mean to have more than one call stack?
+
+	With more than one call stack, you get the appearance of having multiple things happen at the same time. In reality, only a true multiprocessor system can actually do more than one thing at at ime, but with Java threads, it can appear that you're doing several things simultaneously. In other words, execution can move back and forth between stacks so rapidly that you feel as though all stacks are executing at the same time. Remember, Java is just a process running on your underlying OS. So first, Java itself has to be 'the currently executing process' on the OS. But once Java gets its turn to execut, exactly what does the JVM run? Which bytecodes execute? Whatever is on the top of the currently-running stack! And in 100 milliseconds, the currently executing code might switch to a different method on a different stack.
+
+	One of the things a thread must do is keep track of which statement (of whcih method) is currently executing on the thread's stack.
+
+How to launch a new thread:
+
+	1. Make a Runnable object (the thread's job)
+
+		Runnable threadJob = new MyRunnable();
+
+			Runnable is an interface you'll learn about on the next page. You'll write a class that implements the Runnable interface, and that class is where you'll define the work that a thread will perform. In other words, the method tha will be run from the thread's new call stack.
+
+	2. Make a Thread object (the worker) and give it a Runnable(the job)
+
+		Thread myThread = new Thread(threadJob);
+
+			Pass the new Runnable object into the Thread Constructor. This tells the new Thread object which method to put on the bottom of the new stack- the Runnable's run() method.
+
+	3. Start the Thread
+
+		myThread.start();
+
+			Nothing happens until you call the Thread's start() method. That's when you go from having just a Thread instance to having a new thread of execution. When the new thread starts up, it takes the Runnable object's run() method and puts it on the bottom of the new thread's stack.
+
+Every Thread needs a job to do. A method to put on the new thread stack.
+
+	Runnable is to a Thread what a job is to a worker. A Runnable is the job a thread is supposed to run.
+
+	A Runnable holds the method that goes on the bottom of the new thread's stack: run()
+
+	A Thread object needs a job. A job the thread will run when the thread is started. That job is actually the first method that goes on the new thread's stack, and it must always be a method that looks like this:
+
+		public void run() {
+			//code that will be run by the new thread.
+		}
+
+	How does the thread know which method to put at the bottom of the stack? Because Runnable defines a contract. Because Runnable is an interface. A thread's job can be defined in any class that implements teh Runnable interface. The thread cares only that you pass the Thread constructor an object of a class that implements Runnable.
+
+	When you pass a Runnable to a Thread constructor, you're really just giving the Thread a way to get to a run() method. You're givnig the Thread its job to do.
+
+To make a job for your thread, implement the Runnable interface
+
+public class MyRunnable implements Runnable {
+	
+	public void run() {
+		go();
+	}
+
+	public void go() {
+		doMore();
+	}
+
+	public void doMore() {
+		System.out.println("to o' the stack");
+	}
+}
+
+class ThreadTester {
+	
+	public static void main (String[] args) {
+
+		Runnable threadJob = new MyRunnable();
+		//Pass the new Runnable instance into the new Thread constructor. This tells the thread what method to put on the bottom of the new stack. In other words, the first method that the new thread will run.
+
+		Thread myThread = new Thread(threadJob);
+
+		myThread.start();
+		//You won't get a new thread of execution until you call start() on the Thread instance. A thread is not really a thread until you start it. Before that, it's jsut a Thread instance, like any other object, but it won't have any real 'threadness'
+
+		System.out.println("back in main");
+	}
+}
+
+The three states of a new thread
+
+thread t = new Thread(r);
+	New:
+		A Thread instance has been created but not started. In other words, there is a Thread object, but no thread of execution.
+
+t.start();
+	Runnable:
+		When you start the thread, it moves into the runnable state. This means the thread is ready to run and just waiting for its Big Chance to be selected for execution. At this point, there is a new call stack or this thread.
+
+Selected to run
+	Running:
+		This is the state all threads want to be in. The Currently Running Thread. Only the JVM therad scheduler can make that decision. You can sometimes influence taht decision, but you cannot force a thread to move from runnable to running. In the running state, a thread (and ONLY this thread) has an active call stack, and the method on the top of the stack is executing.
+
+But there's more. Once the thread becomes runnable, it can move back and forth between runnable, running and an additional state: temporarily not runnable (also known as 'blocked').
+
+Typical runnable/running loop
+
+	Typically, a thread moves back and forth between runnable and running, as teh JVM thread scheduler selects a thread to run and then kicks it back out so another thread gets a chance.
+
+A thread can be made temporarily not-runnable
+
+	The thread scheduler can move a running thread into a blocked state, for a variety of reasons. For example, the thread might be executing code to read from a Socket input steram, but there isn't any data to read. The scheduler will move teh thread out of the running state until something becomes available. Or the executing code might have told the thread to put itself to sleep(sleep()). Or the thread might be waiting because it tried to call a method on an object, and that object was 'locked'. In that case, the thread can't continue until the object's lock is freed by the thread that has it.
+
+The Thread Scheduler
+
+	The thread scheduler makes all the decisions about who moves from runnable to running, and about when (and under what circumstances) a thread leaves the running state. The scheduler decides who runs, and for how long, and where the threads go when the scheduler decides to kick them out of the currently-running state.
+
+	You can't control the scheduler. There is no API for calling methods on the scheduler. Most importantly, there are no guarantees about scheduling.
+
+	The bottom line is this: do not base your program's correctness on the scheduler working in a particular way.
+
+	The scheduler implementations are different for different JVM's, and even running the same program on the same machine can give you different results. One of the worst mistakes new Java programmers make is to test their multi-threaded program on a single machine, and assume the thread scheduler will always work that way, regardless of where the program runs.
+
+	The secret to almost everything is sleep. That's right, sleep. Putting a thread to sleep, even for a few milliseconds, forces teh currently-running thread to leave the running state, thus giving another thread a chance to run. The thread's sleep() method does come with one guarantee: a sleeping thread will not become teh currently-running thread before the length of its time has expired. For example, if you tell your thread to sleep for two seconds, that thread can never become the running thread again until sometime after the two seconds have passed.
+
+/////////////////
+//BULLET POINTS//
+/////////////////
+- A thread with a lower-case 't' is a separate thread of execution in Java.
+- Every thread in Java has its own call stack.
+- A Thread with a capital 'T' is the java.lang.Thread class. A Thread object represents a thread of execution.
+- A Thread needs a job to do. A Thread's job is an instance of something that implements the Runnable interface.
+- The Runnable interface has a single method, run(). This is the method taht goes on the bottom of the new call stack. In other words, it is the first method to run in the new thread.
+- To launch a new thread, you need a Runnable to pass to the Thread's constructor.
+- A thread is in the NEW state when you have instantiated a Thread object but have not yet called start().
+- When you start a thread(by calling the Thread object's start() method), a new stack is created, with the Runnable's run() method on the bottom of the stack. The thread is now in the RUNNABLE state, waiting to be chosen to run.
+- A thread is said to be RUNNING when the JVM's thread scheduler has selected it to be the currently running thread. On a single-processor machine, there can be only one currently-running thread.
+- Sometimes a therad can be moved from teh RUNNING state to a BLOCKED state. A thread might be blocked because it's waiting for data from a stream, or because it has gone to sleep, or because it is waiting for an object's lock.
+- Thread scheduling is not guaranteed to work in any particular way, so you cannot be certain that threads will take turns nicely. You can help influence turn-taking by putting your threads to sleep periodically.
+
+Putting a thread to sleep
+	
+	One of the best ways to help your threads take turns is to put them to sleep periodically. All you need to do is call the static sleep() method, passing it the sleep duration in milliseconds.
+		Thread.sleep(2000);
+
+	This will knock a thread out of the running state, and keep it out of the runnable state for two seconds. The therad can't become the running thread again until after at least two seconds have passed.
+
+	A bit unfortunately, the sleep method throws an InterruptedException, a checked exception, so all calls to sleep must be wrapped ina  try/catch(or declared). So a sleep call really looks like this.
+
+		try {
+			Thread.sleep(2000);
+		}	catch (InterruptedException ex) {ex.printStackTrace();}
+
+	Your thread will probably never be interrupted from sleep; the exception is in the API to support a thread communication mechanism that almost nobody uses in the Real World. But, you still have to obey the handle or declare law, so you need to get used to wrapping your sleep() calls in a try/catch.
+
+	Now you know that your thread won't wake up before the specified duration, but is it possible that it will wake up some time after the 'timer' has expired? Yes and no. It doesn't matter, really, because whent eh thread wakes up, it always goes back to the runnable state. The thread won't automatically wake up at the designated time and become the currently-running thread. When a thread wakes up, the therad is once again at the mercy of the thread scheduler. Now, for applications that don't require perfect timing, and that have only a few threads, it might appear as though the thread wakes up and resumes running right on schedule (say, after the 2000 millis). But don't bet your program on it.
+
+Using sleep to make our program more predictable.
+
+	Where can you put a sleep call to make sure that 'back in main' always prints before 'top o the stack'?
+
+
+public class MyRunnable implements Runnable {
+	
+	public void run() {
+		go();
+	}
+
+	public void go() {
+
+		try{
+			Thread.sleep(2000);
+			//Calling sleep here will force the new thread to leave the currently-running state.
+		} catch (InterruptedException ex) {ex.printStackTrace();}
+
+		doMore();
+		//the main thread will become the currently-running thread again, and print out "back in main" Then tehre will be a pause (for about two seconsd) before we get to this line, which calls doMore() and prints out "top of the stack".
+	}
+
+	public void doMore() {
+		System.out.println("Top o' the stack");
+	}
+
+	class ThreadTestDrive {
+		public static void main (String[] args) {
+			Runnable theJob = new MyRunnable();
+			Thread t = new Thread(theJob);
+			t.start();
+			System.out.println("Back in main");
+		}
+	}
+}
+
+Making and starting two threads
+
+	Threads have names. You can give your threads a name of your choosing, or you can accept their default names. But the cool thing about names is taht you can use them to tell which thread is running. The following example starts two threads. Each thread has the same job: run in a loop, printing the currently-running thread's name with each iteration.
+
+public class RunThreads implements Runnable {
+		
+		public static void main (String[] args) {
+			RunThreads runner = new RunThreads();
+			Thread alpha = new Thread(runner);
+			Thread beta = new Thread(runner);
+			alpha.setName("Alpha thread");
+			beta.setName("Beta thread");
+			alpha.start();
+			beta.start();
+		}
+
+		public void run() {
+			for (int i = 0; i < 25; i++) {
+				String threadName = Thread.currentThread().getName();
+				System.out.println(threadName + "is runnign");
+			}
+		}
+}
