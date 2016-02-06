@@ -373,3 +373,55 @@ public class RunThreads implements Runnable {
 			}
 		}
 }
+
+Threads can lead to concurrency 'issues.'
+
+	Concurrency issues lead to race conditions. Race conditions lead to data corruption.
+
+	It all comes down to one potentially deadly scenario: two or more threads have access to a single object's data. In other words, methods executing on two different stacks are both calling,say,getters or setters on a single object on the heap.
+
+	It's a whole 'left-hand-doesn't know what the right hand is doing' thing. Two threads, without a care in the world, humming along executing their methods, each thread thinking that he is the One True Thread. The only one that matters. After all, when a thread is not running, and in runnable(or bloacked) it's essentially knocked unconscious. When it comes to the currently-running thread again, it doesn't know that it ever stopped.
+
+The Ryan and Monica problem, in code
+
+	The following example shows what can happen when two threads Ryan and Monica share a single object, the bank account.
+
+	The code has 2 classes, BankAccount, and MonicaAndRyanJob. The MonicaAndRyanJob class implements Runnable, and represents the behavior that Ryan and Monica both have-checking the balance and making withdrawals. But of course, each thread falls asleep inbetween checking the balance and actually making the withdrawal.
+
+	The MonicaAndRyanJob class has an IV of type BankAccount, that represents their shared account.
+
+1. Make on instance of RyanAndMonicaJob.
+
+	The RyanAndMonicaJob class is the Runnable (the job to do), and since both Monica and Ryan do the same thing (check balance and withdrawal money), we only need one instance.
+
+		RyanAndMonicaJob theJob = new RyanAndMonicaJob();
+
+2. Make two threads with the same Runnable
+	
+		Thread one = new Thread(theJob);
+		Thread two = new Thread(theJob);
+
+3. Name and start the threads
+
+	one.setName("Ryan");
+	two.setName("Monica");
+	one.start();
+	two.start();
+
+4. Watch both threads execute the run() method
+
+	One thread represents Ryan, the other represents Monica. Both threads continually check the balance and then make a withdrawal, but only if it's safe.
+
+		if (account.getBalance() >= amount) {
+			try {
+				Thread.sleep(500);
+			} catch(InterruptedException ex) {ex.printStackTrace();}
+		}
+
+	In the run() method, do exactly what Ryan and Monica would do -check the balance and, if there's enough money, make the withdrawal.
+
+	This should protect against overdrawing the account
+
+	Except, Ryan and Monica always fall asleep after they check the balance but before they finish the withdrawal.
+
+	
