@@ -18,7 +18,7 @@ public class RyanAndMonicaJob implements Runnable {
 
 	public void run() {
 		for (int x = 0; x < 10; x++) {
-			makeWithdrawl(10);
+			makeWithdrawal(10);
 			if (account.getBalance() < 0) {
 				System.out.println("Overdrawn");
 			}
@@ -26,4 +26,18 @@ public class RyanAndMonicaJob implements Runnable {
 	}
 	//In the run() method, a thread loops through and tries to make a withdrawal with each iteration. After the withdrawal, it checks the balance once again to see if the account is overdrawn.
 
+	private void makeWithdrawal(int amount) {
+		if (account.getBalance() >= amount) {
+			System.out.println(Thread.currentThread().getName()+ "is about to withdraw");
+				try {
+					System.out.println(Thread.currentThread().getName()+"is going to sleep");
+					Thread.sleep(500);
+				}	catch (InterruptedException ex) {ex.printStackTrace();}
+				System.out.println(Thread.currentThread().getName() + " woke up.");
+				account.withdraw(amount);
+				System.out.println(Thread.currentThread().getName()+" completes the withdrawal");
+		}	else {
+			System.out.println("Sorry, not enough for " +Thread.currentThread().getName());
+		}
+	}
 }
