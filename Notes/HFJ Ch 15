@@ -424,4 +424,54 @@ The Ryan and Monica problem, in code
 
 	Except, Ryan and Monica always fall asleep after they check the balance but before they finish the withdrawal.
 
+They need a lock for account access
 	
+1. There's a lock associated with the bank account transaction (checking the balance and withdrawing money). There's only one key, and it stays with thelock until somebody wants to access the account.
+	The bank account transaction is unlocked when nobody is using the account.
+
+2. When Ryan wants to acces the bank account(to check the balance and withdraw money), he locks the lock and puts the key in his pocket. Now nobody else can access th account, since the key is gone.
+	When Ryan wants to access the account, he secures the lock and takes the key.
+
+3. Ryan keeps the key in his pocket until he finishes the transaction. He has the only key, soMonica can't access the account(or the checkbook) until Ryan unlocks the account and returns the key. Now, even if Ryan falls asleep after he checks the balance, he has a guarantee that the balance will be the same when he wakes up, because he kept the key while he was asleep.
+	When Ryan is finished, he unlocks the lock and returns the key. Now the key is available for Monica to access the account.
+
+We need the makeWithdrawal() method to run as one atomic thing.
+
+	We need to make sure that once a thread enters the makeWithdrawal() method, it must be allowed to finish the method before any other thread can enter.
+
+	We need to make sure that once a thread has checked the account balance, that thread has a guarantee that it can wake up and finish the withdrawal before any other thread can check the account balance.
+
+	Use the synchronized keyword to modify a method so that only one thread at a time can access it.
+
+	That's how you protect the bank account, you don't put a lock on the bank account itself; you lock the method that does the banking transaction. That way, one thread gets to complete the whole transaction, start to finish, even if htat thread falls asleep while in the middle of the method.
+
+	The synchronized keyword means taht a thread needs a key in order to access the synchronized code.
+
+	To protect your data, synchronize the methods that act on that data.
+
+	private synchronized void makeWithdrawal(int amount) {
+		if (account.getBalance() > = amount) {
+			System.out.println(Thread.currentThread().getName() + " is about to withdraw");
+
+		}
+	}
+
+Using an object's lock
+
+	Every object has a lock. MOst of the time, the lock is unlocked, and you can imagine a virtual key sitting with it. Object locks come into play only when there are synchronized methods. When an object has one or more synchronized methods, a thread can enter a synchronized method only if the thread can get the key to the object's lock.
+
+	The locks are not per method, they are per object. If an object has two synchronized methods, it does not simply mean that you can't have two threads entering the same method. It means you can't have two threads entering any of the synchronized methods.
+
+	Think about it. If you have multiple methods that can potentially act on an object's IVs, all those methods need to be protected with synchronized.
+
+	The goal of synchronization is to protect critical data. But remember, you don't lock the data itself, you synchronize the methods that access the data.
+
+	So what happens when a thread is cranking through its call stack (starting with the run() method) and it suddenly hits a synchronized method? The thread recognizes that it needs a key for that object before it can enter the method. It looks for the key (this is all handled by the Java JVM; there's no API in Java for accessing object locks), and if the key is available, the thread grabs the key and enters the method.
+
+	From that point forward, the thread hangs on to that key like the thread's life depends on it. The thread won't give up the key until it completes the synchronized method. So while that thread is holding the key, no other threads can enter any of that object's synchronized methods, because the one key for that object won't be available.
+
+	Every Java object has a lock. A lock has only one key.
+
+	Most of the time, the lock is unlocked and nobody cares.
+
+	But if anobject has synchronized methods, a thread can enter one of the synchronized methods ONLY if the key for the object's lock is available. In other words, only if another thread hasn't already grabbed the one key.
