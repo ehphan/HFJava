@@ -458,7 +458,7 @@ We need the makeWithdrawal() method to run as one atomic thing.
 
 Using an object's lock
 
-	Every object has a lock. MOst of the time, the lock is unlocked, and you can imagine a virtual key sitting with it. Object locks come into play only when there are synchronized methods. When an object has one or more synchronized methods, a thread can enter a synchronized method only if the thread can get the key to the object's lock.
+	Every object has a lock. Most of the time, the lock is unlocked, and you can imagine a virtual key sitting with it. Object locks come into play only when there are synchronized methods. When an object has one or more synchronized methods, a thread can enter a synchronized method only if the thread can get the key to the object's lock.
 
 	The locks are not per method, they are per object. If an object has two synchronized methods, it does not simply mean that you can't have two threads entering the same method. It means you can't have two threads entering any of the synchronized methods.
 
@@ -475,3 +475,82 @@ Using an object's lock
 	Most of the time, the lock is unlocked and nobody cares.
 
 	But if anobject has synchronized methods, a thread can enter one of the synchronized methods ONLY if the key for the object's lock is available. In other words, only if another thread hasn't already grabbed the one key.
+
+The dreaded "Lost Update" problem
+
+	The lost update revolves around one process:
+
+	Step 1: Get the balance in the account
+		int i = balance;
+
+	Step 2: Add 1 to that balance
+		balance = i + 1;
+
+	The trick to showing this is to force the computer to take two steps to complete the change to the balance. In the real world, you'd do this particular move in a single statement:
+		balance++;
+
+	But by forcing it into two steps, the problem with a non-atomic process will become clear. So imagine that rather than the trivial "get the balance and then add 1 to the current balance" steps, the two (or more) steps in this method are much more complex, and couldn't be done in one statement.
+
+	In the "Lost update" problem, we have two threads, both trying to increment the balance.
+
+class TestSync implements Runnable {
+	
+	private int balance;
+
+	public void run() {
+		for(int i = 0; i < 50; i++) {
+		//each thread runs 50 times, incrementing the balance on each iteration
+			increment();
+			System.out.println("balance is " + balance);
+		}
+	}
+
+	public void increment() {
+		int i = balance;
+		balance = i + 1;
+		//Heres the crucial part, we increment the balance by adding 1 to whatever the balance was AT THE TIME WE READ IT (rather than adding 1 to the CURRENT value)
+	}
+}
+
+public class TestSyncTest {
+	public static void main (String[] args) {
+		TestSync job = new TestSync();
+		Thread a = new Thread(job);
+		Thread b = new Thread(job);
+		a.start();
+		b.start();
+	}
+}
+
+	Make the increment() method atomic. Synchronize it.
+
+	Synchronizing the increment() method solves the "Lost Update" problem, because it keeps the two steps in the method as one unbreakable unit.
+
+public synchronized void increment() {
+	int i = balance;
+	balance = i + 1;
+}
+
+Once a thread enters teh method, we have to make sure that all the steps in the method are complete (as one atomic process) before any other thread can enter the method.
+
+public void go() {
+	doStuff();
+
+	synchronized(this) {
+		criticalStuff();
+		moreCriticalStuff();
+	}
+}
+	Now only these two method calls are grouped into one atomic unit. When you use the synchronized keyword WITHIN a method, rather than in a method declaration, you have to provide an argument taht is the object whose key the thread needs to get.
+
+	Although there are other ways to do it, you will almost always synchronize on the current object(this). Thats the same object you'd lock if the whole method were synchronized.
+
+The deadly side of synchronization
+
+	Thread deadlock happens when you have two threads, both of which are holding a key the other thread wants. There's no way out of this scenario, so the two threads will simply sit and wait.
+
+	If you're familiar with databases or other application servers, you mgiht recognize the problem; databases often have a locking mechanism somewhat like synchronization. But a real transaction management system can sometimes deal with deadlock. It might assume, for example, taht deadlock might have occurred when two transactions are taking too long to complete. But unlike Java, the application server can do a "transaction rollback" that returns the state of the rolled-back transaction to where it was before the transaction (the atomic part) began.
+
+	Java has no mechanism to handle deadlock. It won't even know deadlock occurred. So it's up to you to design carefully. If you find yourself writing much multithreaded code, you might want to study "Java Threads" by Scott Oaks and Henry Wong for design tips on avoiding deadlock. One fo the most common tips is to pay attention to the order in which your threads are started.
+
+Remember, the point of synchronization is to make a specific section of code work ATOMICALLY. In other words, it's not just the individual methods we care about, it's methods that require more than one step to complete. Think about it. If we had not synchronized the makeWithdrawal() method, Ryan would have checked the balance(by calling the synchronized checkBalance()), and then immediately exited the method and returned the key.
