@@ -1,0 +1,365 @@
+HFJ Ch 16
+
+Challenge #1 Sort the songs in alphabetical order
+
+	We used ArrayList, but it does not contain any kind of sort method
+
+ArrayList is not the only collection
+
+	Although ArrayList is the one you'll use most often, there are others for special occasions. Some of the key collection classes include:
+
+	TreeSet
+		Keeps the elements sorted and prevents duplicates
+
+	HashMap
+		Lets you store the access elements as name/value pairs
+
+	LinkedList
+		Designed to give better performance when you insert or delete elements from the middle of the collection.
+
+	HashSet
+		Prevents duplicates in the collection, and given an element, can find that element in the collection quickly.
+
+	LinkedHashmap
+		Like a regular HashMap, except it can remember the order in which elements(name/value pairs) were inserted, or it can be configured to remember the order in which elements were last accessed
+
+You could use a TreeSet. Or you could use the Collections.sort() method
+
+	If you put all the Strings (the song titles) into a TreeSet instead of an ArrayList, the String would automatically land in the right place, alphabetically sorted. Whenever you printed the list, the elements would always come out in alphabetical order.
+
+	And that's great when you need a set(we'll talk about sets in a few) or when you know that the list must always stay sorted alphabetically.
+
+	On the other hand, if you don't need the list to stay sorted, TreeSet might be more expensive than you need. With ArrayList, inserst can be blindingly fast because the new element just goes in at the end.
+
+But now you need Song objects, not just simple Strings.
+
+	Now your boss wants actual Song class instances in the ist, not just Strings, so that each Song can have more data. The new jukebox device outputs more information, so this time the file will have four pieces(tokens) instead of just two.
+
+	The Song class is really simple, with only one interesting feature- the overridden toString() method. Remember, the toString() method is defined in a class Object, so every class in Java inherits the method. And since the toString method is called on an object when it's printed(System.out.println(anObject)), you should override it to print something more readable than the default unique identifier code. When you print a list, the toString() method will be called on each object.
+
+The sort() method declaration
+
+	From the API docs, it looks like the sort() method is declared strangely. That's because the sort() method makes heavy use of generics. Anytime you see something with angle brackets in Java source code or documentation, it means generics- a feature added to Java 5.0. So it looks like we'll have to learn how to interpret the documentation before we can figure out why we were able to sort String objects in an ArrayList, but not an ArrayList of Song objects.
+
+Generics means more type-safety
+
+	Virtually all of the code you write that deals with generics will be collection-related code. Although generics can be used in other ways, the main point of generics is to let you write type-safe collections. In other words, code that makes the compiler stop you from putting a Dog into  a list of Ducks.
+
+	Before generics, the compiler could not care less what you put into a collection, because all collection implementations were declared to hold type Object. You could put anything in an ArrayList; it was like allArrayLists were declaerd as ArrayList<Object>.
+
+WITHOUT generics
+
+	Objects go IN as a reference to Ball,Fish,Guitar, Car, and come OUT as reference type Object.
+
+	Before generics, there was no way to declare the type of an ArrayList, so its add() method took type Object.
+
+WITH generics
+
+	Objects go IN as a reference to only Fish objects, and come out as a reference of type Fish.
+
+	With generics, you can create type-safe collections where more problems are caught at compile-time instead of runtime.
+
+	Without generics, the compiler would happily let you put a Pumpkin into an ArrayList that aws supposed to hold only Cat objects.
+
+	Now with generics, you can put only Fish objects in teh ArrayList<Fish>, so the objects come out as Fish references.
+
+Learning generics. Of the dozens of things you could learn about generics, there are really only three that matter to most programmers:
+
+	1. Creating instances of generified classes(like ArrayList)
+
+		When you make an ArrayList, you have to tell it the type of objects you'll allow in the list, just as you do with play old arrays.
+
+			new ArrayList<Song>()
+
+	2. Declaring and assigning variables of generic types
+
+		How does polymorphism really work with generic types? If you have an ArrayList<Animal> reference variable, can you assign an ArrayList<Dog> to it? wWhat about a List<Animal> reference? Can you assign an ArrayList<Animal> to it? You'll see
+
+			List<Song> songList = new ArrayList<Song>()
+
+	3. Declaring (and invoking) methods that take generic types
+
+		If you have a method that takes as a parameter, say, an ArrayList of Animal objects, what does that really mean? Can you also pass it an ArrayList of Dog objects? We'll look at some subtle and tricky polymorphism issues that are very different from the way you write methods that take plain old arrays.
+
+			void foo (List<Song> list)
+			x.foo(songList)
+
+Using generic CLASSES
+
+	Since ArrayList is our most-used generified type, we'll start by looking at its documentation. The two key areas to look at in a generified class are:
+	1. The class declaration
+	2. The method declaration that lets you add elements
+
+Understanding ArrayList documentation What is the true meaning of E
+
+public class ArrayList<E> extends AbstractList<E> implements List<E> {
+//The E is a placeholder for the REAL type you use when you declare and create an ArrayList.
+//ArrayList is a subclass of AbstractList, so whatever type you specify for the ArrayList is automatically used for the type of the AbstractList
+//The type (the value of <E>) becomes the type of the List interface as well.
+	public boolean add (E o)
+	//Here's teh important part! Whatever E is determines what kind of things you're allowed to add to the ArrayList
+}
+
+Think of E as a standin for the type of element you want this collection to hold and return. E element.
+
+The E represents the type used to create an instance of ArrayList. When you see an E in the ArrayList documentation, you can do a mental find/replace to exchange it for whatever <type> you use to instantiate ArrayList.
+
+So, new ArrayList<Song> means that E becomes Song in any method or variable declaration that uses E
+
+Using type parameters with ArrayList
+	
+	THIS code:
+		ArrayList<String> thisList = new ArrayList<String>
+
+	Means ArrayList:
+		public class ArrayList<E> extends AbstractList<E> {
+			public boolean add (E o)
+		}
+
+	Is treated by the compiler as:
+		public class ArrayList<String> extends AbstractList<String> {
+			public boolean add (String o)
+		}
+
+	In other words, the E is replaced by the real type (also called the type parameter) taht you use when you create the ArrayList. And that's why the add() method for ArrayList won't let you add anything except objects of a reference type that's compatible with the type of E. So if you make an ArrayList<String>, the add() method suddenly becomes add(String o). If you make the ArrayList of type Dog, suddenly the add() method becoems add(Dog o).
+
+Using generic METHODS
+
+	A generic class means that the class declaration includes a type parameter. A generic method means that the method declaration uses a type parameter in its signature. You can use type parameters in a method in several different ways:
+
+	1. Using a type parameter defined in the class declaration
+
+		public class ArrayList<E> extends AbstractList<E> {
+			public boolean add(E o)
+		}
+			When you declare a type parameter for the class, you can simply use that type any place that you'd use a real class or interface type. The type declared in the method argument is essentially replaced with the type you use when you instantiate the class.
+
+	2. Using a type parameter that was NOT defined in the class declaration
+
+		public <T extends Animal> void takeThing(ArrayList<T> list)
+		//Here we can use <T> because we declared "T" earlier in the method declaration.
+
+			If the class itself doesn't use a type parameter, you can still specify one for a method, by declaring it in a really unusual space- before the return type. This method says taht T can be "any type of Animal"
+
+Here's where it gets weird.
+This:
+
+	public <T extends Animal> void takeThing(ArrayList<T> list)
+
+Is not the same as this:
+
+	public void takeThing(ArrayList<Animal> list)
+
+Both are lega, but they're different.
+	The first one, where <T extends Animal> is part of the method declaration, means that any ArrayList declared of a type that is Animal, or one of Animal's subtypes, is legal. So you could invoke the top method using an ArrayList<Dog> or something.
+
+	The second one, where the method argument is ArrayList<Animal> means that only an ArrayList<Animal> is legal. In other words, while the first version takes an ArrayList of any type that is a type of Animal, the second version takes only an ArrayList of type Animal. not any subclass.
+
+	And yes, it does appear to violate teh point of polymorphism. But it will become clear when we revisit this in detail.
+
+Revisitin the sort() method.
+	We were able to sort a list of Strings, but not of Song objects.
+
+	The sort()) method can take only lists of Comparable objects.
+
+	Song is NOT a subtype of Comparable, so you cannot sort() the list of Songs.
+
+public static <T extends Comparable<? super T>> void sort(List<T> list)
+								1.	
+	1. This says "whatever 'T' is must be fo type comparable"
+
+public final class String extends Object implements Serializable, Comparable<String>, CharSequence
+
+In generics, "extends" means "extends or implements"
+
+	The Java engineers had to give you a way to put a constraint on a parameterized type, so that you can restrict it to, say, only subclasses of Animal. But you also need to constrain a type to allow only classes that implement a particular interface.  So here's a situation where we need one kind of syntax to work for both situations-inheritance and implementation. In other words, that works for both extends and implements.
+
+	And the winning word was extends. But it really means "is-a", and works regardless of whether teh type on the right is an interface or class.
+
+Finally we know what's wrong, the Song class needs to implement Comparable
+
+	We can pass the ArrayList<Song> to the sort() method only if the Song class implements Comparable, since that's the way the sort() method was declared. 
+
+	public interface Comparable<T> {
+		int compareTo(T o);
+	}
+
+	It looks like the compareTo() method will be called on one Song object, passing that Song a reference to a different Song. The Song running the compareTo() method has to figure out if the Song it was passed should be sorted higher, lower, or the same in the list.
+
+	Your big job now is to decide what makes one song greater than another, and then implement the compareTo() method to reflect that. A negative number means the Song you were passed is greater than the Song running the method. Returning a positive number says that teh Song running the method is greater than the Song passed to the compareTo() method. Returnin zero means that the Songs are equal. 
+
+We can sort the list, but there's a new problem, we want two different views of the song list, one by song title, and one by artist.
+
+	But when you make a collection element comaprable, you get only one chance to implement the compareTo() method. what do?
+
+Use a custom comparator.
+
+	An element in a list can compare itself to another of its own type in only one way, using its compareTo() method. But a Comparator is external to the element type you're comparing-it's a separate class. So you can make as many of these as you like!
+
+	Then all you need to do is call the overloaded sort() method that takes teh list and the Comparator will help the sort() method put things in order.
+
+	The sort() method that takes a Comparator will use teh Comparator instead of teh elemetn's own compareTo() method, when it puts the elements in order. In other words, if your sort() method gets a Comparator, it won't even call the compareTo() method of the elements in the list. The sort() method will instead invoke teh compare() method on the Comparator.
+
+	The rules are:
+
+		- Invoking the one-argument sort(List o) method means the list element's compareTo() method determines the order. So the elements in the list MUST implement the Comaprable interface.
+
+		- Invoking sort(List o, Comparator c) means the list element's compareTo() method will NOT be called, and the Comparator's compare() method will be used instead. That means teh elements in the list do NOT need to implement the Comparable interface.
+
+	If you pass a Comparator to the sort() method, the sort order is determined by the Comparator rather thant he elements own compareTo() method.
+
+The sorting works great, now we know how to sort on both title (using the Song object's compareTo() method) and artist(using the Comparator's compare() method). But there's a new problem we didn't noticewith a test sample of the jukebox text file - the sorted list contains duplicates.
+
+We need a Set instead of a List
+
+	from the Collection API, we find three main interfaces, List, Set and Map. ArrayList is a List, but it looks like Set is exactly what we need.
+
+	> LIST - when sequence matters.
+		Collections that know about index position.
+		Lists know where something is in the list. You can have more than one element referencing the same object.
+
+	> SET - when uniqueness matters
+		Collections that do not allow duplicates
+		Sets know whether something si already in the collection. You can never have more than on element referencing the same object(or more than one lement referencing two objects that are considered equal - we'll look at what object equality means in a moment).
+
+	> MAP - when finding something by key matters.
+		Collections that use key-value pairs.
+		Maps know the value associated with a given key. You can have two keys that reference the same value, but you cannot have duplicate keys. Although keys are typically String names (so that you can make name/value property lists for example), a key can be any object.
+
+What makes two objects equal?
+
+	Reference equality vs Object equality.
+
+	>Reference Equality
+	Two references, one object on the heap
+	Two references taht refer to the same object on the heap are equal. Period. If you call teh hashCode() method on both references, you'll get the same result. If you don't override the hashCode() method, the default behavior is that each object will get a unique number.
+	If you want to know if two references are really referring to the same object, use the == operator, which(remember) compares the bits in the variables. If both references point to the same object, the bits will be identical.
+
+	>Object equality
+	Two references, two objects on the heap, but the objects are considered meaningfully equivalent.
+
+		If you want to treat two different Song obejcts as equal, you must override both the hashCode() and equals() method inherited from class Object.
+
+		If you don't override hashCode(), the default behavior is to give each object a unique hashcode value. So you must override hashCode() to be sure that two equivalent objects return the same hashcode. But you must also override equals() so that if you call it on either object, passing in the other object, always returns true.
+
+How a HashSet checks for duplicates: hashCode() and equals()
+
+	When you put an object into a Hashset, it uses the object's hashcode value to determine where to put the object in the Set. But it also compares the object's hashcode to the hashcode of all the other objects in the HashSet, and if tehre's no matching hashcode, the HashSet assumes that this new object is no a duplicate.
+
+	If the hashcodes are different, the HashSet assumes tehre's no way the objects can be equal.
+
+	So you must override hashCode() to make sure the objects have th same value.
+
+	But two objects with the same hashCode() might not be equal, so if the HashSet finds a matching hashcode for two objects, one you're inserting, and one already in teh set. The HashSet will then call one of the object's equals() methods to see if the hashcode-matched objects really are equal.
+
+	If they're equal, the HashSet knows that the object you're attempting to add is a duplicate of something in the Set, so the add doesn't happen.
+
+	You don't get an exception, but the HashSet's add() method returns a boolean to tell you whether the new object was added. So if the add() method returns a false, you know the new object was a duplicate of soemthing already int eh set.
+
+Java Object Law for HashCode() and equals()
+	The API docs for class Object state the rules you MUST follow:
+	> If two objects are equal, the MUST have matching hashcodes.
+	> If two objects are equal, calling equals() on either object MUST return true. In other words, if (a.equals(b)) then (b.equals(a))
+	> If two objects have the same hashcode value, they are NOT required to be equal. But if they're equal, they MUST have the same hashcode value.
+	> So, if you override equals(), you MUST override hashCode() method.
+	> The default behavior of hashCode() is to generate a unique integer for each object on the heap. So if you don't override hashCode9) in a class, no two objects of that type can EVER be considered equal.
+	> The default behavior of equals() is to do an == comparison. In otherwords, to test wehther teh two references refer to a single object on the heap. So if you don't override equals() in a class, no two objects can EVER be considered equal since references to two different objects will always contain a different bit pattern.
+		a.equals(b) must also mean that a.hashCode()==b.hashCode()
+		BUT a.hashCode() == b.hashCode() does NOT have to mean a.equals(b)
+
+What you MUST know about TreeSet
+	TreeSet elements MUST be comparable!
+	TreeSet doesn't know how the object's should be sorted. You have to tell the TreeSet how.
+
+To use a TreeSet, one of tehse things must be true:
+
+	> The elements in teh list must be of a type that implemetns Comparable.
+		The Book class on the previous exercise didn't implement Comparable, so it wouldn't work at runtime. Think about it, the TreeSet's sole purpose is to keep your elements sorted, and once again- it had no idea how to sort Book objects. It doesn't fail at compile time, because teh TreeSet add() method doesn't take a Comparable type, The TreeSet add() method takes whatever type you use when you created teh TreeSet. In other words, if you say new TreeSet<Book>() the add() method is essentially add(Book). And there's no requirement that the Book class implement Comparable! But it fails at runtime when you add the second element to the set. That's teh first time the set tries to call one of the object's compareTo() methods, and can't.
+
+			class Book implements Comparable {
+				String title;
+				public Book(String t) {
+					title = t;
+				}
+				public int compareTo(Object b) {
+					Book book = (Book) b;
+					return(title.compareTo(book.title));
+				}
+			}
+
+	OR
+	> You use the TreeSet's overloaded constructor that takes a Comparator
+	TreeSet works a lot like the sort() method - you have a choice of using the element's compareTo() method, assuming the element type implemented teh Comparable interface, Or you can use a custom Comparator that knows how to sort the elements in the set. To use a custom Comparator, you call the TreeSet constructor that takes a Comparator.
+
+	public class BookCompare implements Comparator<Book>{
+		public int compare(Book one, Book two) {
+			return(one.title.compareTo(two.title));
+		}
+	}
+
+	class Test {
+		public void go() {
+			book b1 = new Book("How cats");
+			book b2 = new Book("Remixing");
+			BookCompare bCompare = new BookCompare();
+			TreeSet<Book> tree = new TreeSet<Book>(bCompare);
+		}
+	}
+
+We've seen Lists and Sets, now we'll use a Map
+	Remember that Maps are part of Java collections but they DO NOT implement the Collection interface.
+
+	Imagine you want a collection that acts like a property list, where you give it a name and it gives you back the value associated with that name. Although keys will often be Strings, they can be any Java object(or, through autoboxing, a primitive).
+
+	Each element in a Map is actually TWO objects - a key and a value. You can have duplicate values, but NOT duplicate keys.
+
+Finally, back to generics
+
+	If a method argument is an array of Animals, it will also take an array of any Animal subtype.
+
+	In other words, if a method is declared as:
+		void foo(Animal[] a){}
+
+	Assuming Dog extends Animal, you are free to call both:
+		foo(anAnimalArray);
+		foo(aDogAray);
+
+Using polymorphic arguments and generics
+
+	If you declare a method to take ArrayList<Animal> it can take ONLY an ArrayList<Animal> not ArrayList<Dog> or ArrayList<Cat>
+
+So how to unscrew?
+
+	There is a way to create a method argument that can accept an ArrayList of any Animal subtype. The simplest way is to use a wildcare, added to the Java language explicitly for this reason.
+
+	public void takeAnimals(ArrayList<? extends Animal> animals) {
+		for(Animal a: animals) {
+			a.eat();
+		}
+	}
+	//Remember, the keyword "extensd" here means either extensd OR implements depending on the type. So if you want to take an ArrayList of types that implement the Pet interface, you'd declare it as: ArrayList<? extends Pet>
+
+So canyou stil add a cat to an ArrayList<Dog> in this?
+	NO. When you use the wildcard<?> in your declaration, the compiler won't let you do anything that adds to the list.
+
+	When you use a wildcard in your method argument, the compiler will STOP you from doing anything that could hurt the list referenced by teh method parameter.
+
+	You can still invoke methods on the eleemtns in the list, but you cannot add elements to the list.
+
+	In other words, you can do things with the list elements, but you can't put new things in the list. So you're safe at runtime, because the compiler won't let you do anything that might be horrible at runtime.
+
+	So this is OK inside takeAnimals():
+		for(Animal a: animals) {
+			a.eat();
+		}
+	But THIS would not compile:
+		animals.add(new Cat());
+
+Alternate syntax for doing the same thing
+	This:
+	public <T extends Animal> void takeThing(ArrayList<T> list)
+
+	Does the same thing as this:
+	public void takeThing(ArrayList<? extends Animal> list)
+
+	

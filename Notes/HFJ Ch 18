@@ -1,0 +1,179 @@
+HFJ Ch 18
+
+remote deployment with RMI
+
+RMI (Remote Method Invocation)
+
+Method calls are always between two objects on the same heap
+
+An instance of JVM doesn't know anything about a different instance of JVM
+
+What if you want to invoke a method on an object running on another machine.
+
+A design for remote method calls
+
+Create four things: server, client, server helper, client helper
+
+1. Create client and server apps. The server app is the remote service that has an object with the method that the client wants to invoke.
+
+2. Creat client and server 'helpers'. They'll handle all the low-level networking and I/O details so your client and service can pretend like they're in the same heap
+
+The role o the 'helpers'
+
+	The helpers are the objects that actaully do teh communicating. They make it possible for the client to act as though its calling a method on a local object. In fact, it is. The client calls a method on the client helper, as if the client helper were the actual service. The client helper is a proxy for the Real Thing.
+
+	In other words, the client object thinks it's calling a method on the remote service, because the client helper is pretending to be th service object. Pretending to be the thing with the method the client wants to call.
+
+	But the client helper isn't really the remote service. Although the client helper acts like it, the client helper doesn't have any of the actual method logic the client is expecting. Instead, the client helper contacts the server, transfers information about the method call, and waits for a return from the server.
+
+	On the server side, the service helper receives the request from the client helper, unpacks the information about the call, and then invokes the real method on the real service object. So to the service object, the call is local. It's coming from the service helper, not a remote client.
+
+	The service helper gest the return value from the service, packs it up, and ships it back to the client helper. The client helper unpacks teh information and returns the value to the client object.
+
+How the method call happens
+
+1. Client object calls doBigThing() on the client helper object
+
+2. Client helper packages up information about the call (arguments, method name, etc.) and ships it over the network to the service helper.
+
+3. Service helper unpacks the information from the client helper, finds out which methods to call(and on which object) and invokes the real method on the real service object.
+
+Java RMI gives you the client and service helper objects.
+
+	In Java, RMI builds the client and service helper objects for you, and it even knows how to make the client helper look like the Real Service. In other words, RMI knows how to give the client helper object the same methods you want to call on the remote service.
+
+	Plus, RMI provides all the runtime infrastructure to make it work, including a lookup service so that the client can find and get the client helper.
+
+	With RMI, you don't write any of the networking or I/O code yourself. The client gets to call remote methods just like normal method calls on objects running in the client's own local JVM
+
+	So, the client does have to acknoledge the risk. The client has to acknowledge that when it calls a remote method, even though to the client it's just a local call to the proxy/helper object, the call ultimately involves Sockets and streams. The client's original call is local, but the proxy turns it into a remote call. A remote call just means a method that's invoked on an object on another JVM. How the information about that call gets transferred from one JVM to another depends on the protocol used by the helper objects.
+
+In RMI, the client helper is a 'stub' and the server helper is a 'skeleton'
+
+Making the Remote Service
+
+1: Make a Remote Interface
+	The remote interface defines the methods that a client can call remotely. It's what the client will use as the polymorphic class type for your service. Both the Stub and the actual service will implement this.
+
+2: Make a Remote Implementation
+	This is the class that does the Real Work. It has the real implementation of the remote methods defined in the remote interface. It's the object that the client wants to call methods on.
+
+3: Generate the stubs and skeletons using rmic
+	These are the client and server 'helpers'. You don't have to create these classes or ever look at the source code that generates them. It's all handled automatically when you run the rmic tool that ships with your JDK.
+
+4: Start the RMI registry (rmiregistry) //in a separate terminal
+	The rmiregistry is like the white pages of a phon book. It's where the user goes to get the proxy (the client stub/helper object).
+
+5: Start the remote service
+	You have to get the service object up and running. Your service implementation class instantiates an instance of the service and registers it with the RMI registry. Registering it makes the service available for clients
+
+Step 1: Make a Remote Interface
+	
+	1. Extend java.rmi.Remote
+
+		Remote is a 'marker' interface, which means it has no methods. It has a special meaning for RMI, though, so you must follow this rule. Notice taht we say 'extends' here. One interface is allowed to extend another interface.
+
+			public interface MyRemote extends Remote {}
+
+				Your interface has to announce that it's for remote method calls. An interface can't implement anything, but it can extend other interfaces.
+
+	2. Declare that all methods throw a RemoteException
+
+		The remote interface is the one the client uses as the polymorphic type for the service. In other words, the client invokes methods on something that implements the remote interface. That something is the stub, of course, and since the stub is doing networkign and I/O, all kinds of Bad Things can happen. The client has to acknowledge the risks by handling or declaring the remote exceptions. If the methods in an interface declare exceptions, any code calling methods on a reference of that type must handle or declare the exceptions.
+
+			import java.rmi.*; // the remote interface is in java.rmi
+
+			public interface MyRemote extends Remote {
+				public String sayHello() throws RemoteException;
+				//Every remote method call is considered 'risky'. Declaring RemoteException on every method forces the client to pay attention and acknowledge that things might not work.
+			}
+
+	3. Be sure arguments and return values are primitives or Serializable
+
+		Arguments and return values of a remote method must be eitehr primitive or Serializable. Any argument to a remote method has to be packaged up and shipped across the netwwork, and that's done through Serialization. Same thing with return values. If you use primitives, Strings, and the majority of types in the API, you'll be fine. If you are passing around your own types, just be sure taht you make your classes implement Serializable.
+
+			public String sayHello() throws RemoteException;
+			//This return value is gonna be shipped over teh wire from the server back to the client, so ti must be Serializable. That's how args and return values get packaged up and sent
+
+Step 2: Make a Remote Implementation
+
+	1. Implement the Remote interface
+
+		Your service has to implement the remote interface - the one with the methods your client is going to call.
+
+			public class MyRemoteImpl extends UnicastRemoteObject implements MyRemote {
+				public String sayHello() {
+				//The compiler will make sure that you've implemented all the methods from the interface you implement. In this case, there's only one
+					return "Server says, 'Hey'";
+				}
+			}
+
+	2. Extend UnicastRemoteObject
+
+		In order to work as a remote service object, your code needs some functionality related to 'being remote'. The simplest way is to extend UnicastRemoteObject (from teh java.rmi.server pacakge) and let that class (your superclass) do the work for you.
+
+			public class MyRemoteImpl extends UnicastRemoteObject implements MyRemote}{}
+
+	3. Write a no-arg constructor that declares a RemoteException
+
+		Your new superclass, UnicastRemoteObject, has one little problem, it's constructor throws a RemoteException. The only way to deal with this is to declare a constructor for your remote implementation, just so that you have a place to declare teh RemoteException. Remember, when a class is instantiated, its superclass constructor is always called. If your superclass constructor throws an exception, you have no choice but to declare taht your constructor also throws an exception.
+
+			public MyRemoteImpl() throws RemoteException{}
+			//You don't have to put anything in the constructor. You just need a way to declare that your superclass constructor throws an exception.
+
+	4. Register the service with the RMI registry
+
+		Now that you've got a remote service, you have to make it available to remote clients. You do this by instantiating it and putting it into the RMI registry (which must be running or this line of code fails). When you register the implementation object, the RMI system actually putst he stub in the registry, since that's what the client really needs. Register your service using the static rebind() method of the java.rmi.Naming class.
+
+			try{
+				MyRemote service = new MyRemoteImpl();
+				Naming.rebind("Remote Hello", service);
+			}	catch(Exception ex) {ex.printStackTrace();}
+
+				Give your service a name (that clients can use to look it up in the registry) and register it with teh RMI registry. When you bind the service object, RMI swaps the service for the stub and puts the stub in the registry.
+
+Step 3: generate stubs and skeletons
+
+	1. Run rmic on the remote implementation class (not the remote interface)
+
+		The rmic tool, that comes with the JDK, takes a service implementation and creates two new classes, the stub and the skeleton. It uses a naming convention that is the name of your remote implementation, with either _Stub or _Skeleton added to the end. There are other options with rmic, including not generating skeletons. rmic must be able to see your implementation class, so you'll probably run rmic from teh directory where your remote implementation is.
+
+Step 4: run rmiregistry
+
+	1. Bring up a terminal and start the rmiregistry
+
+		Be sure you start it from a directory that has access to your classes. The simplest way is to start from your 'classes' directory
+
+Step 5: start the service
+
+	1. Bring up another terminal and start your service
+
+		This might be from a main() method in your remote implementation class, or from a separate launcher class. In this simple example, we put the starter code in the implementation class, in a main method that instantiates the object and registers it with RMI registry.
+
+
+How does the client get the stub object?
+
+	The client has to get the stub object, since that's the thing the client will call methods on. And that's where the RMI registry comes in. The client does a 'lookup', like going to the white pages of a phone book, and essentially says, "here's a name, and i'd like the stub that goes with the name."
+
+	MyRemote service = (MyRemote) Naming.lookup("rmi://127.0.0.1/Remote Hello");
+		MyRemote: The client always uses the remote implementation as the type of the service. In fact, the client never needs to know the actual class name of your remote service.
+		(MyRemote): You have to cast it to the interface, since the lookup method returns type Object.
+		lookup(): lookup() is a static method of the Naming class
+		127.0.0.1: your host name or IP address goes here
+		Remote Hello: This must be the name that the service was registered under.
+
+	1. Client does a lookup on the RMI registry
+		Naming.lookup("rmi://127.0.0.1/Remote Hello");
+
+	2. RMI registry returns the stub object
+		(as the return value of the lookup method) and RMI deserializes the stub automatically. You MUST have teh stub class (that rmic generated for you ) on the client or teh stub won't be deserialized
+
+	3. Client invokes a method on the stub, as though the stub IS the real service.
+
+How does the client get the stub class?
+
+	Be sure each machine has the class files it needs.
+	The top three things programmers do wrong with RMI are:
+	1) Forget to start rmiregistry before starting remote service(when you register the service using Naming.rebind(), the rmiregistry must be running!)
+	2) Forget to make arguments and return types serializable (you won't know until runtime; this is not something the compiler will detect)
+	3) Forget to give the stub class to the client.

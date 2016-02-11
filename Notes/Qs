@@ -1,0 +1,22 @@
+Qs
+
+Give me a method getFile() that reads a FileThing.txt
+
+	void getFile() {
+		try {
+			File file = new File("FileThing.txt");
+			BufferedReader br = new BufferedReader(new FileReader(file));
+		} catch (Exception ex) {ex.printStackTrace();}
+	}
+
+What is the main point of generics? When is it used generally?
+	It lets you write type-safe collections. Most code you write that deals with generics will be collection-related code.
+
+To use a TreeSet, what do you need to be true(either)?
+	1.The elements in the list must be of a type that implements Comparable
+		class Book implements Comparable
+	2. You use the TreeSet's overloaded constructor that takes a Comparator.
+		public class myCompare implements Comparator<myObj>
+		TreeSet<myObj> tree = new TreeSet<myObj>(myCompare);
+
+		

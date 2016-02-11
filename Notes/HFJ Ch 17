@@ -1,0 +1,288 @@
+HFJ Ch 17
+
+package, jars and deployment
+
+Deployment Options:
+1. Local
+	The entire application runs on the end-user's computer, as a stand-alone, probably GUI , program, deployed as an executable JAR.
+2. Combination of local and remote
+	The application is distributed with a client portion running on the user's local system, connected to a server where other parts of the application are running.
+3. Remote
+	The entire Java application runs on a server system, with the client accessing the system through some non-Java means, probably a web browser.
+
+Separate source code and class files.
+	A single directory with a pile of source code and class files is a mess, you need to separate the two.
+
+	The key is a combination of directory structure organization and the -d compiler option.
+
+	There are dozens of ways to organize, your company may have a specific type. But we recommend an organizational scheme that's become almost standard.
+
+	With this scheme, you create a project directory, and inside that you create a directory called source and a directory called classes. You start by saving your source code (.java files) into the source directory. Then the trick is to compile your code in such a way that the output(.class files) ends up in the classes directory.
+
+	And there's a nice compiler flag, -d, that lets you do that.
+		%cd MyProject/source
+		%javac -d ../classes MyApp.java
+
+		This tells teh compiler to put the compiled code into the classes directory that's one up and one back down from the working directory.
+
+	To compile all the .java files in the source directory, use:
+		%javac -d ../classes *.java
+		//*.java compiles ALL source files in the current directory.
+
+Put your Java in a JAR
+
+	JAR file is a Java ARchive. Based on the pkzip file format. It lets you bundle all your classes so that instead of giving your client 28 class files, you hand over a single JAR.
+
+	What does the client do with the AJR? How do you get it to run?
+
+	You make the JAR executable.
+
+	An executable JAR means the end-user doesn't ahve to pull the class fiels out before running the program. The user can run the app  while the class files are still in the JAR. The trick is to create a manifest file, that goes in the JAR and holds the information about the files in the JAR. To make a JAR executable, the manifest must tell the JVM which class has the main() method.
+
+Making an executable JAR
+
+	1. Make sure all of your class files are in the classes directory
+
+	2. Create a manifest.txt file that states which class has the main() method.
+		Make a text file named manifest .txt that has one line:
+			Main-Class: MyApp //do not put .class on the end
+
+		Press the return key after typing the Main-Class line, or your manifest may not work correctly. Put the manifest file into the "classes" directory
+
+	3. Run the jar tool to create a JAR file that contains everything in teh classes directory, plus the manifest.
+		%cd MiniProject/classes
+			%jar -cvmf manifest.txt app1.jar *.class
+			OR
+			%jar -cvmf manifest.txt app1.jar MyApp.class
+
+Running(executing) the JAR
+
+	Most 100% local Java apps are deployed as executabel JAR files.
+
+	Java is capable of loading a class from a JAR, and calling the main() method of that class. In fact, the entire application can stay in the JAR. Once the abll is rolling, the JVM doesn't care wehre your classes come from, as long as it can find them. And one of the places the JVM looks is within any JAR files in the classpath. If it can see a JAR, the JVM will look in that JAR when it needs to find and load a class.
+
+		%cd MyProject/classes
+		%java -jar app1.jar
+
+Put your classes in packages!
+	
+	Packages prevent class name conflicts
+
+		Packages aren't just for preventing name collisions, that's a key feature. 
+
+		A package name is like the full name of a class, technically known as the fully-qualified name.
+
+Preventing package name conflicts
+
+	Sun strongly suggests a pakcage naming convention that greatly reduces that risk - prepend every class with your reverse domain name. Remember, domain names are guaratneed to be unique.
+		Reverse domain package names:
+			com.headfirstjava.projects.Chart
+
+To put your class in a package:
+
+1. Choose a package name
+	We're using com.headfirstjava as our example. The class name is PackageExercise, so the fully-qualified name of the class is now:
+		com.headfirstjava.PackageExercise
+
+2. Put a package statement in your class
+	It must be the first statement in the source code file, above any import statements. There can be only one package statement per source code fiel, so all classes in a source file must be in the same package. That includes inner classes of course.
+		package com.headfirstjava;
+		import javax.swing.*;
+
+		public class PackageExercise{}
+
+3. Set up a matching directory structure
+	Your class isn't truly in a package until you put the class in a matching directory structure. So, if the fully-qualified class name is com.headfirstjava.PackageExercise, you MUST put the PackageExercise source code in a directory named headfirstjava, which must be in a directory named com.
+	It is possible to compile without doing that, but trust us- it's not worth the other problems you'll have. Keep your source code in a directory structure that matches the package structure, and you'll avoid a ton of painful headaches down the road.
+
+Compiling and running with packages
+
+	When your class is in a package, it's a little tricker to compile and run. The main issue is that both teh compiler and JVM have to be capable of finding your class and all of the other classes it uses. For the classes in the core API, that's never a problem.
+
+	Compiling with the -d(directory) flag
+		%cd MyProject/source //stay in the source directory, do not cd down.
+		%javac -d ../classes com/headfirstjava/PackageExercise.java
+			-d ../classes
+			tells the compiler to put the compiled code (class files) into the classes directory, within the right package structure!
+			com/headfirstjava
+			Now you have to specify the PATH to get to the actual source file.
+		To compile all the .java files in the com.headfirstjava package use:
+		%javac -d ../classes com/headfirstjava/*.java
+			*.java compiles every source (.java) file in this directory
+
+	Running your code
+		%cd MyProject/classes
+		%java com.headfirstjava.PackageExercise
+			You MUST give the fully-qualified fclass name. The JVM will see that, andimmediately look inside its current directory and expect to find a directory named com, where it expects to find a directory named headfirstjava, and in there it expects to find teh class. If the class is in teh "com" directory, or even in "classes" it won't work.
+
+The -d flag is even cooler than we said.
+
+	the -d flag tells the compiler, "Put the class into its package directory structure, using the class specified after the -d as the root directory. But if the directories aren't there, create them first and then put the class in the right place!"
+
+	Once your class is in a package, you can't call it by its 'short' name. You MUST specify, at the command-line, the fully-qualified name of the class whose main() method you want to run. But since the fully-qualified name includes the apckage structure, Java insists that the class be in a matchign directory structure. So if at the command-line you say:
+		%java com.foo.Book
+	The JVM wil look in its current directory(and the rest of its classpath), for a directory named com. It will not look for a class named Book, until it has found a directory named "com" with a directory inside named "foo". Only then will the JVM accept that its found the correct Book class. If it finds a Book class anywhere else, it assumes the class isn't in the right structure, even if it is! The JVM won't for example, look back up the directory tree to say "Oh, I can see that above us is a directory named com, so this must be the right package"
+
+Making an executable JAR with packages.
+
+	When your class is in a package, the package directory structure must be inside teh JAR! You cant' just pop your classes in teh JAR the way we did pre-packages. ANd you must be sure that you don't influde any other directories above your package. The first directory of your package (usually com) must be the first directory within the JAR! If you were to accidentally include the directory above the package (eg classes directory), the JAR wouldn't work correctly.
+
+	classes
+	^			^
+	com 	manifest.txt
+	^
+	headfirstjava
+	^
+	PackageExercise.class
+
+	1. Make sure all of yoru class files are within the correct package structuer, under the classes directory.
+
+	2. Create a manifest.txt file that states which class has the main() method, and be sure to use the fully-qualified class name.
+		Make a text file named manifest.txt with a single line:
+			Main-Class: com.headfirstjava.PackageExercise
+		Put the manifest file into the classes directory.
+
+	3. Run the jar tool to create a JAR file that contains teh package directories plus the manifest.
+		The only thing you need to include is the 'com' directory, and the entire package(and all classes) will go into the JAR.
+			%cd MyProject/classes
+			%jar -cvmf manifest.txt packEx.jar com //All you specify is the com directory, and you'll get everything in it.
+
+So where did the manifest file go?
+	The jar tool can do more than just create and run a JAR. You can extract the contents of a JAR(like unzipping)
+
+	jar commands for listing and extracting
+	1. List the contents of a JAR
+		% jar -tf packEx.jar
+			-tf
+			stands for 'Table File' as in "show me a table of the JAR file"
+
+	2. Extract the contents of a JAR(unjar)
+		%cd Sky
+		%jar -xf packEx.jar
+			-xf
+			stands for 'Extract File' and it works like unzipping. If you extract the packEx.jar, you'll see the META-INF directory and the com directory in your current directory
+
+	META-INF stands for 'meta information' the jar tool creates the meta-inf directory as well as teh MANIFEST.MF file. It also takes the contents of your manifest file, and puts it into the MANIFEST.MF file. So your manifest file doesn't go into the jar, but the contents of it are put into the 'real' manifest.
+
+//BULLET POINTS//
+
+- Organize your project so that your source code and class files are not in the same directory.
+- A standard organization structure is to create a project directory, and then put a source directory and a clases directory inside of the project directory.
+- Organizing your classes into packages prevents naming collisions with otehr classes, if you prepend your reverse domain name on the front of a class name.
+- To put a class in a package, put a package statement at the top of the source code file, before any import statements:
+	package com.wickedlysmart;
+- To be in a package, a class must be in a directory structure that exactly matches the package structure. For example, com.wickedlysmart.Foo, the Foo class must be in a directory named com>wickedlysmart
+- To make your compiled class land in the correct package directory structure under the classes directory, use the -d compiler flag:
+	% cd source
+	% javac -d ../classes com/wickedlysmart/Foo.java
+- You can bundle your classes into JAR(Java ARchives) files. JAR is based on the pkzip format.
+- You can make an executable JAR file by putting a manifest into the JAR that states which class has the main() method. To create a manifest file, make a text file with an entry like the following(for example):
+	Main-Class: com.wickedlysmart.Foo
+- Be sure you hit the return key after typing the Main-Class line, or your manifest file may not work.
+- To create a JAR file, type:
+	jar -cvfm manifest.txt MyJar.jar com
+- The entire package directory structure (and only the directories matching the package) must be immediately inside the JAR file.
+- To run an executable JAR file, type:
+	java -jar MyJar.jar
+
+Java Web Start
+
+	With Java Web Start (JWS), your application is launched for teh first time from a Web browser but it runs as a stand-alone application(almost), without the constraints of the browser. And once it's downloaded to the end-user's machine (which happens the first time the user accesses the browser link that starts the download), it stays there.
+
+	JWS is a small Java program taht lives on teh client machine and works like a browser plug-in. This Java program is called the Java Web Start 'helper app', and its key purpose is to manage the downloading,updating, and launching(executing) of your JWS apps.
+
+	Whats nice about JWS is its ability to detect when even a small part of application (say a single class file) has changed on the server, and - without any end-user intervention - download and integrate the updated code.
+
+	Theres still the issue of getting the end-user the Java and JWS. But you can set things up so that if your end-users don't have JWS, they can download it from Sun. And if they DO have JWS, but their version of Java is out of date, the Java 2 SE can eb downloaded to the end-user machine.
+
+	Best of all, it's simple to use. You can serve up a JWS app much like any other type of Web resource such as a plain old HTML page or a JPEG image. You set up a Web (HTML) page with a link to your JWS application, and you're in business.
+
+	End-users launch a Java Web Start app by clicking on a link in a web page. But once the app downloads, it runs outside the browser, just like any other stand-alone Java application. In fact, a JWS app is just an executable JAR that's distributed over the Web.
+
+How Java Web Start works
+
+1. The client clicks on a Web page link to your JWS application (a .jnlp file)
+	The Web page link
+		<a href = "MyApp.jnlp">Click</a>
+
+2. The Web server (HTTP) gets the request and sends back a .jnlp file (this is NOT the JAR)
+	The .jnlp file is an XML document that states teh name of the application's executable JAR file
+
+3. Java Web Start (a small 'helper app' on the client) is started up by the browser. The JWS helper app reads the .jnlp file, and asks the server for the MyApp.jar file.
+
+4. The Web server 'serves' up the requested .jar file.
+
+5. Java Web Start gets the JAR and starts the application by calling the specified main() method (just like an executable JAR).
+
+The .jnlp file
+
+	To make a JWS app, you need a .jnlp (Java Network Launch Protocol) file that describes your application. This is the file the JWS app reads and uses to find your JAR and launch the app (by calling the JAR's main() method). A .jnlp file is a simple XML document that has several different things you can put in, but as a minimum, it should look like this:
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<jnlp spec="0.2 1.0"
+	codebase="http://127.0.0.1/~kathy"
+
+//The 'codebase' tag is where you specify the 'root' of where your web start stuff is on the server. We're testing this on our localhost, so we're using the local loopback address. For web start apps on our internet web server, this would say "http://www.wickedlysmart.com"
+
+	href="MyApp.jnlp">
+
+//This is the location of the .jnlp file relative to the codebase. This example shows that MyApp.jnlp is available in the root directory of the web server, not nested in some other directory.
+
+		<information>
+			<title>kathy App</title>
+			<vendor>Wickedly Smart</vendor>
+			<homepage href="index.html"/>
+			<description>Head First Webstart demo</description>
+			<icon href="kathys.gif"/>
+			<offline-allowed/>
+//This means the user can run your program without being connected to the internet. If teh user is offline, it means the automatic-updating feature won't work.
+		</information>
+
+		<resources>
+			<j2se version="1.3+"/>
+//This says that your app needs ver 1.3 or greater of Java
+			<jar href="MyApp.jar"/>
+//The name of yoru executable JAR. You might have otehr JAR files as well, that hold otehr classes or even sounds and images used by your app.
+		</resources>
+
+		<application-desc main-class="HelloWebStart"/>
+</jnlp>
+
+
+Steps for making and deploying a Java Web Start app
+
+1. Make an executable JAR for your application.
+
+2. Write a .jnlp file
+
+3. Place your JAR and .jnlp files on your Web Server.
+
+4. Add a new mime type to your Web server.
+	application/x-java-jnlp-file
+
+	This causes the server to send the .jnlp file with the correct header, so that when the browser receives the .jnlp file it knows what it is and knows to start the JWS helper app.
+
+5. Create a Web page with a link t your .jnlp file
+	<HTML>
+		<BODY>
+			<a href="MyApp2.jnlp">Launch My App</a>
+		</BODY>
+	</HTML>
+
+
+How is a JWS different from an applet?
+
+	Applets can't liev outside of a Web Browser. Applets are downloaded from teh Web as part of a Web page rather than simply being FROM a web page. With JWS applications, once they'er downloaded from the web, the user doesn't even have to be using a browser to relaunch the application locally. Instead the user can start up the JWS helper app to launch the already downloaded app.
+
+
+//BULLET POINTS//
+
+- JWS technology lets you deploy a stand-alone client application from the Web.
+- JWS includes a 'helper app' that must be installed on the client(along with Java)
+- A JWS app has two pieces: an executable JAR and a .jnlp file
+- A .jnlp file is a simple SXML document that describes your JWS application. It includes tags for specifying the name and location of the JAR, and the name of the class with the main() method.
+- When a browser gets a .jnlp file from the server, the browser starst up teh JWS helper app.
+- The JWS helper app reads the .jlp file and requests the executable JAR from the Web server.
+- When the JWS gets the JAR, it invokes the main() method.
+
