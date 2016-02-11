@@ -177,3 +177,70 @@ How does the client get the stub class?
 	1) Forget to start rmiregistry before starting remote service(when you register the service using Naming.rebind(), the rmiregistry must be running!)
 	2) Forget to make arguments and return types serializable (you won't know until runtime; this is not something the compiler will detect)
 	3) Forget to give the stub class to the client.
+
+//BULLET POINTS//
+
+- An object on one heap cannot get a normal Java reference to an object on a different heap.
+- Java Remote Method Invocation (RMI) makes it seem like you're calling a method on a remote object (i.e. an object in a different JVM), but you aren't.
+- When a client calls a method on a remote object, the client is really calling a method on a proxy of the remote object. The proxy is called a 'stub'
+- A stub is a client helper object that takes care of the low-level networking details (sockets, streams, serialization, etc.) by packaging and sending method calls to the server.
+- To build a remote service (in other words, an object that a remote client can ultimately call methods on), you must start with a remote interface.
+- A remote interface must extend the java.rmi.Remote interface, and all methods must declare RemoteException.
+- Your remote service implements your remote interface.
+- Your remote service should extend UnicastRemoteObject. There are other wasy to create a remote object, but extending UnicastRemoteObject is the simplest.
+- Your remote service class must have a constructor, and the constructor must declare a RemoteException (because the superclass constructor declares one).
+- Your remote service must be instantiated, and the object registered with the RMI registry.
+- To register a remote service, use the static Naming.rebind("Service Name"< serviceInstance);
+- The RMI registry must be running on the same machine as the remote service, before you try to register a remote object with the RMI registry.
+- The client looks up your remote service using the static Naming.lookup("rmi://MyHostName/ServiceName");
+- Almost everything related to RMI can throw a RemoteException (checked by the compiler). This includes registering or looking up a service in the registry, and all remote method calls from the client to the stub.
+
+What about Servlets?
+
+	Servlets are Java programs that run on (and with) an HTTP web server. When a client uses a web browser to interact with a web page, a request is sent back to the web server. If the request needs the help of a Java servlet, the web server runs (or calls, if the servlet is already running) the servlet code. Servlet code is simply code that runs on the server, to do work as a result of whategver the client requests. 
+
+	Servlets can use RMI.
+
+	By far, the most common use of J2EE technology is to mix servlets and EJBs together, where servlets are the client of the EJB. And in that case, the servlet is using RMI to talk to the EJBs
+
+	1. Client fills out a registration form and clicks 'submit'. The HTTP server gets the request, sees that it's for a servlet, and sends the request to the servlet.
+
+	2. Servlet (Java code) runs, adds data to the database, composes a web page (with custom info) and sends it back to the client where it displays in the browser.
+
+Steps for making and running a servlet
+
+1. Find out where your servlets need to be placed.
+
+	For these examples, we'll assume that you already have a web server up and running, and that it's already configured to support servlets. The most important thing is to find out exactly where your servlet class files have to be placed in order for your server to 'see' them. If you have a web site hosted by an ISP, the hosting service can tell you where to put your servlets, just as they'll tell you where to place your CGI scripts.
+
+2. Get the servlets.jar and add it to your classpath
+
+	Servlets aren't part of the standard Java libraries; you need the servlets classes packaged into the servlets.jar file. You can download the servelts classes from java.sun.com or you can get them from your Java-enabled web server (like Apache Tomcat, at the apache.org site). Without these classes, you won't be able to compile your servlets.
+
+3. Write a servlet class by extending HttpServlet
+
+	A servlet is just a Java class that extends HttpServlet (from the javax.servlet.http package). There are other types of servlets you can make, but most of the time we care only about HttpServlet.
+
+		public class MyServletA extends HttpServlet {}
+
+4. Write an HTML page that invokes your servlet.
+
+	When a user clicks a link that references your servlet, the web server will find the servlet and invoke the appropriate method depending on the HTTP command (GET,POST,etc.)
+
+		<a href="servlets/MyServletA">The Servlet.</a>
+
+5. Make your servlet and HTML page available at your server.
+
+	This is completely dependent on your web server (and more specifically, on which version of Java Servlets that you're using). Your ISP may wimply tell you to drop it into a "Servlets" directory on your web site. But if you're using, say, the latest version of Tomcat, you'lll have a lot more work to do to get the servlet (and web page) into the right location.
+
+//BULLET POINTS//
+
+- Servlets are Java classes that run entirely on (and/or within) an HTTP (web) server.
+- Servlets are useful for running code on the server as a result of client interaction with a web page. For example, if a client submits information in a web page form, the servlet can process the information, add it to a database, and send back a customized, confirmation response page.
+- To compile a servlet, you need the servlet packages which are in the servlets.jar file. The servlet classes are not part of the Java standard libraries, so you need to download the servlets.jar from java.sun.com or get them from a servlet-capable web server. (Note: the Servlet library is included with the Java 2 Enterprise Edition(J2EE))
+- To run a servlet, you must have a web server capable of running servlets, such as the Tomcat server from apache.org
+- Your servlets must be placed in a location that's specific to your particular web server, so you'll need to find that out before you try to run your servlets. If you have a web site hosted by an ISP that supports servlets, the ISP will tell you which directory to place your servlets in.
+- A typical servlet extends HttpServlet and overrides one or more servlet methods, such as doGet() or doPost().
+- A web server starts the servlet and calls the appropriate method (doGet(), etc.) based on the client's request.
+- The servlet can send back a response by getting a PrintWRiter output stream from the response parameter of the doGet() method.
+- The servlet 'writes' out an HTML page, complete with tags.
