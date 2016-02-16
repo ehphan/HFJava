@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ch4ex1</title>
+</head>
+<body>
+	<script>
+		function fahrToCent(degFahren){
+			var degCent = 5/9 * (degFahren -32);
+			return degCent;
+		}
+
+		var degFahren = [212, 32, -459.15];
+		var degCent = [];
+		var loopCounter;
+
+		for (loopCounter = 0; loopCounter<=2; loopCounter++){
+			degCent[loopCounter] = fahrToCent(degFahren[loopCounter]);
+			document.write(degFahren[loopCounter]+" degs Fahren is "+degCent[loopCounter]+" degs Cels")
+		}
+
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+coca JS
+
+confirm("Text Here");
+
+	opens a dialogue box that asks the user to confirm while displaying text here
+
+prompt("Text here");
+
+	promps user for a response in dialogue box
+
+Using console.log
+
+	The interpreter doesn't print out every single thing it does. console.log() will take whatever is inside the parentheses and log it to the console below your code. this is commonly called printing out.
+
+JS operators
+
+	some new ones
+
+	=== equal value AND equal type
+
+	!== not equal value OR not equal type
+
+Substrings
+
+	"some word".substring(x,y);
+
+	x is where you start chopping
+
+	y is where you finish chopping the original string
+
+	Example: to select He in "Hello" you would do
+		"hello".substring(0,2);
+
+	the letter h is in position 0 e is position 1, etc. So you start at position 0 and slice right up until position 2
+
+Functions!
+
+	Making a function is pretty easy, like so:
+
+	var divByThree = function (number) {
+		var val = number / 3;
+		console.log(val);
+	};
+
+	divByThree(6);
+
+	Functions take inputs, do something, and produce output.
+
+	the var keyword declares a variable named dudeThing
+
+	The keyword function tells the computer that dudeThing is a function and not something else
+
+	params go in the parenths. the computer will look out for it in the code block
+
+	THE ENTIRE FUNCTION ENDS WITH A SEMI COLON
+
+Don't repeat yourself. Don't repeat yourself
+
+	If you're repeating shit in code thats bad practice dawg, be lazy, be easy.
+
+Return keyword
+	
+	When we run functions, we're not always trying to print something, sometimes we need a value returned.
+
+Global vs Local variables
+	
+	SCOPE: scope can be global or local.
+
+	Variables defined outside a function are accessible anywhere once they have been declared. These are GLOBAL.
+
+	VARs defined in a function are local to that function.
+
+	If you declare a var globally and need to use it in a function, use the name WITHOUT the var keyword in front of it. if you want to make a new local var with the same name, declare with VAR
+
+While vs For
+
+	for loops are great for doing the same thing over, and when you have a definite number of times to run the thing.
+
+	While loops are good when you don't know how many times you'll have to do thing.
+
+do / while
+
+	When you want your loop to run at least one time no matter what. Do this thing one time, then check the condition to see if we should keep going.

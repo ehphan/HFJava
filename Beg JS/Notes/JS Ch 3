@@ -1,0 +1,198 @@
+JS Ch 3
+
+Decisions and loops
+What do:
+	> Comparing number and string values
+	> Making decisions with the if,else, and switch statements
+	> Repeating code for as long as a condition is true
+
+Decision making - the if and switch statements
+
+	All programming languages enable you to make decisions - that is, they enable the program to follow a certain course of action depending on whether a particular condition is met. This is what gives programming languages their intelligence.
+
+	Conditions are comparisons between variables and data, such as:
+
+		> is A bigger than B?
+		> is X equal to Y?
+		> is M not equal to N?
+
+	You'll notice that all of these questions have a yes or no answer, they are boolean-based and can only evaluate to true or false. So we'll be telling our code to execute certain things if a condition is true.
+
+	In JS, you can change the flow of the code's execution depending on whether a condition is true or false, using an if statement or a switch statement.
+
+Comparison operators
+
+	Decision making also has its own operators, which enable you to test conditions. Comparison operators, just like the mathematical operators you saw in the preceding chapter, have a left-hand side LHS, and a right-hand side RHS, and the comparison is made between the two. The technical terms for these are the left operand and the right operand. For example, the less-than operator, with the symbol <, is a comparison operator. You could write 23<45, which translates as "is 23 less than 45?" here the answer would be true.
+
+	Usual suspects:
+
+		== tests if LHS is equal to RHS
+		< tests if LHS is less than RHS
+		> tests LHS greater than RHS
+		<= tests LHS less or equal RHS
+		>= tests LHS greater or equal RHS
+		!= tests LHS is not equal to RHS
+
+Precedence
+
+	Remember that operators have an order of precedence (PEMDAS, positioning). Comparison operators have the same deal. == and != have the lowest order of precedence, then the rest have the same level (<,>,<=,>=)
+
+	All of these comparison operators are lower than your math operators, so 
+		3*5<2*5
+	would still work out okay, but its a good rule to just use parentheses.
+
+Assignment versus comparison
+
+	don't mix up the assignment operator = and the comparison operator ==.
+
+Assigning the results of comparisons
+
+	You can store the results of a comparison in a variable, for ex.
+
+		var age = prompt("Enger age:","");
+		var isOverSixty = parseInt(age,10)>60;
+		document.write("Older than 60: "+isOverSixty);
+
+	We get the age in the prompt, and parse the number, and use the > to see if it's greater than 60. This will give us a true or false stored in the isOverSixty
+
+The if statement
+
+	The if statement is one you'll find yourself using in almost every program that is more than a couple of lines long.
+
+		if(roomTemperature>80) {
+			roomTemperature= roomTemperature - 10;
+		}
+
+	If the things in the (test condition) are true execute the curlies.
+
+Logical operators
+
+	There are three logical operators AND, OR, NOT
+	AND: &&
+	OR: ||
+	NOT: !
+
+AND
+
+	AND operator takes two booleans LHS/RHS and results in another boolean. if LHS and RHS evaluate to true, the result is true
+
+OR
+
+	Just like and, it takes two booleans, but this time if either of the LHS/RHS are true, the result is true.
+
+NOT
+
+	JS is used to executing code if a condition is true. So if you want a false condition to cause code to execute, you need to switch that false value to true(and any true value to false). That way you trick JS to execute code after a false condition
+
+	You do this using the NOT operator. This operator reverses the logic of a result; it takes one boolean value and changes it to the other boolean value. It changes true to false and false to true. This is sometimes called negation.
+
+Multiple conditions inside an if statement
+
+	You can nest if statements like
+
+		if(degCent<100){
+			if(degCent>0){
+				document.write("degCent is between 0 and 100");
+			}
+		}
+
+	But its a bit much to type and can be confusing. JS offers a better alternative - using multiple conditions inside the condition part of the if statement. The multiple conditions are strung together with the logical operators you just looked at. So the preceding code could be written:
+
+		if (degCent>0 && degCent<100) {
+			document.write("Shit");
+		}
+
+	the if statement's condition first evaluates if degCent >0, if thats true, then it runs the other one. only if both of these are true will the following code run.
+
+else and else if
+
+	if (myAge>=0 && myAge <=10){
+		document.write("My age is between0-10");
+	}	else{
+		document.write("my age is not between 0-10");
+	}
+
+Comparing strings
+
+	You can compare strings the same as numbers, be aware that it is case sensitive so "Paul" != "paul"
+
+	The >= etc operators work with strings as well as with numbers, but again it is an alphabetical comparison. so "A" < "B" is true, because A comes before B in the alphabet. but "a" < "B" is false, because uppercase letters are treated as always coming before lowercase letters. The code numbers for uppercase letters are lower than the code numbers for lowercase letters.
+
+	to avoid confusion, you can convert strings to upper or lowercase using toUpperCase() or toLowerCase() functions.
+
+The switch statement
+
+	The best way to think of the switch statement is "switch to the code where the case matches". A switch statement has four important elements:
+	> the test expression
+	> the case statements
+	> the break statements
+	> the default statement
+
+	The test expression is given in the parentheses following the switch keyword
+
+	The case statements do the condition checking.
+
+	Remember to put break after your case statements, so you don't run through the rest of the code, once you meet your test expression, you wanna run your block and then get out of the switch.
+
+	Finally, you have the default case, which is the code that will execute when none of the other case statements match. default statement is optional, if you have no default code you wanna execute then you can leave it out. 
+
+ex3
+
+Looping - the for and while statements
+
+	looping is a repeating block of code when a condition is true. This is achieved in JS with the use of two statements: while and for.
+
+The for loop
+
+	same shit as java
+		(var loopCounter = 0; loopCounter <=2; loopCounter++){
+			//code to run
+		}
+
+the for... in loop
+
+	This loop enables you to loop through each element in the array without having to know how many elements the array actually contains. Basically says "For each element in the array, do something". Rather than having to work out the index number of each element, the for...in loop does it for you and automatically moves to the next index with each iteration.
+
+		for(index in arrayName) {
+			//some code
+		}
+
+	index is a variable you declare prior to the loop, which will automatically be populated with the next index value in the array. arrayName is the name of the variable holding the array you want to loop through.
+
+		var myArray = ["Paul","Paula","Pauline"];
+
+		for (var elementIndex in myArray) {
+			document.write(myArray[elementIndex]);
+		}
+
+		This allows you to forloop without the definite counter, it will just run through however many indexes it has.
+
+The while loop
+
+	The for loop is used for looping a definite number of times. The while loop enables you to test a condition and keep on looping while it's true.
+
+		while(degCent!=100){
+			//some code
+		}
+
+	The while loop consists of a condition which, if it evaluates to true, causes teh block of code inside the curly braces to execute once; then the condition is re-evaluated. It'll keep doing it until condition == false.
+
+	One thing to watch out for is that if the condition is false to start with, the while loop will not execute.
+
+The do... while loop
+
+	while loops wont' execute if the statement is false to begin with. But sometimes you need to run something in a while atleast once, regardless of the while being true.
+
+		var userAge;
+
+		do{
+			userAge = prompt("Please enter your age","");
+		}	while (isNaN(userAge)==true);
+
+	the stuff within do will execute regardless of while's statement condition. 
+
+The break and continue statements
+
+	You might need to break out of a for loop if you feed in the wrong kind of data.
+
+	The continue statement is similar to break in that it stops the execution of a loop at the point where it is found, but instead of leaving the loop, it starts execution at the next iteration, starting with the for or while's statement's condition being re-evaluated, just as if the last line of the loop's code had been reached.

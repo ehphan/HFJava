@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>5-7</title>
+</head>
+<body>
+	<script>
+		var greeting;
+
+		var nowDate = new Date();
+		var nowHour = nowDate.getHours();
+		var nowMinute = nowDate.getMinutes();
+		var nowSecond = nowDate.getSeconds();
+
+		if (nowMinute < 10){
+			nowMinute = "0" + nowMinute;
+		}
+
+		if (nowSecond < 10){
+			nowSecond = "0" + nowSecond;
+		}
+
+		if (nowHour < 12) {
+			greeting = "OH FUCK ITS EARLY";
+		}	else if (nowHour < 17) {
+			greeting = "its grind time baby";
+		}	else {
+			greeting = "oyasumi-nesai";
+		}
+
+		document.write("<h4>" + greeting + " and welcome to the Jungle</h4>");
+		document.write("According to your clock, the time is ");
+		document.write(nowHour + ":" + nowMinute + ":" + nowSecond);
+	</script>
+</body>
+</html>

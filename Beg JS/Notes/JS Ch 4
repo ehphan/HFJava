@@ -1,0 +1,79 @@
+JS Ch 4
+
+Functions and Scope
+
+Creating your own functions
+
+	function nameOfThing(param){
+		//code to run
+	}
+
+	Each function you define in JS must be given a unique name for that particular page. The name comes immediately after the function keyword.
+
+Scope and lifetime
+
+	scope is the extent of a variable or function's availability. Which parts of your code can access a variable and the data it contains
+
+GLOBAL SCOPE
+	
+	Any variables or functions declared outside of a function will be available to all JS code on the page. 
+
+	So this code's degFahren has global Scope
+
+		var degFahren = 12;
+
+		function fahrToCent(thing){
+			var degCent = 5/9 * (degFahren-32);
+			return degCent;
+		}
+
+	But we can change the global variable from within the function
+
+		var degFahren = 12;
+
+		function fahrToCent(thing){
+			degFahren = 20;
+			var degCent = 5/9 * (degFahren-32);
+			return degCent;
+		}
+
+	This change in value changes the GLOBAL variable, so outside of the block it still counts as 20.
+
+	In practice, you want to avoid creating global variables and functions because they can be easily and unintentionally modified.
+
+Functional scope
+
+	Variables and functions declared inside a function are visible only inside that function. These are more commonly known as local variables.
+
+	So what happens when the code inside a function ends and execution returns to the point at which the code was called? Do the variables defined within the function retain their value when you call the function the next time?
+
+	No: variables not only have the scope property, where they are visible. But they also have a lifetime. When a function finishes, the variables in that function die and their values are lost, unless you return one of them to the calling code. 
+
+Functions as values
+	
+	JS is a powerful language, and a lot of that power comes from functions. functions can be treated just like any other type of value.
+
+		function fahrToCent(fahr){
+			var degCent = 5/9 * (fahr-32);
+			return degCent;
+		}
+
+		var myFunction = fahrToCent;
+
+	this assigns the fahrToCent() function to the myFunction variable, but look at the right side, the parenths are missing. it looks like a variable.
+
+	In this statement we are not executing the fahrToCent() function, but rather referring to it as the actual function itself.
+
+	This also means we can pass a function to another function's parameter:
+
+		function doSomething(fn) {
+			fn("Hello, World");
+		}
+
+		doSomething(alert);
+
+	This code defines a function doSomething(), and has a single param called fn. Inside the function, the fn variable is used as a function; it's executed by using the fn identifier followed by a pair of parenths. so it does alert("Hello, world");
+
+Summary
+
+	> Functions are reusable bits of code. JS has a lot of built-in functions that provide programmers services, such as converting a string to a #. However, JS also enables you to define and use your own functions using the function keyword. Functions can have 0+ params passed to them and can return a value if you so wish.

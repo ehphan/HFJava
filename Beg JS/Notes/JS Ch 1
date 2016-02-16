@@ -1,0 +1,70 @@
+JS Ch 1
+
+What Can JavaScript Do for Me?
+
+	JS is primarily used to interact with users.
+		- User input validation
+		- Enhancement
+
+	JS was originally created for validating form input. So like checking a user's credit card details.
+
+	But today JS is used for more than just input-related tasks. Advance JS-Driven applications can be created that rival the speed and functionality of conventional desktop applications. Such as Google Maps, GCalendar. These applications provide a real service. In most of these applications, JS only powers the UI, with the actual data processing being done on the server. But even then, JS could be used on the server if used with a JS-based processing engine.
+
+	Maybe get a proper HTML editor; one that enables you to edit the HTML source code, that's where you need to add your JS. Good tools aimed at developing we-based applications, like Adobe's Dreamweaver.
+
+Where do my scripts go?
+
+	Inserting JS into a page is much like inserting any other HTML content; you use tags to mark the start and the end of your script. The element you use to do this is <script/>. This tells the browser that the following chunk of text, bounded by the closing </script> tag, is not HTML to be displayed, but rather script code to be processed. The chunk of code surrounded by the <script> and </script> tags is called the script block.
+		<script>
+			//Example code
+		</script>
+
+	When the browser spots <script> tags, instead of trying to display the contained text to the user, it uses the browser's JS engine to run the code's instructions.
+
+	You can put the <script/> element inside the header or inside the body of the HTML page. However, although you can put them outside these areas ie - before the <html> tag or after </html> - This is not permitted in the web standards and so is considered bad practice. Today's JS devs typically add their <script> elements directly before the </body> tag.
+
+	The <script/> element has a type attribute that tells teh browser what type of text is contained within the element. For JS, the best practice is to omit the type attribute (browsers automatically assume that any <script/> element without a type is JS). We used to always set the type attribute to text/javascript, but witht he introduction of the HTML specification, it is no longer considered good practice to do so. Only include the type attribute if the <script/> elemetn contains something other tahn JS.
+
+Linking to an extended JS file
+
+	The <script/> element has the capability to specify taht the JS code is not inside the web page, but inside a separate file. You should give any external files the file extension .js. Though it's not compulsory, it does make it easier for you to work out waht is contained in each of your files.
+
+	To link to an external JS file, create a <script/> element and use its src attribute to specify the location of the external file.
+
+	Imagine you've created a file called MyCommonFunctions.js to which you want to link, and the file is in the same directory as your web page. The <script/> element would look like this:
+
+		<script src="MyCommonFunctions.js"></script>
+
+	The browser will read this code and include the file contents as part of your web page. When linking to external files, you must not put any code within the opening and closing <script> tags; for example
+
+		INVALID
+		<script src="MyCommonFunctions.js">
+		var myVariable;
+		if (myVariable == 1) {
+			//do thing
+		}
+		</script>
+
+	It's important to note that an opening <script> tag must be accompanied by a closing </script> tag. You cannot use the self-closing syntax found in XML
+
+		INVALID
+		<script src="MyCommonFunctions.js" />
+
+	Generaly, you use the <script/> element to load local files (those on the same computer as the web page itself). However, you can load external files from a web server by specifying the web address of the file. For example, if your file was called MyCommonFunctions.js and was loaded on a web server with the domain name www.mysite.com, the <script/> element would look like this:
+
+		<script src="http://www.mysite.com/MyCommonFunctions.js"></script>
+
+	Linking to an external file is common when incorporating well-known JS libraries into a web page. The servers are known as Content Delivery Networks, or CDNs. But if they alter things it could fuck your code, so be very sure you trust them.
+
+Advantages of Using an External File
+
+	The biggest advantage of external files is code reuse. Instead of cut pasting between several pages, you can link to an external file and all the pages linked up will have it. It works nicely for updating as well
+
+	External files can also be cached in your browser. If your files are large, this could save download time and also reduce bandwidth usage.
+
+	When the browser loads in teh web page, the browser goes through it, rendering it tag by tag from top to bottom of the page. This process is called parsing. The web browser starts at the top of the page and works its way down to the bottom of the page. So the beginning of the html will set the page background to white, but as it goes down and reads the JS, it sets to red.
+
+alert()
+
+	The message box displayed by the alert() function is modal. Modal simply means that the message box won't go away until the user closes it by clicking the OK button. In fact, parsing of the page stops at the line where the alert() function is used and doesn't restart until the user closes the message box. 
+

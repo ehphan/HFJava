@@ -1,0 +1,226 @@
+JS Ch 2
+
+Types of Data in JS
+
+	Javascript is a eakly typed language and a lot more forgiving about how you use different types of data. When you deal with data, you often don't need to specify type; JS will work that out for itself. Furthermore, when you are using different types of data at teh same time, JS will work uot behind the scenes what you're trying to do.
+
+	Even though JS is very good at working out what data it's dealing with, on occasion it'll get things wrong or at least not do what you want it to do. In these situations, you need to make it explicit to JS what sort of data type you intended and how it should be used. To dot hat, you need to know a little bit about data types.
+
+Numerical data
+
+	Numerical data comes in two forms:
+
+	> Whole numbers, such as 145, also known as integers.
+
+	> Fractional numbers, such as 1.234, known as floating-point numbers.
+
+Text Data
+
+	Another term for one or more characters of text is a string. You tell JS that text is to be treated as text and not as code simply by enclosing it inside quotation marks. Strings can be wrapped in " or ', just be consistent.
+
+	So if you're trying to string o'rly, you wouldn't do 'o'rly' because it would cut the string short. "o'rly" works but you can also use the escape character \ backslash. so 'o\'rly' would be OK.
+
+Booleans
+
+	true or false, same biz
+
+Variables-Storing data in memory
+
+	Data can be stored either permanently or temporarily
+
+	Variables however are temporary, and when your visitors close the page, your variables are lost, unless you make it a point to save them.
+
+	JS is case sensitive, so myVariables != MyVariables.
+
+	There are some variable names that are reserved words. Certain characters such as & and % are not allowed in names. You are allowed to use numbers in your variable names, but the names must not begin with numbers. So 101myVariables is not okay, but myVariabels101 is cool.
+
+Creating variabels and giving them values.
+
+	Before you can use a variable, you should declare its existence to the JS engine using the var keyword. This tells the engine that it needs to reserve memory in which to store your data later. To declare a new variable called myFirstVariable you would write:
+
+		var myFirstVariable;
+
+	Note the semicolon at the end is not part of the name, but ends the statement.
+
+	You put data into your variables, a process called assigning values to your variables, by using the equals sign. For example, if you want your variable name myVar to hold the number 101, you would write:
+
+		myVar = 101;
+
+	The equals sign has a special name when used to assign values to a variable. it's called the assignment operator. = 
+
+Ex 1
+
+	var myVar;
+
+	When you declare var, it actually has a value of undefined, because it only exists to the JS engine, but not actual data. undefined is an actual primitive value in JS and it enables you to do comparisons.
+
+Assigning variabels with the value of other variables
+
+	You can assign a variable with a number or string, but you can assign a variable with the data stored inside another variable.
+
+		var myVar1;
+		var myVar2;
+		myVar2 = 22;
+
+	you can do this
+
+		myVar1 = myVar2;
+
+	and myVar1 will become 22
+
+Using data-calculations and basic string manipulation
+
+Numerical calculations
+
+	JS has the usual operators +- */
+
+	var totalSum;
+	totalSum = 10 + 5 + 5;
+	alert(totalSum);
+
+	First you declare a variable totalSum to hold the sum.
+
+Increment and Decrement operators
+
+	same ol' ++ --
+
+	So instead of doing this
+
+		myVar = myVar+1;
+		myVar = myVar-1;
+
+	you could do this
+
+		myVar++;
+		myVar--;
+
+	You can put the ++-- before or after and it does matter
+
+		myVar = myNum++ -20;
+
+	This would -20 from myNum and then increment, whereas
+
+		myVar = ++myNum -20;
+
+	would increment myNum and then subtract 20
+
+	Another increment operator is the good ol' += or -=, it's good to increment by an amount other than 1 so you can
+
+		myVar+=6;
+			is the same thing as
+		myVar = myVar+6;
+
+	Same thing goes for multiplication or subtraction
+
+		myVar *= 6;
+
+Operator Precedence
+
+	JS will PEMDAS your shit for free, but if you've got a + and a - on the same line JS will read from left to right.
+
+Basic string operations
+
+	adding two strings to make one string is a process termed concatenation. So you could add strings that say "goodbye " and "jojo" and it would come out "goodbye jojo" using the + operator
+
+		var concatString = "goodbye " + "jojo";
+
+Ex 5
+
+	document.x we used to set things like bgColor, but in this one we can use it to write text and HTML to the page
+
+		document.write()
+
+Mixing Numbers and strings
+
+	You can add numbers to strings easily because it will just concatenate ex.
+		alert("My age is "+101);
+	This would produce an alert box with "My age is 101" inside it
+
+Data type conversion
+
+	As you've seen if you string+number you'll concatenate the two. Usually, JS has enough sense to make data type conversions like this when it needs to, but sometimes you need to convert the type ofa piece of data yourself. You may be given a piece of string data that you want to think of as a number, which is likely to happen if you are using forms to collect data from the user. any values input by th user are treated as strings, even if they are numbers.
+
+	Could be a problem if JS thinks you have "25" and "15" as strings and adds them to be 2515 instead of 40.
+
+		1+2+"abc"
+			returns a string 3abc, whereas:
+		"abc" + 1 + 2
+			returns abc12
+
+	We have two conversion functions that convert strings to numbers: parseInt() and parseFloat()
+
+	parseInt() takes a string and converts it to an integer. parseInt() will run and build a number up until it hits an invalid point, the command will stop converting and return the number it has converted so far.
+
+		parseInt("123");
+			converts the string "123" to the number 123
+		parseInt("123abc");
+			converts the string "123abc" to the number 123, when it hits a it assumes the number has ended and just returns what it has.
+
+	parseFloat() does the same shit, but it returns floats/fractions. Knows about decimal points on the string and is considered an allowed part of the number.
+
+ex 7
+
+	parseInt(myString, 10)
+		Notice how the second value, the number 10, that is passed to parseInt(). This is called the radix, and it determines how the string is parsed into a number. By passing the number 10, you tell the parseInt() function to convert the number using the base 10 number system. But you can parseInt() to convert numbers to binary 2 hex 16. Always specify the radix, without it JS guesses what number system to use, and you could encounter unexpected results.
+
+Dealing with strings that won't convert
+
+	Some strings simply aer not convertible to numbers, such as strings taht don't contain any numerical data. 
+
+		myString = "I'm a name not a number";
+		parseInt(myString, 10);
+			gives us NaN, not a number.
+
+	NaN is actually a special value in JS. It has its own function, isNan(), which checks whether something is NaN or not, ex
+
+		myVar1 = isNaN("hello");
+
+	will store the value true in variable myVar1, because "Hello" is not a number, whereas
+
+		myVar2 = isNaN("34");
+
+	will store the value false, because 34 can be converted. In later chapters you see how you can use the isNaN() function to check the validity of strings as numbers.
+
+Arrays
+
+	The differene between a normal variable and an array is that an array can hold more than one item of data at the same time. For example, you could use an array with the name myArray to store both the numbers 25 and 35. Each place where a piece of data can be stored in an array is called an element.
+
+	You distinguish the pieces by assigning each one an index value
+
+	Notice that index values start at 0 and not at 1. Computers start from 0, and think of the first item as the zero item.
+
+	Arrays can hold a number of elements 2^32, or as few as you want. You don't have to say up front how many pieces of data you want to store in an array.
+
+	To create a new array, you need to declare a variable name and tell JS that you want it to be a new array using the new keyword and the Array() function.
+
+		var myArray = new Array();
+
+	code is case sensitive, so you can't say new array(); but today's JS devs create arrays like so
+
+		var myArray = [];
+
+	This uses an array literal to create the array. It is functionally teh same thing as using new Array(), but it requires less typing. 
+
+	You feed data into an array like so
+
+		var myArray = ["Paul",345,"Jimmy",112,"boob",99];
+
+	When you do it like this, they are assigned starting from 0 index++, you could also
+
+		var myArray=[];
+		myArray[0] = "paul";
+		myArray[1] = 345;
+
+	So declaring the first way is easier, but sometimes you'll want to change data stored in a particular element in an array.
+
+	One notable thing is taht you can store different data types in the same array. JS is very flexible as to what you can put in an array and where you can put it.
+
+ex 8
+
+A multi-dimensional array
+
+	A multi-dimensional array is one with two or more indexes for each element.
+
+ex 9
+
+	Truth is JS doesn't actually support multi-dimensional rrays, only single ones. However by nesting arrays you get the same thing.

@@ -1,0 +1,603 @@
+JS Ch5 Notes
+
+JavaScript - An object-based language
+
+Date objects
+
+	You can define times as Date objects. Because they are Date objects, they come with a variety of properties and methosd that you can use when you need to manipulate or calculate times. You can use the getTime() method to get the # of milliseconds between the time in the Date object and a specific date.
+
+Creating an Object
+
+	You need to use the new operator like so:
+		var myDate = new Date();
+	Since a constructor is a function, you can pass params to the constructor to add data to your obj
+		var myDate = new Date("1 Jan 2014");
+	How object data is stored in variables differs from how primitive data is stored. Variables assigned to objects don't hold the actual data, but rather a refernce to the memory address where the data can be found.
+
+	It's important to know that it holds the reference because shit like this:
+		var myArray = [0,1,2];
+		var mySecondArray = myArray;
+		myArray[0] = 100;
+		alert(mySecondArray[0]);
+	This will set the mySecondArray reference to the same thing as myArray, so if we change myArray, the reference will follow suit.
+
+	If you do this with primitives, the second thing you set will not follow suit because it is assigned an actual value, rather than a reference.
+
+Using an object's properties
+
+	Accessing the values contained in an object's properties is simple. You write the name of the variable containing(or referencing) your object, followed by a dot, and then the name of the object's property.
+
+	If you defined an Array object contained in the variable myArray, you could access its length property like this:
+		myArray.length
+	Unlike variables, some properties are read-only. You can get information from them, but you can't change information inside of them.
+
+Callin an Object's methods
+
+	Using a method is same biz as using properties:
+		myArray.sort();
+
+Primitives and objects
+
+JavaScript's native object types
+
+String Objects
+
+	Like most objects, String objects need to be created before they can be used:
+		var string1 = new String("Hello");
+	However, you can also declare a string primitive and use it as if it were a String object:
+		var string1 = "Hello";
+	Using this one is preferable. The advantages to doing it this way are that there is no need to create a String object itself, and you avoid the troubles with comparing string objects. When you try to compare string objects with primitive string values, the actual values are compared, but with String objects, the object references are compared.
+
+	The String object has a vast number of methods and properties.
+
+	Length property returns the number of characters in the string.
+
+	Finding a string inside another string the indexOf() and lastIndexOf() methods.
+
+	indexOf() and lastIndexOf() are used for searching for the occurrence of one string inside another. A string contained inside another is usually termed a substring. 
+
+	indexOf() and lastIndexOf() take two params:
+	> The string you want to find
+	> The character position you want to start searching from (optional)
+
+	Character position starts at 0. If you don't include the second param, searching starts from the beginning.
+
+	The return value of indexOf() and lastIndexOf() is the character position in the string at which the substring was found. Again, it's 0-based, so if the substring is found at the start of the string then 0 is returned. If no match, the value of -1 is returned.
+
+	Case sensitivity is an issue too, if you tell it to search for fucko it won't find Fucko.
+
+	indexOf() starts searching from the beginning of the string, or the position you specified in the second param, and works toward the end.
+
+	lastIndexOf() starts at the end of the string, or the position you specified, and works toward the beginning of the string
+
+Copying part of a string - the substr() and substring() methods
+
+	If you wanted to cut out part of a string and assign that cut-out part of another variable or use it in an expression, you would use the substr() and substring() methods. They provide the same end result, but require different params.
+
+	substring() accepts two params: the character start position and the position after the last character desired in the substring. The second param is optional; if you don't include it, all characters from the start position to the end of the string are included.
+
+	substr() takes two params: the first being the start position of the first character you want included in your substring. The second parameter specifies the length of the string of characters you want to cut out of the longer string.
+
+	Let's look at the use of substr() and lastIndexOf() methods together. Later in the book, you see how you can retrieve the file path and name of the currently loaded web page. However, there is no way of retrieving the filename alone. So if, for example, your file is http://mywebsite/temp/myfile.html, you may need to extract the myfile.html part. This is where substr() and lastIndexOf() are useful:
+
+		var fileName = window.location.href;
+		fileName = fileName.substr(fileName.lastIndexOf("/") + 1);
+		document.write("The file name of this page is " +fileName);
+
+	This code uses the return value of the lastIndexOf() method as a parameter for another method, good job. The goal in using fileName.lastIndexOf("/") is to find the position of the final /, which will be the last character before the name of the file. You add one to the value, because you don't want to include that character, then pass this new value to the substr() method. As a result, substr() will return all the characters right to the end of the string, which is what you want.
+
+Converting case - The toLowerCase() and toUpperCase() methods
+
+Selecting a single character from a String - the charAt() and charCodeAt() methods
+
+	If you want to find out information about a single character within a string, you need the charAt() and charCodeAt() methods. These methods can be useful for checking the validity of user input.
+
+	The charAt() method accepts one parameter: the index position of the character you want in the string. It then returns that character. charAt() treats the position of the string characters index 0.
+
+	the charCodeAt() method is similar, but instead of returning the character itself, it returns a number that represents the decimal character code for that character in the Unicode character set.
+
+Converting character codes to a string - the fromCharCode() method.
+
+	fromCharCode() is the kinda opposite of charCodeAt(), in that you pass it a series of comma-separated numbers representing character codes, and it converts them to a single string.
+
+	However, the fromCharCode() method is unusual in that it's a static method - you don't need to have created a String object to use it with; it's always available to you.
+
+Removing leading and trailing whitespace - the trim() method
+
+	When working with user-provided data, there's no guarantee they'll input it correctly. Therefore, it's always best to assume the user is incorrect.
+
+	Commonly you'll want to trim whitespace from String objects with String's trim() method. It returns a new string with all leading and trailing whitespace removed:
+		var name = prompt("Gimme name");
+		name = name.trim();
+
+		alert("Hello "+name);
+
+Array Objects
+
+	length property gives you the length of the array.
+
+Adding elements the push() method
+
+	push() lets you append something to an array, giving it a new index.
+
+Joining arrays the concat() method
+
+	If you want to take two separate arrays and join them into one big array, you can use the Array object's concat() method. The concat() method returns a new array like this. To do this you use the method on your first array, and pass the name of the second array as a param.
+
+Copying part of an array - the slice() method
+
+	When you want to copy a portion of an array, you can use the slice() method. Using slice() you can slice out a portion of the array and assign it to a new variable name. slice () has two params:
+	> The index of the first element you want copied
+	> The index of the element marking the end of the portion you are slicing out (optional)
+
+	so shit like
+		var slicedArray = names.slice(1,3);
+	will give you the elements at index 1,2. This new index slicedArray will store the 2 elements starting from index 0 like usual.
+
+Converting an array into a single string the join() method
+
+	join() concatenates all the elements in an array and returns them as a string. It also enables you to specify any characters you want to insert between elements as they are joined together. This method only has one param, and that's the string you want inserted between elements.
+
+Putting your array in order - the sort() method
+	
+	using sort() organizes shit alphabetically, UPPERCASE comes before lowercase so Piss goes before piss
+
+Putting your array into reverse order the revers() method
+
+	myArray.reverse(); will just flip your last indexes to your first indexes.
+
+Finding array elements the indexOf() and lastIndexOf() methosd
+
+	myArray.indexOf("red");
+	will return the index position that holds red.
+
+Iterating through an Array without Loops
+
+	These methods are called iterative methods because they iterate, or loop, through the array. These methods execute a function that you define on every element while they iterate through an array. The function these methods use must follow one rule- it must accept three arguments like the following code:
+		function functionName (value, index, array) {
+			//do something
+		}
+	When executed, JS passes 3 args to your function. The first is the value of the element, the second is the index of the element, and the third is the array itself.These three params enable you to perform just about any operation or comparison you might need in relation to the array and its elements.
+
+Testing each element the every() some() and filter() methods
+
+	every and some are testing methods. The every() tests whether all elements in the array pass the test in your function. consider:
+
+		var numbers = [1,2,3,4,5];
+
+		function isLessThan3(value, index, array) {
+			var returnValue = false;
+
+			if (value < 3){
+				returnValue = true;
+			}
+			return returnValue;
+		}
+
+		alert(numbers.every(isLessThan3));
+
+	The first line shows the creation of an array called numbers; its elements hold values 1 through 5. The next line defines the isLessThan3() function. It accepts the three mandatory arguments and determines if the value of each element is less than 3. The last line alerts the outcome of the every() test. Because not every value in the array is less than 3, the result of the every() test is false.
+
+	Contrast with the some() method. some() test only cares if some of the elements pass the test in your function.
+
+	The filter() method executes your fu nction on every element in the array, and if your function returns TRUE for a particular element, that element is added to a new array that the filter() method returns:
+
+		var numbers =[1,2,3,4,5];
+
+		function isLessThan3(value, index, array){
+			var returnValue = false;
+
+			if (value < 3){
+				returnValue = true;
+			}
+
+			return returnValue;
+		}
+
+		if (numbers.some(isLessThan3)){
+			var result = numbers.filter(isLessThan3);
+			alert("These numbers are less than 3: " + result);
+		}
+
+Operating on elements the forEach() and map() methods
+
+	The final two methods are the forEach() and map() methods. Unlike the previous iterative methods, these two methods do not test each element in the array with your function; instead, the function you write should perform some kind of operation that uses the element in some way. Look at the following code:
+
+		var numbers = [1,2,3,4,5];
+
+		for (var i = 0;i < numbers.length;i++){
+			var result = numbers[i] * 2;
+			alert(result);
+		}
+
+	This code can be rewritten to use teh forEach() method. It does something for each element in the array. All you need to do is write a function to double a given value and output the result in an lert box like this:
+
+		var numbers = [1,2,3,4,5];
+
+		function doubleAndAlert(value,index,array){
+			var result = value * 2;
+			alert(result);
+		}
+
+		numbers.forEach(doubleAndAlert);
+
+	Notice that doubleAndAlert() function doesn't return a value like the testing methods do. It cannot return a value; its only purpose is to perform an operation on every element in the array. But sometimes you want to store the result of the function, and you can do that using the map() method
+
+	The premise of the map() method is similar to that of forEach(). It executes a given function on every element in an array, but it also returns a new array that contains the results of the function.
+
+		var numbers = [1,2,3,4,5];
+
+		function doubleAndReturn(value,index,array){
+			var result = value * 2;
+			return result;
+		}
+
+		var doubledNumbers = numbers.map(doubleAndReturn);
+
+The Math Object
+
+	FTMP its same as java Math.thing
+	Math.PI
+
+The abs() method Math.abs(-21) comes back as 21 etc
+
+Finding largest and smallest # min() and max() methods
+
+	var max = Math.max(21,22); // result is 22
+	var min = Math.min(25,34); // result is 25
+
+Rounding numbers
+
+The ceil() method
+
+	the ceil() method always rounds a number up to the largest whole number or integer. so 10.1 becomes 11. AND -9.99 becomes -9 because it chooses the greater number.
+
+The floor() method
+
+	opposite shit of ceil() 10.1 becomes 10. -9.99 becomes -10
+
+The round() method
+
+	will only round up if the decimal is .5 or greater
+
+	will round down if the decimal is any lower.
+
+The random() method
+
+	Simulating a d6 throw like so
+
+	var diceThrow;
+
+	for (var throwCount = 0; throwcount < 10; throwCount++){
+		diceThrow = (Math.floor(Math.random() * 6) + 1);
+		document.write(diceThrow + "<br>");
+	}
+
+The pow() method
+
+	Math.pow(2,8); is 2^8
+
+Number Objects and toFixed() method
+
+	toFixed() method cuts a number off after a certain point.
+
+	itemCostAfterTax.toFixed(2);
+
+	Sets it to 2 decimal places 12.74$
+
+	Will round up or down
+
+Date objects
+
+	Creating a Date object can be done in four ways. First method you simply declare a new Date object without initializing value. In this case, the date and time value will be set to the current date and time on the PC.
+
+		var theDate1 = new Date();
+
+	Secondly, you can define a Date object by passing the # of milliseconds since Jan 1, 1970 00:00:00 GMT.
+
+		var theDate2 = new Date(949278000000);
+
+	Third, you can declare a Date object by passing a string representing a date, or a date and time. EX. 31 January 2014:
+
+		var theDate3 = new Date("31 January 2014");
+			you can also write 31 Jan 2014 or any number of valid variations.
+
+	Fourth, you initialize it by passing the following params, separated by commas: year, month, day, hours, minutes, seconds, millis. ex.
+
+		var theDate4 = new Date(2014,0,31,15,35,20,20)
+
+Getting Date values
+
+	using these get methods we can get parts of the date
+		getDate(): day of the month
+		getDay(): get day of the week as an integer, sunday 0 monday 1 etc
+		getMonth(): get month as an integer, jan 0 feb 1
+		getFullyear() getyear as a 4 digit number
+		toDateString() returns the full date based on the current time zone as a human-readable string, for example "Wed 31 Dec 2003"
+
+	So if you wanted to get the month from date Object
+		var myDate = new Date();
+		myDate.getMonth(); would return
+
+Setting Date values
+
+	setDate(): the date of the month is passed in as the parameter to set the date
+	setMonth(): pass month in as an integer 0 january etc
+	setFullYear(): This sets the year to the four digit number
+
+Calculations and Dates
+
+	Example code:
+		var myDate = new Date("1 Jan 2010");
+		myDate.setDate(32);
+		document.write(myDate);
+
+	you can't put 32 days in January, so it will set date to feb 1
+
+	The same applies for setMonth() method, if you set it to a value greater than 11, the date automatically rolls over to the next year.
+
+	So how do you use setDate() and setMonth()? If you want to find out what the date will be 28 days from now. Given that different months have different numbers of days and that you could roll over to a different year, it's not as simple as it may seem. 
+
+		var nowDate = new Date();
+		var currentDay = nowDate.getDate();
+		nowDate.setDate(currentDay + 28);
+
+	This sets your date to the current day and adds 28 days to it, so it will automatically know how many days are left in the month so you can overlap fine.
+
+Getting time values
+
+	getHours()
+	getMinutes()
+	getSeconds()
+	getMilliseconds()
+	toTimeString()
+
+	These gets return the time of a specified Date object, where the time is based on the 24-hour clock: 0 for midnight. and 23 for 11PM. toTimeString returns the same as toDateString. returns a string "13:03:51 UTC".
+
+Setting time values
+
+	setHours()
+	setMinutes()
+	setSeconds()
+	setMilliseconds()
+
+	same with dates, if you overshoot a time value, it spills over to the next one, so if its 9 and you add 64 minutes you'll go to 10:04
+
+Creating your own custom objects
+
+	to create an object in JS simply use the new operator in conjunction with teh Object constructor
+
+		var johnDoe = new Object();
+
+	But like arrays, JS provies a literal syntax to signify an object: a pair of curlies {}. so you can rewrite the previous code like so:
+
+		var johnDoe = {};
+
+	Todays JS devs favor this literal syntax instead of calling the Object constructor.
+
+	Once you have an object, you can begin to populate it with properties. It is similar to creating a variable, except you do not use the var keyword. Simply use the name of the object, followed by a dot, then the name of the property, and assign it a value. ex:
+
+		johnDoe.firstName = "John";
+		johnDoe.lastName = "Doe";
+
+	These two lines of code create the firstName and lastName properties on the johnDoe object and assign their respective values. JavaScript does not check if these properties exist before they're created; it simply creates them. While this is nice, the primary issue is that JS won't tell you if you accidentally misspell a property name; it'll just create a new property with the misspelled name, something that can make it difficult to track bugs. So always be careful when creating properties.
+
+	You can assign methods in the same way, except you assign a function instead of another type of value, like so:
+
+		johnDoe.greet = function() {
+			alert("My name is " + this.firstName + " " + this.lastName);
+		}; //remember to end functions with a ; outside the curlies.
+
+	First, notice there is no name between function and (). A function that has no name is called an anonymous function. Anonymous functions, in and of themselves, are a syntax error unless you assign that function to a variable. Once you assign an anonymous function to a variable, that function's name becomes the name of the variable. So you can execute the anonymous function assigned to johnDoe.greet like this:
+
+		johnDoe.greet();
+
+	Next, notice the use of this inside the function: this.firstName and this.lastName. In JS, this is a special veriable that refers to the current object - the johnDoe object in this case. it literally means "this object".
+
+	However, you won't always have the name of the object to use in place of this. Therefore, it is preferred to erfer to the current object of a method by using this rather than the actual name of the object.
+
+	So the full code for creating this johnDoe object looks like this:
+
+		var johnDoe = {};
+
+		johnDoe.firstName = "John";
+		johnDoe.lastName = "Doe";
+		johnDoe.greet = function() {
+			alert("My name is " + this.firstName + " " + this.lastName);
+		};
+
+	This is perfectly valid in JS, but it takes four statements to create the complete object. These four statements can be reduced to one statement by defining the entire object using literal notation. It looks weird at first but you'll get used to it:
+
+		var johnDoe = {
+				firstName : "John",
+				lastName : "Doe",
+				greet : function() {
+					alert ("YADDA");
+				};
+		}
+
+
+Creating new types of objects (reference types)
+
+	A reference type consists of three things:
+	> A constructor
+	> Method definitions
+	> Properties
+
+	A constructor is a function that is called every time one of your objects based on this reference type is created. It's useful when you want to initialize properties or the object in some way. You need to create a constructor even if you don't pass any parameters to it or if it contains no code. 
+
+Definining a reference type
+
+	The first thing you need to do is create a constructor:
+
+		function Person(firstName, lastname) {
+			this.firstName = firstName;
+			this.lastName = lastName;
+		}
+
+	At first this looks like a function, and you're right. It's not until you start defining the properties and methods that it becomes something more than a function. This is in contrast to some programming languages, which have a more formal way of defining types.
+
+	Typically, a reference typ is defined with an uppercase letter. Doing so makes it easy to differentiate a function from a reference type easily and quickly.
+
+	Now you need to define getFullName() and greet() methods. You can define them inside of the constructor, but it is more efficient to define them on Person's prototype, like this:
+
+		Person.prototype.getFullname = function() {
+			return this.firstName + " " + this.lastName();
+		};
+
+		Person.prototype.greet = function(person) {
+			alert("Hello, " + person.getFullname() + " . I'm " + this.getFullName());
+		};
+
+	Every function object has a prototype property, but it is only useful for constructor functions. You can think of the Person.prototype property as an actual prototype for the Person objects. Any properties and methods you assign to Person.prototype are usable on all Person objects. They're more than usable, they're shared.
+
+	But why were firstName and lastName assigned in the constructor instead of Person.prototye? The firstName and lastName properties are called instance data. Instance Data is unique to each individual object, or instance.
+
+Creating and using reference type instances
+
+	You create instances of your reference type in the same way you created instances of JS's built-in types: using the new keyword. So to create a new instance of Person, you'd write this:
+
+		var johnDoe = new Person("John", "Doe");
+
+	So here you created two new Person objects, stored them in variables, but this time it's an object based on the Person type.
+
+	Objects created from a constructor typically consume less of the computer's memory than literal objects.
+
+Objects and stuff
+
+	Property names can be a string or a number, but if the property name is a number, it has to be accessed with the bracket notation.
+
+		var ageGroup = {30:"kids",100:"old"};
+		console.log(ageGroup.30)//this will throw an error
+		console.log(ageGroup["30"])//kids
+
+	As a JS developer you will most often use the object data type, mostly for storing data and creating your own custom methods and functions.
+
+Reference data type and primitive data types
+
+	One of the main differences between reference data type and primite data types is reference data type's value is stored as a reference, it is not stored directly on the variable, as a value, as the primitive data types are.
+
+		//The primitive data type String is stored as a value
+		var person = "leroy";
+		var person2 = person;
+		person = "jenkins";
+
+		console.log(person2)//leroy
+		console.log(person)//jenkins
+
+	Compare the primitive data saved-as-value demonstrated above with the save-as-reference for objects:
+
+		var person = {name: "leroy"};
+		var person2 = person;
+		person.name = "jenkins";
+
+		console.log(person2.name)//jenkins
+		console.log(person.name)//jenkins
+
+	In this example, we copied the person object to person2, but because the value in person was STORED AS A REFERENCE, and not an actual value, when we changed the person.name property, it changed it for person2 as well, because person2 doesn't have the value, it has the reference.
+
+Object data properties have attributes
+
+	Each data property (object property that store data) has not only the name-value pair, but also 3 attributes (the 3 attributes are set to true by default):
+
+	> Configurable Attribute: specifies whether the property can be deleted or changed.
+	> Enumerable : Specifies whether the property can be returned in a for/in loop.
+	> Writable: Specifies whether the property can be changed.
+
+Creating objects
+
+	var mango = {
+		color: "yellow",
+		shape: "round",
+		sweetness: 8,
+		howSweetAmI: function() {
+			console.log("shitnigga");
+		}
+	}
+
+Practical patterns for creating objects
+
+	1. Constructor pattern for creating objects
+
+		function Fruit (theColor, theSweetness, theFruitName, theNativeToLand){
+			this.color = theColor;
+			this.sweetness = theSweetness;
+			this.fruitName = theFruitName;
+			this.nativeToLand = theNativeToLand;
+
+			this.showName = function() {
+				console.log("This is a "+ this.fruitName);
+			}
+
+			this.nativeTo = function() {
+				this.nativeToLand.forEach(function (eachCountry) {
+					console.log("Grown in:" + eachCountry);
+				});
+			}
+		}
+
+Own and inherited properties
+
+	To find out if a property exists on an object (either as an inherited or an own property), you use the in operator:
+
+	var school = {schoolName:"MIT"};
+
+	console.log("schoolName" in school); //true, because schoolName is an own property on the school object
+
+	console.log("schoolType" in school); //false, we didn't define schoolType.
+
+hasOwnProperty
+
+	To find out if an object has a specific property as one of its own property, you use the hasOwnProperty method. This method is very useful because from time to time you need to enumerate an object and you want only the own properties, not the inherited ones.
+
+		var school = {schoolName: "MIT"};
+
+		console.log(school.hasOwnProperty("schoolName")); //true
+
+Accessing and enumerating properties on objects
+
+	To access the enumerable (own and inherited) properties on objects, you use the for/in loop or a general loop
+
+	var school = {schoolName:"MIT",schoolAccredited:true,schoolLocation:"Mass"};
+
+	//use of the for/in loop to access the properties in the school object
+
+	for (var eachItem in school) {
+		console.log(eachItem);//prints schoolName, etc etc
+	}
+
+Deleting properties of an object
+
+	To delete a property from an object, you use the delete operator. You cannot delete properties that were inherited, nor can you delete propereties with their attributes set to configurable. You must delete the inherited properties on the prototype object (where the properties were defined). 
+
+	The delete operator returns true if the delete was successful. It also returns true if the property to delete was nonexistent or the property could not be deleted (such as non-configurable or not owned by the object).
+
+		var christmasList = {mike:"book", jason:"sweater"}
+		delete christmasList.mike;
+
+Serialize and deserialize objects
+
+	To transfer your objects via HTTP or to otherwise convert it to a string, you will need to serialize it (convert it to a string); you can use the JSON.stringify function to serialize your objects. Note that prior to ECMAScript5, you had to use a popular json2 library to get the JSON.stringify function. it is now standard in ECMAScript5
+
+	to deserialize your object, you use the JSON.parse function from the same json2 library
+
+		var christmasList = {mike:"Book", jason:"sweater", chelsea:"iPad" }
+		JSON.stringify(christmasList);
+		//prints this string:
+		//"{"mike":"Book","jason":"sweater","chels":"iPad"}"
+
+	To print a stringified object with formatting, add "null" and "4" as parameters:
+
+		JSON.stringify(christmasList,null,4);
+		// "{
+    "mike": "Book",
+    "jason": "sweater",
+    "chels": "iPad"​
+		}"
+
+	The following is a JSON string, so we cannot access the properties with dot notation.
+		'{"mike":"Book","jason":"sweater","chels":"iPad"}';
+	Lets convert it to an object
+		var christmasListObj = JSON.parse(christmasListStr);
+	Now that it is an object, we use dot notation
+		console.log(christmasListObj.mike);//book

@@ -1,0 +1,68 @@
+http://javascriptissexy.com/how-to-learn-javascript-properly/
+
+Week 1: Making a Website with HTML and CSS; Learn JavaScript Data Types, Functions, Control Flow, and Loops
+
+		1. Codecademy.com: Complete Web Fundamentals
+12/02
+		2. Codecademy.com: Make a Website track.
+12/02
+		3. Beginning JavaScript: Read Ch 1 (Intro to JS and the Web) and Ch 2 (Data Types and Variables.)
+13/02
+		4. Beginning JS: Read Ch 3 (Decisions, Loops, and Functions)
+13/02
+		5. Codecademy: Work through the JavaScript Track. Specifically work through these sections:
+			Introduction to JS
+			Functions
+			For Loops in JS
+			While Loops in JS
+			Control Flow
+14/02
+		6. Beginning JS: Read Ch 4 (Common Mistakes, Debugging, and Error Handling)
+14/02
+
+Week 2: Learn JavaScript Objects, the Browser Object Model (BOM), and Events; Learn jQuery.
+
+		1. Beginning JS: Read Ch 5(JS - An object- based language)
+16/02
+		2. Read the article on JIS (JavaScript Objects in Detail)
+			http://javascriptissexy.com/javascript-objects-in-detail/
+16/02
+		3. Codecademy: Work through the last three sections of the cc JS track:
+			Data Structures
+			Objects 1
+			Objects 2
+
+		4. Beginning JS: Read Ch 6(Programming the Browser)
+
+		5. Beginning JS: Read Ch 15(JS Frameworks), and stop just after you complete this section:"Digging deeper into jQuery"
+
+		6. Codecademy: Work through the entire jQuery Track on CC
+
+
+Week 3: HTML Forms and Frames; JS Strings; Build Your First Interactive Website
+
+		1. Beginning JS: Read Ch 7(HTML Forms: Interacting with the user)
+
+		2. Beginning JS: Read Ch 8(Windows and Frames)
+
+		3. Beginning JS: Read Ch 9(String Manipulation)
+
+		4. CC: Now, make your first cool website. Work through the entire Make an Interactive Website track on CC
+
+Week 4: JS Date, Timers, and Cookies
+
+		1. Beginning JS: Read Ch 10(Date,Time,Timers)
+
+		2. Beginning JS: Read Ch 11(Storing Information:Cookies)
+
+Week 5: JS "this," Variable Scope, and Hoisting, the DOM, JavaScript XML, and AJAX
+
+		1. JIS: Read post JavaScript Variable Scope and Hoisting Explained
+			http://javascriptissexy.com/javascript-variable-scope-and-hoisting-explained/
+
+		2. JIS: Read post Understand JavaScript's "this" with Clarity, and Master It.
+			http://javascriptissexy.com/understand-javascripts-this-with-clarity-and-master-it/
+
+		3. Beginning JS: Read Ch 12 (Dynamic HTML and the W3C Document Object Model)
+
+		4. Beginning JS: Read Chapter 14(Ajax)
