@@ -1,0 +1,215 @@
+JSch8
+
+programming the browser
+
+What you'r gonna learn:
+> proper use of your'e're
+> Working with the browser's native window object
+> sending the browser to a URL
+> Manipulating images after they are loaded in the page
+> retrieving the browser's current geographical position
+> detecting the user's browser
+
+The collection of objects that the browser makes available for you to use with JS is generally called the browser object model (BOM)
+
+Introduction to the browser's objects
+
+	When JS is running in a web page, it has access to a large number of other objects made available by the web browser. These objects are created for you rather than you needing to create them explicitly. As mentioned, the objects, their methods, properties,  and events are all mapped out in the BOM.
+
+	BOM is pretty overwhelming, you'll find that initially you won't be using more than 10% of available objects methods and properties. So we'll start with more commonly used parts of the BOM. These parts of the BOM are, to a certain extent, common across all browsers. Later chapters build on this so that by the end of the book you'll be able to really make the BOM work for you.
+
+	QQ What does BOM stand for?
+		browser object model
+
+	Window object
+		-location object
+		-history object
+		-navigator object
+		-screen object
+		-document objcet
+			-forms object
+			-images object
+			- links object
+
+	the BOM has a hierarchy. at the top of the hierarchy is the window object. think of this as representing the frame of teh browser and everythign associated with it, like scrollbars, navigator bar icons, so on.
+
+	inside the window frame is the page. the page is represented in the BOM by the document object
+
+The window object
+
+	The window object represents the browser's frame or window, in which the web page is contained.
+
+	The window object is a global object, which means you don't need to use its name to access its properties and methods. in fact, the global functions and variables are all created as properties of the global object. ex, the alert() function you have been using is actually the alert method of the window object. so you can write it like window.alert("yo");, but thats2much.
+
+	QQ window object is a _ object, what mean?
+		global, you don't need to use its name to access its properties and methods
+
+	Some of the properties of the window object are objects. Those common to all browsers include the document,navigator,history,screen,and location objects. 
+		Document: your page
+		history: history of pages visited by the user
+		navigator: holds information about the browser
+		screen: contains information about the display capabilities
+		location: contains details on the current page's location
+
+	QQ Some properties of the window object are objects themselves. common 5? what do?
+		^^^^
+
+	at this point its worth highlighting that, within a web page, you shouldn't use names for your functions or variables that conflict with names of BOM objects or their properties and methods.
+
+	Make sure to use different variable names. Because any function or variable you define within the global scope actually gets appended to the window object. so if you call var history = "string"; you won't be able to window.history.back(); because history does not refer to the windows object, but rather the value you made.
+
+	QQ If you define a function or variable within the global scope, what do you have to be careful for?
+		using names the global scope needs like history, it gets appended to the window object. so window.history.back() wouldn't work
+
+The history object
+
+	The history object keeps track of each page that the user visits. This list of pages is commonly called the history stack for the browser. It enables the user to click the browser's back and forward buttons to revisit pages.
+
+	QQ What does the history object do?
+		keeps track of each page the user visits. this list of pages is called the history stack for the browser.
+
+	Like the native JS Array type, the history object has a length proeprty. You can use this to find out how many pages are in the history stack.
+
+	The history object has the back() and forward() methods. When they are called, teh location of the page currently loaded in the browser si changed to the previous or next page.
+
+	The history object also has the go() method. This takes one param that specifies how far forward or backward in the history stack you want to go. 
+		history.go(-2);
+	would send you back to the page before the previous.
+
+	QQ 3 basic methods of history object?
+		back() forward() go()
+
+The location Object
+
+	The location object contains lots of potentially useful info about the current page's location. Not only does it contain the Uniform Resource Locator (URL) for the page, but also the server hosting the page, the port number of the server connection, and the protocol used.
+
+	QQ What info does the location object have?
+		URL uniform resource locator, server host, port#, protocol.
+
+	QQ What can you use the location object to change?
+		location, current page.
+
+	QQ 2 methods that location object uses? difference?
+		href() and replace()
+		href() sends them to page and puts previous page in history stack.
+		replace() replaces current page, prev page does not go to stack.
+
+The navigator Object
+
+	QQ the navigator object is better named ?
+		Browser object, because the navigator returns lots of info about the browser and OS in which it's running
+
+	QQ Historically what is teh most common use of the navigator object?
+		handling browser differences, you can find out which browser, versiona nd OS the user has. known as browser sniffing
+
+	QQ What is the main use of the geolocation object? What pass?
+		its getCurrentPosition() method, passit a callback function.
+
+	QQ What does the getCurrentPosition() return?
+		lat,long,alt,speed
+
+	QQ Code example for getCurrentPosition(), use a variable to retrieve positional values.
+		function success(position){
+			var crds = position.coords;
+
+			var latitude = crds.latitude;
+			var longitude = crds.longitude;
+			var altitutde = crds.altitude;
+			var speed = crds.speed;
+		}
+
+	QQ What 2 params do you pass into getCurrentPosition()?
+		callback functions p1 success p2 errors (numeric value code indicating reason for failure, message description of failure)
+
+The screen object
+
+	contains info about the display capabilities of the client machine. properties include height/width properties indicating vert/horiz range of the screen, respectively, in pixels.
+
+	QQ What info does the screen object have?
+		display capabilities of client machine, height/width.
+
+The document Object
+
+	QQ What do you use document object for?
+		To gain access to HTML elements, properties, and their methods inside your page
+
+	QQ The document object has a number of properties associated with it which are _ structures called _. The main 3 are
+		array-like, structures. 
+		forms, images, and links
+
+The images collection
+
+	You can insert an image into html using the following tag:
+
+		<img alt = "USA" name = "myImage" src ="usa.gif" />
+
+	The browser makes this image available for you to manipulate with JS by creating an img object for it with the name myImage. each image on your page has an img object created for it.
+
+	QQ Where do all of the img objects on a page get stored?
+		document.images[];
+
+	each of the img objects in a page is stored in the images collection, which is a property of the document object. You use this, and other collections, as you would an array. The first image on the page is found in the element document.images[0], the second in document.images[1] etcetc
+
+	you can also assign a variable to reference an img object in the images collection. It can make code easier to type and read. ex
+
+		var myImage2 = document.images[1];
+
+	now you can write myImage2 instead of document.images[2]; to the same effect.
+
+	Because teh document.images property is a collection, it has properties similar to the native JS Array type, such as the length property. if you want to know how many images are on a page, document.images.length tells you
+
+The links collection
+
+	for each hyperlink element <a/> defined with an href attribute, the browser creates an a object. the most important property of the a object is the href property, corresponding to the href attribute of the tag. Using this, you acn find out where the link points to, and you can change this even after the page has loaded.
+
+	The collection of all a objects in a page is contained within the links collection, much as the img obbjects are contained in the images collection.
+
+		document.links[0];
+
+	would hold the first a object.
+
+	QQ Where do all the link objects get stored?
+		document.links[];
+
+Determining the user's browser
+
+	Remember that not all browsers support the same features. So make sure your pages work correctly on all browsers, or atleast degrade gracefully. such as by displaying a message suggesting that the suer upgrade his or her browser.
+
+	You have two ways to test if the browser can execute your code: feature detection and browser sniffing. They share a similar end goal, but they are used for different purposes
+
+	QQ 2 ways to test if a browser can execute your code?
+		feature detection and browser sniffing, they share a similar end goal, but they are used for different purposes.
+
+Feature detection
+
+	Feature detection is the process of determining if a browser supports a given feature, and it is the preferred method of browser detection. It requires little maintenance, and it is used to execute code across all browsers that implement (or don't implement) a specific feature.
+
+	This is a common problem because even the latest versions of browsers don't always support the same features, but you can avoid these types of issues with feature detection. The pattern is simple: Check if the feature exists, and only use the feature if it does. Therefore, all you need is an if statement, like this:
+
+		if (navigator.geolocation){
+			//use geolocation
+		}
+
+	HOLD THE PHONE. This code uses navigator.geolocation as the if statement's condition. Isn't the if statement supposed to work on true/false values? yes, but JS can treat any value as true or false. We call these truthy and falsey. They aren't true boolean values, but they evaluate to true/false when used in a conditional statement.
+
+	Here's how this works; the following values are falsey:
+		> 0
+		> "" (an empty string)
+		> null
+		> undefined
+		> [] (an empty array)
+		> false
+
+	Just about everything else is truthy.
+
+	In browsers that don't support geolocation, navigator.geolocation is undefined and therefore falsey.
+
+	Many JS devs like to avoid truthy/falsey statements, and opt for a clearer comparison by using the typeof operator like:
+
+		if (typeof navigator.geolocation !="undefined"){
+			//use geolocation
+		}
+
+	the typeof operator returns a string that tells you the type of a value or object. In browsers that support geolocation, the type is "object"; in browsers that don't, it's "undefined".
+
+	Feature detection is extremely useful, and it enables you to isolate browsers based on the features they do or don't support. 
