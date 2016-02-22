@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns=”http://www.w3.org/1999/xhtml”>
+<head>
+	<title>Fahren to Cels calculator</title>
+	<script type="text/javascript">
+		var myText = document.form1;
+
+
+		function calcF_onchange(temp){
+			var myC;
+			var myF;
+			myF = temp;
+			myC = (myF - 32) * 5/9;
+			document.form1.textC.value = myC;
+		}
+
+		function calcC_onchange(temp){
+			var myC;
+			var myF;
+			myC = temp;
+			myF = (myC * 9/5) + 32;
+			document.form1.textF.value = myF;
+		}
+	</script>
+</head>
+<body>
+	<form action="" name="form1">
+		<p>
+			Fahrens:
+			<br/>
+			<input type="text" name="textF" value="212.00" 
+			onchange="calcF_onchange(parseInt(document.form1.textF.value))" />
+		</p>
+		<p>
+			Celsius:
+			<br/>
+			<input type="text" name="textC" value="0" 
+			onchange="calcC_onchange(parseInt(document.form1.textC.value))" />
+		</p>
+	</form>
+</body>
+</html>

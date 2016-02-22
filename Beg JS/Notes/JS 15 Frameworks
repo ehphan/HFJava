@@ -1,0 +1,203 @@
+JS Frameworks
+
+Picking a framework to work with
+
+	JS frameworks can be typically categorized into two groups: general and specialty
+
+		$(document).ready(document_ready);
+
+	Calls the jQuery function and passes the document DOM object to it.
+	the jQuery function returns a jQuery object, of which ready() is a method. By passing a DOM object to the jQuery function, you've actually created a new object that wraps itself around the DOM object.
+
+		var jDocument = $(document);
+		jDocument.ready(document_ready);
+
+	Same thing as previous code, except you have a jQuery object contained in the jDocument variable, which you can reuse.
+
+	It is important to note that jQuery objects cannot be used in place of DOM objects. In the previous example, the jQuery function returns a completely different object than the document object it was passed.
+
+	This type of reuse - assigning a variable and reusing it later - is perfectly fine to use with jQuery objects, but jQuery adds the ability to chain method calls together. Method chaining is like so:
+
+		$(document.body).attr("bgColor", "yellow").html("<h1>Hello, jQuery World</h1>");
+
+Digging deeper into jQuery
+Selecting Elements
+
+	W3C DOM standard gives you the getElementById() and getElementsByTagName() methods to find and retrieve elements in the DOM.
+
+	jQuery truly shines in that; using CSS selectors, you can select elements based on their CSS class name, their relationship with other elements, their id attribute value, or simply their tag name. like so:
+
+		$("a")
+
+	This code selects all <a/> elements within the page and returns them in an array. Because ti is an array, you can use the length property to find out how many elements were selected, like this:
+
+		alert($("a").length);
+
+	jQuery was designed to make DOM manipulation easy, and because of this design philosophy, you can make changes to several elements at the asme time. So if you have 100 links on a page, but one day you want it to open in a new window, instead of setting the target attribute to _blank for every a, you can use jQuery to retrieve them all.
+
+		$("a").attr("target","_blank");
+
+	calling $("a") results in a jQuery object, but this object also doubles as an array. Any method you call on this aprticular jQuery object will perform the same operation on all elements in the array.
+
+	You can also select elements with CSS id syntax; that is, the value of an element's id attribute prepended with the pound sign#. You could use the DOM's getElementByID() method to perform the same task, but using the jQuery function requires less keystrokes, and you have the benefit of return a jQuery object.
+
+		$("#myDiv")
+
+	Even though you know only one element can be selected with this code, you can stil use the length property to make sure the elemetn was found in the page. If the element wasn't found, length will be 0. Same goes with CSS classes.
+
+		$(".myCssClass")
+
+	Since jQuery uses CSS selectors, you can also dick around with nested selectors the same way we do in CSS with the parent > child thing (h1 > p)
+
+		$("p > span")
+
+	The jQuery function also grants you the ability to use multiple selectors in one function call. Look at the following code as an example
+
+		$("a, #myDiv, .myCssClass, p > span")
+
+	Simply delimit each selector with a comma. This code retrieves all <a/> elements, an element with an id of myDiv, elements with the CSS class myCssClass, and all <span/> children of <p/> elements. If you wanted to set the text color of these elements to red, you could simply use the following code.
+
+		$("a, #myDiv, .myCssClass, p > span").attr("style", "color:red;");
+
+	But this isn't the best way to change an element's style. In fact, jQuery provides you with many methods to alter an element's style
+
+Changing style
+
+	As with the DOM, you change an element's style by changing individual CSS properties or by changing the element's CSS class. You do so by using the css() method. This method accepts two arguments: the property's name, and its value.
+
+		$("#myDiv").css("color", "red");
+
+	Property names you pass to the css() method can be in either style sheet format or in script format.
+
+		$("#myDiv").css("background-color", "red");
+		$("#myDiv").css("backgroundColor", "red");
+		//Both of these work
+
+	Typically if you want to change an element's style, it's better to change the element's CSS class instead of the individual style properties. Doing so keeps the style content in the style sheet where it belongs.
+
+Using multiple CSS classes
+
+	The jQuery objcet exposes several methods to manipulate an element's className property. Before looking at them, you should know that it's legal for an element to have multiple CSS classes. for ex:
+
+		<div class = "myClass1 myClass2">
+			my div w/ 2 css classes.
+		</div>
+
+	To apply 2 or more CSS classes to an element, simply separate the class names with spaces. This concept is being introduced to you because jQuery's methods to manipulate class names are built around this concept.
+
+	the first method, addClass() adds the specified CSS class(es) to the element.
+
+		$("#myDiv").addClass("myClass1").addClass("myClass2");
+
+	so this adds myClass1 and myClass2 to the element #myDiv you can also pass both in one call
+
+		$("#myDiv").addClass("myClass1 myClass2");
+
+	Remember to separate the class names with a space. When you want to remove a specific class or classes from an element, use the removeClass() method
+
+		$("#myDiv").removeClass("myClass2");
+
+	if you do removeClass() but don't pass in any arguments, it will remove the element from all CSS classes. like so
+
+		$("#myDiv").removeClass();
+
+Using the toggleClass method
+
+	toggleClass() only accepts one class name. it checks if an element has that class, it removes it if it does, or adds it if it does not.
+
+		$("#myDiv").addClass("myClass1 myClass2").toggleClass("myClass2").toggleClass("myClass2");
+
+	So that code adds the classes and toggles it off and on again.
+
+	This method is handy when you need to add or remove a specific class from an element. For example, the following code si plain old JS and DOM coding to add and remove a specific class depending on the type of event:
+
+		if (e.type == "mouseover"){
+			eSrc.className = "mouseover";
+		}	else if {
+			eSrc.className = "";
+		}
+
+	but with the toggleClass() method you can cut this code down to:
+
+		if (e.type == "mouseover" || e.type == "mouseout"){
+			$(eSrc).toggleClass("mouseover");
+		}
+
+	using the toggleClass() method can make your code more efficient and quicker to download thanks to a reduced size, which is always a noble goal to shoot for.
+
+Using the hasClass() method
+
+	hasClass() method returns true/false depending on if the specified css class is applied to the element.
+
+	Note that since it returns t/f then you cannot chain anymore methods after calling it
+
+Creating appending, and removing elements
+
+		function window_onload(){
+			var a = document.createEleemnt("a");
+			a.id = "myLink";
+			a.setAttribute("href", "http://jquery.com");
+			a.setAttribute("title", "jQuery's Website");
+	
+			var text = document.createTextNode("Click to go to jq website");
+	
+			a.appendChild(text);
+			document.body.appendChild(a);
+		}
+		onload = window_onload;
+
+Creating elements
+
+	There's technically nothing wrong with that code, but its p.verbose. using jQuery you can do the same thing with less typing
+
+		function document_ready(){
+			var a = $(document.createElement("a"));
+			$(document.body).append (
+				a.attr("id","myLink")
+				.attr("href","http://jquery.com")
+				.attr("title","jQuery's Website")
+				.text("Click here to go to jQuery's website.")
+			);
+		}
+
+		$(document).ready(document_ready);
+
+	First you create the <a/> element with the document.createElement() method.
+
+		var a = $(document.createElement("a"));
+
+	instead of simply assigning the element to a variable, you pass it to the jQuery function so you can use the jQuery methods to populate it with attributes and text. Next you pass the document.body object to the jQuery function and call the append() method.
+
+		$(document.body).append()
+
+Appending elements
+
+	Remember what makes method chaining possible in jQuery is that most methods return the jQuery object you called the method on. So the text() method returns the jQuery object referencing the <a/> element object to the append() method called on the jQuery object referencing the document.body object.
+
+Removing elements
+
+	Removing elements from the DOM is much easier withjQuery than with the traditional DOM methods. in jQuery we just use the remove() method like so:
+
+		$("#myLink").remove();
+
+	This code finds the <a/> method in the previous code and removes it from the DOM. You can also remove all of a parent's child nodes by calling the empty() method.
+
+		$(document.body).empty();
+
+	this would empty the body element, thus removing all content from the page.
+
+The jQuery event model and handling events
+
+	all jQuery objects expose a method called bind(), which you use to assign event handlers to specific events.
+
+		function myButton_click(event) {
+			alert("you clicked me");
+		}
+
+		$("#myButton").bind("click", myButton_click);
+
+	this code assigns the myButton_click() function to handle the click event for an element with an id value of myButton element.
+
+	jQuery passes a jQuery.Event object to the function handling the event. 
+
+	

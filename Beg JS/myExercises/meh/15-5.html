@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title> c15 ex3 w jQuery</title>
+	<style type="text/css">
+
+		.tabStrip{
+			background-color:#E4e2d5;
+			padding: 3px;
+			height:22px;
+		}
+
+		.tabStrip-tab{
+			float: left;
+			font: 14px arial;
+			cursor: pointer;
+			padding: 2px;
+			border:1px solid transparent;
+		}
+
+		.tabStrip-tab-hover {
+			border-color: #316ac5;
+			background-color: #c1d2ee;
+		}
+
+		.tabStrip-tab-click {
+			border-color:#facc5a;
+			background-color: #f9e391;
+		}
+
+	</style>
+	<script type="text/javascript" src="jquery-1.12.0.js"></script>
+	<script type="text/javascript">
+
+	var currentNum = 0;
+
+	function handleEvent(e){
+		var el = $(e.target);
+
+		if (e.type == "mouseover" || e.type == "mouseout"){
+			if (el.hasClass("tabStrip-tab") && !el.hasClass("tabStrip-tab-click")){
+				el.toggleClass("tabStrip-tab-hover");
+			}
+		}
+
+		if (e.type == "click"){
+			if(el.hasClass("tabStrip-tab-hover")){
+				var id = e.target.id;
+				var num = id.sub7y
+				str(id.lastIndexOf("-")+1);
+
+				if (currentNum != num){
+					deactivateTab();
+
+					el.toggleClass("tabStrip-tab-hover").toggleClass("tabStrip-tab-click");
+					showDescription(num);
+					currentNum = num;
+				}
+			}
+		}
+	}
+
+	function showDescription(num){
+		var div = $(document.createElement("div"));
+
+		$("#descContainer").append(
+			div.attr("id", "tabStrip-desc-" + num).text("Description for tab " + num));
+	}
+
+	function deactivateTab(){
+		var descEl = $("#tabStrip-desc-" + currentNum);
+
+		if (descEl.length > 0){
+			descEl.remove();
+			$("#tabStrip-tab-" + currentNum).toggleClass("tabStrip-tab-click");
+		}
+	}
+
+	$(document).bind("click mouseover mouseout", handleEvent);
+	</script>
+</head>
+<body>
+	<div class="tabStrip">
+		<div id="tabStrip-tab-1" class="tabStrip-tab">Tab 1 </div>
+		<div id="tabStrip-tab-2" class="tabStrip-tab">Tab 2</div>
+		<div id="tabStrip-tab-3" class="tabStrip-tab">Tab 3</div>
+	</div>
+	<div id="descContainer"></div>
+</body>
+</html>

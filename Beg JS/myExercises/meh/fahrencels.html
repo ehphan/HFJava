@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns=”http://www.w3.org/1999/xhtml”>
+<head>
+	<title>Fahren to Cels calculator</title>
+	<script type="text/javascript">
+		var myTextF = document.form1.textF;
+		var myTextC = document.form1.textC;
+
+		function calcF_onblur(){
+			var myC;
+			var myF;
+
+			if (isNaN(myTextF.value) == true) {
+				alert("Please enter numbers only");
+			}	else {
+				myF = parseFloat(myTextF.value);
+				myC = (myF - 32) * 5/9;
+				myTextC.value = myC;
+			}
+		}
+
+		function calcC_onblur(){
+			var myC;
+			var myF;
+			if (isNaN(myTextC.value) == true) {
+				alert("Please enter numbers only");
+			}	else {
+				myC = parseFloat(myTextC.value);
+				myF = (myC * 9/5) + 32;
+				myTextF.value = myF;
+			}
+		}
+	</script>
+</head>
+<body>
+	<form action="" name="form1">
+		<p>
+			Fahrens:
+			<br/>
+			<input type="text" name="textF" value="212.00" onchange="calcF_onblur()" />
+		</p>
+		<p>
+			Celsius:
+			<br/>
+			<input type="text" name="textC" value="100.00" onchange="calcC_onblur()" />
+		</p>
+	</form>
+</body>
+</html>

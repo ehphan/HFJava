@@ -1,0 +1,250 @@
+jQuery cc
+
+<script type="text/javascript" src="script.js"></script>
+
+$(document).ready();
+
+Functions
+
+	A function is made up of three parts
+	> The function keyword
+	> any inputs that function takes (they go between the ()s and are separated by commas if there are more than one)
+	> Whatever actions the function should perform(that go inside the {}s)
+
+	General form is
+		function(input1, input2, input3) {
+			do a thing
+			do another ting
+			do more thing
+		}
+
+	say you wanna make a variable to refer to an element
+		var $newVar = $("#thing");
+	remember ""s, and whatever element you're addressing
+
+	$(document).ready(function(){
+		$("button").click(function(){
+			$("div").fadeOut('slow',0);
+		});
+	});
+
+Multiple selectors
+	so if i've got a 
+	p = $("thing1");
+	l = $("thing2");
+	then i can do like this
+	$('p, li').fadeTo('slow', 0);
+
+'this'
+
+	use 'this' to specify which jQuery objects you wanna deal with.
+
+		$(document).ready(function(){
+			$("div").click(function(){
+				$(this).fadeOut('slow');
+			});
+		});
+
+	using 'this' we have a click action that fades whichever div object we click
+
+Inserting elements
+
+	we can use append() and prepend() to add shit to our already existing elements.
+
+	So if i have a </div> of class info and i want to append/prepend a </p> to it
+
+		$(".info").append("<p>stuff and biz</p>");
+		$(".info").prepend("<p>stuff and bizz</p>");
+
+	This adds a </p> element to it, so when you append it would make </p> the last child, and prepend would make it first child.
+
+	appendTo() is same biz, but you tell it the element you want to insert first
+
+		$("<p>stuff and biz</p>").appendTo(".info");
+
+Before and after
+
+	We can specify where in the DOm we insert an element with the .before() and .after() functions:
+
+		$("target").after("<tag>To add</tag>");
+
+		$(document).ready(function(){
+    	$("#one").after("<p>shove it cocko</p>");    
+		});
+
+Moving elements around
+
+	Moving elements around in the DOM is easy, all we need to do is use teh jQuery functions we learned on existing elements instead of creating new ones.
+
+		var $paragraph = $("p"); //existing element
+		$("div").after($paragraph);//move it
+		// same as:
+		$("div").after($("p"));
+
+	This does NOT copy the element from one location to another, it moves the original element, saving you from having to delete the original.
+
+Removing elements
+
+	Eventually you're going to need to remove shit from a page so we have
+
+	.empty() : which deletes an element's content AND ALL ITS DESCENDENTS SALT THE EARTH. so if you empty('ol') all of the 'li's and shit get removed too
+
+	.remove() : not only deletes content, but removes the containing element itself.
+
+		$(document).ready(function(){
+			$($pee).remove();
+		});
+
+Adding and removing classes
+
+	We don't have remove whole elements only. We can fine tune jQuery to alter classes, CSS, and even the contents of our HTML elements
+
+	starting with classes. jQuery has two functions
+	> .addClass()
+	> .removeClass()
+
+	This works great for example if you have a highlighted class that you want to apply to an element when clicked.
+
+		$("selector").addClass("className");
+		$("selector").removeClass("className");
+
+	Remember: you aren't selecting anything, you are modifying your element. This means that you do not need # or . before your class
+
+		$(document).ready(function(){
+ 		  $("#text").click(function(){
+ 		      $(this).addClass("highlighted");
+    	});
+		});
+
+Toggling classes
+
+	Say we wanna turn the highlight off and on. for that we have the .toggleClass() function
+
+		$(document).ready(function(){
+    	$("div").click(function(){
+        	$(this).toggleClass("highlighted");
+    		});
+		});
+
+Changing style
+
+	because resizing elements is so common, jQuery has a specific .height() and .width() functions that can be used to change the heights and widths of HTML elements
+
+		$("div").height("100px");
+		$("div").width("50px");
+
+	jQuery also includes a general-purpose .css() function that takes two inputs: the first is the CSS element to alter, and the second is the value to set it to. for example:
+
+		$("div").css("background-color","#008800");
+
+	This would give all div elements a green bg color.
+
+		$(document).ready(function(){
+	    $("div").css("border-radius","10px").height("200px").width("200px");    
+		});
+
+	here we chained some methods to do a buncha things on this div
+
+Modifying content
+
+	Finally, we can update the contents of our HTML elements - that is, the bit between the opening and closing tags - using the .html() and .val() functions
+
+	.html() can be used to set the contents of the first element match it finds. 
+
+		$("div").html();
+
+	will get the HTML contents of the first div it finds, and
+
+		$("div").html("i love jQ");
+
+	Will set the contents of the first div it finds to "i love jQ"
+
+	.val() is used to get the value of form elements
+
+		$("input:checkbox:checked").val();
+
+	would get the value of the first checked checkbox that jQuery finds
+
+Append to body
+
+		$(document).ready(function(){
+    	$('#button').click(function(){
+        var toAdd = $("input[name=checkListItem]").val();
+        $(".list").append('<div class="item">'+ toAdd +'</div>');
+    	});
+		});
+
+Remove what's been clicked
+
+	To remove items from a list that is created during the webpage's life (not at creation) we need anew event handler
+
+	.on() : you can think of this as a general handler that takes the event, its selector, and an action as inputs:
+
+		$(document).on("event","selector", function(){
+			do thing;
+		});
+
+	in this case the event will be click, selector will be .item and the thing we want to do is call .remove() on this
+
+		$(document).on("click",".item", function(){
+			$(this).remove();
+		});
+
+The .dblclick() event
+
+Hover
+
+	A standard hover thing looks like
+
+		$("div").hover(
+			function(){
+				$(this).addClass("highlight");
+			},
+			function(){
+				$(this).removeClass("highlight");
+			}
+		);
+
+	So it does the first one when you hover over, and does the second one when you hover off
+
+.focus()
+
+	The .focus() event handler only workso n elements that can receive focus. such as <textarea> and <input>
+
+		$(document).ready(function(){
+		  $("input").focus(function(){
+		      $(this).css("outline-color", "#ff0000");
+		  });    
+		});
+
+the .keydown() event
+
+	.keydown() events only work on the things that have focus, it just takes a keystroke as an event trigger
+
+the .animate() effect
+
+	takes two inputs
+	> the animation to perform
+	> the time in which to perform the animation:
+
+		$(document).ready(function(){
+			$("div").animate({left:"+=10px"},500);
+		});
+
+	This will take the first div, move it 10 pixels to the right. Remember, increasing the distance from the left margin moves something to the right; the += bit is just a shorthand for "take the existing number and add 10 to it". In this case, it adds 10px to the current distance from the left margin.
+
+	$(document).ready(function(){
+		$(document).keydown(function(){
+			$("div").animate({left:"+=10px"},500);
+		});
+	});
+
+	$(document).ready(function(){
+		$("div").click(function(){
+			$(this).effect("explode");
+		});
+	});
+
+Draggable
+
+	.draggable() can make any HTML element draggable, you can click and move it anywhere

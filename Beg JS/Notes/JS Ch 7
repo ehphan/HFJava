@@ -1,0 +1,373 @@
+JS Ch 7
+
+HTML forms: interacting with the user
+
+	You use forms on a webpage to get input from the users. You can use this information within the web page, or it can be posted to teh web server where you can manipulate it and store it in a database if you wish. This chapter concentrates on using the information wtihin the web browser, which is called client-side processing.
+
+	All of the HTML elements used for interatcion should be placed inside an HTML form. Lets take a look at HTML forms
+
+HTML Forms
+
+	To make a form use
+
+		<form></form>
+
+		<form name="myForm">
+		</form>
+
+	The form element has a number of attributes
+	> action attribute, which determines where the form is submitted to
+	> method attribute, which determines how the information is submitted
+	> target attribute, which determines the frame to which the response to the form is loaded
+
+	Generally for client-side scripting, these attributes are not necessary because you have no intention of submitting this information to a server.
+
+	Same as how you can access the document.images collection like an array, you can access the forms collection likewise.
+
+	Within the definition of the body element, the window_onload() function is connected to the window object's onload event handler.
+
+		<body onload="window_onload()">
+
+	This means that when the page is loaded, your window_onload() function will be called.
+
+Other Form object properties and methods
+
+	The Form object has an elements property, which holds all of the corresponding objects to a form. The elements property of the Form object has a length property, which tells you how many elements are in a form. The form object also has a length property, which also gives you the number of elements in the form. But it's basically the same thing
+
+		document.myForm.length
+			is shorter than
+		document.myForm.elements.length
+
+	When you submit data from a form to a server, you normally use the Submit button. However, the Form object also has a submit() method, which nearly does the same thing.
+
+	The Form object's onsubmit event handler fires when the user submits a form. If you return true to this handler, the form submission goes ahead. If you return false, the submission is canceled. This makes the onsubmit event handler's code a great place to do form validation.
+
+	In addition to there being a reset button, the Form object has a reset() method, which clears the form, or restores default values if they exist.
+
+HTML Elements in Forms
+	
+	About 10 elements are commonly found within form elements.
+
+	Text Input Elements
+
+		> Text Box
+			<input type ="text"/>
+
+		> Password Box
+			<input type="password"/>
+
+		> Text Area
+			<textarea></textarea>
+
+	Tick Box Elements
+
+		> Check boxes
+			<input type="checkbox"/>
+
+		> Radio Buttons
+			<input type="radio"/>
+
+	Select Elements
+
+		> Drop Down List
+			<select><option></option></select>
+
+		> List Box
+			<select size="4"><option></option></select>
+
+	Buttons
+
+		> Standard button
+			<input type="button"/>
+
+		> Submit Button
+			<input type="submit"/>
+
+		> Reset Button
+			<input type="reset"/>
+
+	Most form elements are created by means of the <input/> element. One of the input elements attributes is the type attribute. This attribute decides which of the form elements this element will be. 
+
+	Each form element inside the web page is made available to you as an object. As with all the other objects you have seen, each element's object has its own set of distinctive properties, methods and events.
+
+Common properties
+
+	Because most form elements are created by the input element, all form elements share several properties and methods in common.
+
+	> The name Property
+		You can use the name value of this property to reference that particular element in your script. Also, if you are sending the information in the form to a server, the element's name property is sent along with any value of the form element, so that the server knows what the value relates to.
+
+	> The value Property
+		Most form element objects also have the value property, which returns the value of the element. For example, for a text box, the value property returns the text that the user entered in the text box. Also, setting the value of the value property enables you to put text inside the text box. However, the use of the value property is specific to each element, so you'll look at what it means as you look at each individual element.
+
+	> The form Property
+		All form element objects also have the form property, which returns the Form object in which the element is contained. This can be useful in cases where you have a generic routine that checks the validity of data in a form. For example, when the user clicks a Submit button, you can pass the Form object referenced by the form property of the Submit button to your data checker, which can use it to loop through each element on the form in turn, checking that the data in the element are valid. This is handy if you have more than one form defined on the page or where you have a generic data checker that you cut and paste to different pages - this way you don't need to know the form's name in advance.
+
+	> The type Property
+		Sometimes it's useful to know what type of element you're dealing with, particularly where you're looping through the elements in a form using the elements collection property. This information can be retrieved by means of the type property, which each element's object has. This property returns the type of the element (for example, button or text).
+
+Common methods
+
+	> The focus() and blur() methods
+		Focus means that keystrokes and shit will go to the element that has the focus. Blur will just remove the focus from an element.
+		All the form element's objects have the onfocus and onblur event handlers. These are fired when an element gets or loses focus.
+
+Buttom Elements
+
+	To create a button called myButton which has words "Click Me" on its face:
+
+		<input type="button" name="myButton" value="Click Me"/>
+		type: button
+		value: text you want to appear, leaving blank gives you blank button
+
+	This element creates an associated Button object; in this example it is called myButton. This object has all the common properties and methods described earlyer, including the value property. This property enabels you to change the text on the button face using JaveaScript, though this is probably not something you'll need to do very often. What the button is really all about is the click event.
+
+	You connect to the button's onclick event handler just as you did witht eh onclick events of the other HTML elemetns such as the <a/>. All you need to do is define a function that you want to have executed when the button is clicked(say,button_onclick()) and then add the onclick event handler as an attribute of the input element like:
+
+		<input type="button" onclick="button_onclick()"/>
+
+	onmouseup and onmousedown are triggered only when the pointer is over the element in question. so if i click down and release when my cursor is off the button, the button will remain "on mouse down"
+
+Submit and Reset buttons
+
+	You define these buttons just as you do a standard button, except that the type atribute of the input tag is set to submit or reset rather than to button. 
+
+		<input type="submit" value="Submit" name="submit1"/>
+		<input type="reset" value="Reset" name="reset1"/>
+
+	These buttons have special purposes, which are not related to script
+
+	When the Submit button is clicked, teh form data from the form that the button is inside gets sent to the server automatically, without the need for any script.
+
+	When the Reset button is clicked, all the elements in a form are cleared and returned to their default values.
+
+	The Submit and Reset buttons have corresponding objects called Submit and Reset, which have exactly the same properties, methods, and events as the standard Button object.
+
+Text Elements
+
+	A text box is created using the input element, like a button. But with the type attribute set to text. You can set the value, and that will be the text that appears within the box when the page is loaded.
+
+	Additional attributes like size determines how many characters wide the text box is, and maxlength determines the maximum number of characters the user can enter in the box.
+
+	For example, to create a text box 10 characters wide, with a maximum character length of 15, and initially containing the words Hello Fagbag:
+
+		<input type="text" name="myTextBox" size="10" maxlength="15" value="Hello Fagbag" />
+
+	The text object that this element creates has a value property, which you can use in your scripts to set or read the text contained inside the text box.
+
+	The Text object also has the select() method, which selects or highlights all the text inside the text box. This may be used if the user has entered an invalid value, and you can set the focus to the text box and select the text inside it. This then puts the user's cursos in the right place to correct the data and makes it very clear to the user where the invalid data is.
+
+	The value property of Text objects always returns a string data type, even if number characters are being entered. If you use the value as a number, JS normally does a conversion from a string data type to a number data type for you, but this is not always the case. For example, JS won't do the conversion if the operation you're performing is valid for a string. If you have a form with two text boxes and you add the values returned from these, JS concatenates rather than adds the two values, so 1 plus 1 = 11 and not 2. To fix this, you need to convert all the values involved to a numerical data type, for example by using parseInt() or parseFloat() or Number(). However, if you subtract two values, an operation only valid for numbers, JS knows to deal with numbers. This is tricky, so it's best to get into the habit of converting explicitly to avoid problems later.
+
+	In addition to the common event handlers, such as onfocus and onblue, the Text object has the onchange, onselect, onkeydown, onkeypress, and onkeyup event handlers
+
+	The onselect event fires when the user selects some text in the text box.
+
+	More useful is the onchange event, which fires when the element loses focus if(and only if) the value inside the text box is different from the value it had when it got the focus. This enables you to do things like validity checks that occur only if something has changed.
+
+	You can use the readonly attribute of the <input/> element or the readOnly property of the Text object to prevent contents from being changed.
+
+		<input type="text" name="txtReadOnly" value="Look but don't change"
+			onfocus="document.form1.txtReadonly.blur()"
+			readonly="readonly">
+
+	The onkeypress, onkeydown, and onkeyup events fire, as their names suggest, when the user presses a key, when the user presses a key down, and when that key is pressed down is let back up, respectively.
+
+The Password text box
+
+	Password boxes are so users can type in a password on a page and have their password characters hidden. However, this protection is visual only. When sent to the server, the text in the password is sent as plain text - there is no encryption or any attempt at hiding the text (unless the page is served over a secure connection from the server).
+
+	Defining a password box is identical to defining a text box, except the type attribute is password
+
+		<input name="password1" type="password"/>
+
+	This form element creates an associated Password object, which is identical to the Text object in its properties,methods, and events.
+
+The Hidden Text Box
+
+	The hidden text box can hold text and numbers just like a normal text box, with the difference being that it's not visible to the user.
+
+		<input type="hidden" name="myHiddenElement"/>
+
+	The hidden text box creates a Hidden object. This is available in the elements array property of the Form object and can be manipulated in JS like any other object, although you can actually set its value only through its HTML definition or through JS. 
+
+	Hidden text boxes are useful if you need a user to fill out forms over several pages. You just save their previous forms to a hidden text box, and on the final page you submit all of it at once. All of the information will be submitted to the server, it's just that some of it is hidden.
+
+The textarea Element
+
+	<textarea/> element allows multi-line input of text. Other than this, it acts very much like the text box element.
+
+	If you want a <textarea/> element 40 characters cols, 20 char rows, with initial text Hello World on the first line and Line 2 on the second line:
+
+		<textarea name="myTextArea" cols="40" rows="20">Hello Warudo
+		Line 2
+		</textarea>
+
+	textarea has a wrap attribute, which can be set to either soft or hard.
+	soft makes the user's carriage returns not part of the submitted element. So the text would come through as if it were one long line. 
+	hard marks the user's carriage returns, so when it is submitted it will have the carriage return statements, and you'll know when the user chose new lines.
+
+	The value property is not an attribute of textarea, but will return the text between the op and ed textarea.
+
+	Textarea has the same properties, methods, and events as the Text object. However it does not have the maxlength attribute.
+
+	Events supported by Textarea object include onkeydown, onkeypress, onkeyup, and onchange event handlers.
+
+Check Boxes and Radio Buttons
+
+	Check boxes and radio buttons are together because their objects have identical properties, methods, and events. Check boxes let the user check and uncheck. Radio buttons are a group of check boxes where only one can be checked at a time.
+
+	Check boxes and radio buttons are made through the <input/> element. Its type attribute is set to "checkbox" or "radio" to determine which box or button is created. 
+
+	To set a check box/radio button as checked when the page is loaded, you simply insert the attribute "checked" into the <input> tag and assign its value as checked.
+
+		<input type="checkbox" name="chkDVD" checked="checked" value="DVD" />
+
+	To create a checked radio button:
+
+		<input type="radio" name="radCPUSpeed" checked="checked" value="1 GHz" />
+
+	Radio buttons are grouped elements, because it would be pointless to have to only check 1 of 1.
+
+	To create a group of radio buttons, you simply give each radio button the same name. This creates an array of radio buttons going by that name that you can access, as you would with any array, using its index.
+
+		<input type="radio" name="radCPUSpeed" checked="checked" value="800" />
+		<input type="radio" name="radCPUSpeed" value="1000" />
+		<input type="radio" name="radCPUSpeed" value="1500" />
+
+	Note how we set #1 to be checked, if you set multiple as checked in a radio button, the LAST of these would have actually been checked.
+
+	the value attribute for the radio buttons is not the same as with previous elements. The value is just the label on the button.
+
+	Each check box has an associated Checkbox object, and each radio button in a group has a separate Radio object. As mentioned earlier, with radio buttons of the same name you can access each Radio object in a group by treating the group of radio buttons as an array, with the name of the array being the name of the radio buttons in the group. As with any array, you can have the length property, which will tell you how many radio buttons are in a group.
+
+	For determining whether a user has actually checked or unchecked a check box, you need to use the checked property of the Checkbox object. This property returns true if the check box is currently checked and false if not.
+
+	Radio buttons are slightly different. Because radio buttons with the same name are grouped together, you need to test each Radio object in the group in turn to see if it has been checked. Only one of the radio buttons in a group can be checked, so if you check another one in the group, the previously checked one will become unchecked, and the new one will be checked in its place.
+
+	Both Checkbox and Radio have the event handlers onclick, onfocus, and onblur, and these operate as you saw for the other elements, although they can also be used to cancel the default action, such as clicking the check box or radio button.
+
+ex 7 6
+	
+	The first thing you do in the function is declare the returnValue variable and set it to true. You'll be returning this as your return value from the function. In this case the return value is important because it decides whether the radio button remains checked as a result of the user clicking it. If you return false, that cancels the user's action, and the radio button remains unchecked. In fact no radio button comes checked, which is why you keep track of the index of the checked radio button so you can track which button was the previously checked one. To allow the user's action to proceed, you return true.
+
+Selection Boxes
+
+	You have two different kind of boxes made with <select>
+	> Drop down list
+	> List boxes
+
+	The select element has one or more options in a list that you can select from; each of these options is defined by means of one or more <option/> elements inside the opening and closing <select> tags.
+
+	The size attribute is used to specify how many of the options are visible to the user.
+
+	So to create a list box 5 rows deep and populate it with 7 options :
+
+		<select name="theDay" size="5">
+			<option value="0"selected="selected">Monday</option>
+			<option value="1">Tuesday</option>
+			<option value="2">Wednesday</option>
+			<option value="3">Thursday</option>
+			<option value="4">Friday</option>
+			<option value="5">Saturday</option>
+			<option value="6">Sunday</option>
+		</select>
+
+	selected = "selected" just makes it the default one to be selected. The values of the options have been defined as numbers, but text would be equally valid.
+
+	If you want this list to be a drop down list, you just need to change the size attribute in the <select> element to 1, and presto, it's a drop-down list.
+
+	If you want to let the user choose more than one item from the list at once, you simply add the multiple attribute to the select definition.
+
+	The <select> element creates a Select object. This object has an options collection property, which is made up of Options objects, one for each <option/> element inside the <select/> element associated with the Select object. So if all of that shit was contained in a form called myForm:
+
+		document.myForm.theDay.options[0]
+
+	would access the option created for Monday
+
+	So how do we find which option has been selected by the user? You use the Select object's selectedIndex property. You can use the index value returned by this property to access the selected option using the options collection.
+
+	The Option object also has index, text, and value properties.
+	> Index returns the index position of that option in the options collection
+	> Text is what's displayed in teh list
+	> Value is the value defined for the option, which would be posted to the server if the form were submitted.
+
+	If you want to find out how many options there are in a select element, you can use the length property of either the Select object itself, or its options collection property.
+
+	Let's see how you would loop through the options for the weekdays:
+
+		var theDayElement = window.document.form1.theDay;
+		document.write("There are " + theDayElement.length + "options<br />");
+		var optionCounter;
+		for (optionCounter = 0; optionCounter < theDayElement.length; optionCounter++){
+			document.write("Option text is " + theDayElement.options[optionCounter].text)
+			document.write(" and its value is");
+			document.write(theDayElement.options[optionCounter].value);
+			document.write("<br />");
+		}
+
+Adding and Removing options
+
+	To add a new option to a select element, you simply create a new Option object using the new operator and then insert it into the options collection of the Select object at an empty index position.
+
+	To add a new option to a select element:
+	1. Create a new Option object 
+		var newOption = new Option("What You See TEXT", "What You Get VALUE");
+	2. Insert it into the options collection of the Select object (at an empty index position)
+
+	When you create a new Option object, there are two parameters to pass:
+	1. The text you want to appear in the list
+	2. The value to be assigned to the option
+
+		var myNewOption = new Option("Name","Value");
+
+	You then simply assign this Option object to an empty array element:
+
+		document.theForm.theSelectObject.options[0] = myNewOption;
+
+	If you want to remove an option, you simply set that part of the options collectio to null. So to remove what we just inserted we would:
+
+		document.theForm.theSelectObject.options[0] = null;
+
+	When you remove an Option object from the options collection, the collection is reordered so that the array index value of each of the options above the removed one has its index value decremented by one.
+
+	When you insert a new option at a certain index position, be aware that it will overwrite any Option object that is already there.
+
+Adding New Options with Standard Methods
+
+	In particular, the Select object you are interested in has additional add() and remove() methods, which add and remove options.
+
+	Before adding an option though, you need to create it. Same as before new Object ("yaddaName", "yaddaValue")
+
+	The Select object's add() method enables you to insert an Option object that you have created and accepts two parameters. 
+	1. The Option object you want to add
+	2. The Options object you want to place the new Option object BEFORE.
+
+	You can pass null as the second param and the Option object will just get appended.
+
+	The add() method won't overwrite any Option object, but will simply move the Option objects up in the collection to make space. 
+
+	function btnAddWed_onclick(){
+		var days = document.form1.theDay;
+		if (days.options[2].text !="Wednesday"){
+			var option = new Option ("Wednesday", 2);
+			var thursdayOption = theDay.options[2];
+			try{
+				days.add(option, thursdayOption);
+			}	catch (error) {
+				days.add(option, 2);
+			}
+		}	else {
+			alert("Do you want 2 wednesdays!?");
+		}
+	}
+
+	The Select object's remove() method accepts just one parameter, namely the index of the option you want removed. When an option is removed, the options at higher index positions are moved down in the collection to fill the gap.
+
+Select Element Events
+
+	Select elements have three event handlers:
+	1. onblur
+	2. onfocus
+	3. onchange
+
