@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>8 </title>
+	<script type="text/javascript">
+		var detailsWindow;
+		function showDetails(bookURL){
+			detailsWindow = window.open(bookURL, "bookDetails", "width=400,height=350");
+			detailsWindow.focus();
+		}
+	</script>
+</head>
+<body>
+	<h2>Online Book Buyer</h2>
+	<p>
+		Click any of the images below for more deets!
+	</p>
+	<h4>Professional Ajax</h4>
+	<p>
+		<img src="http://starmen.net/mother2/images/game/AloysiusT.png"
+			alt="Professional Ajax, 2nd Edition"
+			border="0"
+			onclick="showDetails('pro_ajax_details.htm')"/>
+	</p>
+	<h4>Professional JavaScript for Web Developers</h4>
+	<p>
+		<img src="http://starmen.net/mother2/images/game/AppleKidT.png"
+			alt="Professional JavaScript, 2nd Edition"
+			border="0"
+			onclick="showDetails('pro_js_details.htm')"/>
+	</p>
+</body>
+</html>

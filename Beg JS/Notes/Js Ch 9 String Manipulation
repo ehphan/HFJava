@@ -1,0 +1,384 @@
+Js Ch 9 String Manipulation
+
+String object:
+	> length: The length of the string in characters
+	> charAt() and charCodeAt(): The methods for returning the character or character code at a certain position in the string.
+	> indexOf() and lastIndexOf(): The methods that allow you to search a string for the existence of another string and that return the character position of the string if found.
+	> substr() and substring(): The methods that return just a portion of the string
+	> toUpperCase() and toLowerCase(): The methods that return a string converted to upper- or lowercase
+
+	We're gonna cover 4 new methods split() match() replace() and search(). These can all use regular expressions, something JS wraps up in an object called the RegExp object.
+
+	A regular expression enables you to define a pattern of characters, which can be used for text searching or replacement.
+
+Additional String Methods:
+
+The split() Method
+
+	The String object's split() method splits a single string into an array of substrings. Where the string is split is determined by the separation parameter that you pass to the method.
+
+	So if you had the string
+		var myString = "A,B,C";
+	Then you could split it like
+		var myTextArray = myString.split(',');
+	then the array i created would have A B C
+
+	But if you pass in a string like
+		myString = "A,B,C,"
+	Then split() would give you A, B, C, _ because there was no character after the final ,
+
+The replace() Method
+
+	The replace() method searches a string for occurrences of a substring. Where it finds a match for this substring, it replaces the substring with a third string that you specify
+
+	Ex. Say you have a string with the word May in it:
+		var myString = "The event will be in May, 21 June";
+
+	If you want to replace May with June. you use replace() like so:
+		var myReplaceString = myString.replace("May","June");
+
+	the value of myString is not changed. Instead, the replace() method returns the value of myString but with May replaced with June. You assign this returned string to the variable myReplaceString.
+		myReplaceString = "The event will be in June, 21 June";
+
+The search() Method
+
+	The search() Method enabels you to search a string for a particular piece of text, if it is found, then it returns the character position at which it was found; otherwise it returns -1.
+
+	With plain text search() really isn't any different than indexOf(), but with regular expressions we'll see the diff.
+
+	So say you wanna find Java in this string:
+		var myString = "Beginning JavaScript";
+		alert(myString.search("Java"));
+
+	The alert box would return a value of 10, which is the character position of the J in the first occurrence of Java.
+
+The match() Method
+
+	match() is similar to search(), except that instead of returning the position at which a match was found, it returns an array. Each element of the array contains the text of each match that is found.
+
+	Although you can use plain text with the match() method, it would be pointless to do so:
+		var myString = "1997, 1998, 1999, 2000, 2001, 2002";
+		myMatchArray = myString.match("2000");
+		alert(myMatchArray.length);
+
+	This code results in myMatchArray holding an element containing the value 2000. Given that you already know your search string is 2000, you can see it's been a pretty pointless exercise.
+
+	This method makes more sense when you can use ti with regular expressions. Then you might search for all years in the twenty-first century - that is, those beginning with 2.
+
+Regular Expressions
+
+	Regular expressions provide a means of defining a pattern of characters, which you can then use to split, search for, or replace characters in a string when they fit the defined pattern.
+
+	Regular expressions in JavaScript are used through the RegExp object, which is the native JavaScript object. There are two ways of creating a new RegExp object. The easier way uses a regular expression literal, such as the following:
+		var myRegExp = /\b'|'\b/;
+
+	The fslash / marks the start and end of the regular expression.  This is a special syntax that tells JS that the code is a regular expression, much as quote marks define a string's start and end.
+
+	Alternatively you could us the RegExp object's constructor function RegExp() and do:
+		var myRegExp = new RegExp("\\b'|'\\b");
+
+	The main reason for using this verbose method is that it allows the regular expression to be determined at runtime (as the code is executing and not when you are writing the code). So this is useful if, for example, you want to base the regexp on the user input
+
+Simple Regular Expressions
+
+		var myString = "Paul, Paula, Pauline, paul, Paul";
+
+	So say you want to replace any occurrence of the name "Paul" with "Cocko"
+
+	Well, the pattern of text you need to look for is simply Paul. Representing this as a regular expression, you have this:
+		var myRegExp = /Paul/;
+		myString = myString.replace(myRegExp, "Cocko");
+
+	You see that replace() takes two parameters: the RegExp object that defines the pattern to be searched and replaced, and the replacement text.
+
+	If you run this code you'll see that only the first occurrence of Paul is replaced in the string.
+
+	By default, the RegExp object looks only for the first matching pattern, in this case the first Paul, and then stops. This is a common and important behavior for RegExp objects. Regular expressions tend to start at one end of a string and look through the characters until the first complete match is found, then stop.
+
+	What you want is a global match, which is a search for all possible amtches to be made and replaced. To help you out, the RegExp object has three attributes you can define. 
+
+	G:Global match. This looks for all matches of the pattern rather than stopping after the first match is found.
+
+	I:Pattern is case-insensitive. so Paul and paul would be considered the same pattern
+
+	M:Multi-line flag. Only available in IE5.5+ and NN6+, this specifies that the special characters ^ and $ can match the beginning and the end of lines as well as the beginning and end of the string.
+
+	If you change the RegExp in the code to a global/case-insensitive match:
+		var myRegExp = /Paul/gi;
+
+	This would replace all of the Paul's and the paul.
+
+	But this kinda isn't what we want, we want to just replace the single name Paul and the single name paul.
+
+	The regular expression object's test() method is used to do the actual testing for a match of the regular expression with the test string supplied as the method's only parameter. It returns true when a match is found, or false when it's not. The global flag is irrelevant for the test() method, because it simply looks for the first match and returns true if found.
+
+	The String object's join() method joins all the elements in an array and returns them as a single string. Each element is separated by the value you pass as the join() method's only parameter. Here \n or the newline character has been passed, which means when the string is displayed in the Results box, each match is on its own individual line.
+
+Regular Expressions: Special Characters
+	You will be looking at three types of special characters in this section.
+
+Text, Numbers, and Punctuation.
+	The first group of special characters you'll look at contains the character class's special characters. Character class means digits, letters, and whitespace characters.
+
+	\d	Any digit from 0-9 
+		\d\d matches 72, but not aa or 7a
+
+	\D	Any character that is not a digit
+		\D\D\D matches abc, but not 123
+
+	\w	Any word character; that is,A-Z,a-z,0-9, and the underscore character
+		\w\w\w\w matches Ab_2 but not $$$%
+
+	\W	Any non-word character
+		\W matches @ but not a
+
+	\s	Any whitespace character
+		\s matches tab,return,formfeed,and vertical tab
+
+	\S	Any non-whitespace character
+		\S matches A, but not the tab character
+
+	.	Any single character other than the newline character
+		. matches a or 4 or @
+
+	[...]	Any one of the characters between the brackets[a-z] will match any character in the range a to z
+		[abc] will match a b or c, but nothing else
+
+	[^...]	Any one character, but not one of those inside the brackets
+		[^abc] will match any character except a b or c
+		[^a-z] will match any character that is not in the range a to z
+
+	So to match a telephone number in the format 1-800-000-0000
+		\d-\d\d\d-\d\d\d-\d\d\d\d
+
+Repetition Characters
+
+	RegExp include something called repetition characters, which are a means of specifying how many of the last item or character you want to match.
+
+	{n}	Match n of the previous item
+		x{2} matches xx
+
+	{n,}	Match n or more of the previous item
+		x{2,}matches xx, xxx, xxxx etc
+
+	{n,m}	Match at least n and at most m of the previous item
+		x{2,4} matches xx, xxx, and xxxx
+
+	?	Match the previous item zero or one time
+		x? matches nothing or x
+
+	+ Match the previous item one or more times
+		x+ matches x, xx, xxx
+
+	* Match the previous item zero or more times
+		x* matches nothing, or x, xx, xxx, and so on
+
+	So for a phone number what used to be
+		\d-\d\d\d-\d\d\d-\d\d\d\d
+	You could now do
+		\d-\d{3}-\d{3}-\d{4}
+	So to declare this regexp you would do
+		var myRegExp = /\d-\d{3}-\d{3}-\d{4}/
+
+	Remember that the first and last /'s tell JS what is in between those characters is a regular expression, so JS creates a RegExp object based on this expression
+
+Position Characters
+
+	These characters enable you to specify either WHERE the match should start or end, or WHAT will be on either side of the character pattern. For example, you might want your pattern to exist at the start or end of a string or line, or you might want it to be between two words. The following table lists some of the most common position characters and what they do.
+
+	^
+	The pattern must be at the start of the string, or if it's a multi-line string, then at the beginning of a line. For multi-line text (a string that contains carriage returns), you need to set the multi-line flag when defining the regular expression using /myreg ex/m. Note that this is only applicable to ie5.5 and later and nn6 and later
+
+	$
+	The pattern must be at the end of the string, or if it's a multi-line string, then at the end of a line. For multi-line text (a string that contains carriage returns), you need to set the multi-line flag when defining the regular expression using /myreg ex/m
+
+	\b
+	This matches a word boundary, which is essentially the point between a word character and a non-word character
+
+	\B
+	This matches a position that's not a word boundary
+
+	So if you wanted to make sure your pattern was at the start of a line, you would use:
+		^myPattern
+
+	This would match an occurrence of myPattern if it was at the beginning of a line.
+
+	To match the same pattern, but at the end of a line, you would type:
+		myPattern$
+
+	word-boundary characters \b and \B can be confusing, because they do not match characters but the positions between characters.
+
+	Imagine you have the string 
+		var myString = "Hello world!, let's look at boundaries said 007.";
+
+	To make the word boundaries *that is, the boundaries between the words) of this string stand out, elt's convert them to the | character.
+		var myRegExp = /\b/g;
+		myString = myString.replace(myRegExp, "|");
+		alert(myString);
+
+	You've replaced all the word boundaries, \b with a |
+		|so| |now| |its| |like| |this|
+
+	But if we do the same thing with our regexp set to \B words look like
+		T|h|i|s
+
+Covering All Eventualities
+
+	So what if we had the string
+		var myString = "Paul, Paula, Pauline, paul, Paul, JeanPaul";
+
+	Here the Paul substring in JeanPaul will be changed to Ringo, but you only want the Paul's by themselves, so you would use the RegExp
+		var myRegExp = /\bPaul\b/gi;
+
+	The word boundary makes it so there have to be boundaries before and after the paul regexp in order for it to count.
+
+Grouping Regular Expressions
+
+	If you want a number of expressions to be treated as a single group. you just enclose them in aprentheses, for example, /(\d\d)/. Parentheses in regular expressions are special characters that group together character patterns and are not themselves part of the characters to be matched.
+
+	What is the benefit of grouping patterns? By doing this you can use the special repetition characters to apply to the whole group of characters, rather than just one.
+
+	So for example say we've got
+		var myString = "JavaScript, VBScript and Perl";
+
+	How could you match both JavaScript and VBScript using the same regular expression? The only thing they have in common is that they are whole words and they both end in Script. Well, an easy way would be to use parentheses to group the patterns Java and VN. Then you can use the ? special character to apply to each of these groups of characters to make the pattern match any word having zero or one instances of the characters Java or VB, and ending in script.
+		var myRegExp = /\b(VB)?(Java)?Script\b/gi;
+
+	Breaking this expression down:
+	1. A word boundary: \b
+	2. Zero or one instance of VB: (VB)?
+	3. Zero or one instance of Java: (Java)?
+	4. The characters Script: Script
+	5. A word boundary: \b
+
+	So putting this together would look like
+		var myString = "JavaScript, VBScript and Perl";
+		var myRegExp = /\b(VB)?(Java)?Script\b/gi;
+		myString = myString.replace(myRegExp, "xxx");
+		alert(myString);
+
+	Outputs
+		xxx, xxx and Perl
+
+	But this code will also match VBJavaScript, and we don't want that, so to get around that we use the special character |, which is the alternation character, kinda like how || is in an if statement. It will match the characters on either side of itself.
+
+	So to use this special | character to fix our previous statement it would:
+		var myRegExp = /\b(VB|Java)Script\b/gi;
+
+	This tells it to search for 0 or 1 instance of VB OR Java, not VB AND Java.
+
+Reusing Groups of Characters
+
+	You can reuse the pattern specified by a group of characters alter on in the regular expression. To refer to a previous group of characters, you just type \ and a number indicating the order of the group. For example, the first group can be referred to as \1, the next \2 etc.
+
+	So say you have a list of numbers in a string, with each number separated by a comma. Say you are not allowed to have two instances of the same number in a row.
+		007,007,001,002,002,003
+
+	How can you find instances of repeated digits and replace them with the word ERROR? You need to use the ability to refer to groups in RegExps
+		var myString = "007,007,001,002,002,003,002,004";
+
+	Now you know you need to search for a series of one or more number characters. In RegExps the \d specifies any digit character, and + means one or more of the previous character. So far that gives us
+		\d+
+	You want to match a series of digits followed by a comma
+		\d+,
+	This will match any series of digits followed by a comma, but how do you search for any series of digits followed by a comma, then followed again by the same series of digits? As the digits could be any digits, you can't add them directly into the expression like:
+		NO \d+,007
+	This wouldn't work with the 002 repeat. What you need to do is put the first series of digits in a group; then you can specify that you want to match that group of digits again. This can be done with \1, which says, "Match the characters found in the first group defined using parenths." Put this together and you get
+		(\d+),\1
+	This defines a group whose pattern of characters is one or more digit character. This group must be followed by a comma and then by the same pattern of characters as in the first group. 
+
+		var myString = "007,007,001,002,002,003,002,004";
+		var myRegExp = /(\d+),\1/g;
+		myString = myString.replace(myRegExp,"ERROR");
+		alert(myString);
+
+	Output
+		ERROR,1,ERROR,003,002,004
+
+The String Object - split(), replace(), search(), and match() Methods
+
+The split() Method
+
+	So say we have a string
+		var myListString = "apple, 0.99, banana, 0.50, peach, 0.25, orange, 0.75";
+
+	How do you split it in such a way that only the fruit names are included?
+	You're going to set your RegExp to split whenever it finds a character that is not something a-z, so numbers, full stops, decimals, etc.
+
+The replace() Method
+
+	Something unique to the replace() Method is its ability to replace text based on the groups matched in the regular expression. You do this using the $ sign and the group's number.
+		var myRegExp = /(\d)(\W)/g;
+
+	so $1 would refer to the (\d), and $2 refers to (\W). also note that you have the global flag g to ensure that all matching patterns are replaced, not just the first one.
+
+	So for example if we have this string
+		var myString = "1999, 2000, 2001";
+
+	If you wanted to change this to "the year 1999, the year 2000, the year 2001", how would you do this with RegExps
+
+	First, you need to work out the pattern as a regular expression, in this case four digits.
+		var myRegExp = /\d{4}/g;
+
+	But in this case, the year is different every time, so how do we substitute the year value into the replaced string?
+
+	We change our RegExp so that it's inside a group
+		var myRegExp = /(\d{4})/g;
+
+	Now you can use the group, it would be group number 1, inside the replacement string like so
+		myString = myString.replace(myRegExp, "the year $1");
+
+	This would change myString to the desired the year 20xx thing
+
+	In this quote we want to convert single quotes in text to double quotes. Your test string is
+		'Hello World' said Mr. O'Connerly.
+		He then said 'My Name is O'Connerly, yes that's right, O'Connerly'.
+
+	So the problem here is that we have single ' characters like in that's or O'Connerly.
+
+	Start off by defining the regular expression. First you know that it must include a single quote
+		var myRegExp = /'/;
+
+	But this isn't quite it, as we don't want to replace every single quote
+
+	Looking at the text, you should also notice taht quotes are always at the start or end of a word - that is, at a boundary. On first glance it might be easy to assume that it would be a word boundary. However, don't forget that the ' is a non-word character, so the boundary will be between it and another non-word character, such as a space. So the boundary will be a non-word boundary, or in other words, \B.
+
+	Therefore, the character pattern you're looking for is either a non-word boundary followed by a single quote or a single quote followed by a non-word boundary. The key is the "or," for which you use | in regular expressions. This leaves your regular expression as the following:
+		var myRegExp = /\B'|'\B/g;
+
+	This will match the pattern on the left of the | character or the pattern on the right. You want to replace all the single quotes with double quotes so the g has been added at the end.
+
+The search() Method
+
+	The search() Method allows you to search a string for a pattern of characters. If the pattern is found the character position at which it was found is returned, otherwise you get -1 returned. The method takes only one parameter, the RegExp object.
+
+	In this example we want to find out if the word Java is contained within a string. But we just want Java and nothing more like JavaScript.
+		var myString = "Beginning JavaScript, Beginning Java 2, Professional JavaScript";
+		var myRegExp = /\bJava\b/i;
+		alert(myString.search(myRegExp));
+
+	So to find the word Java on its own between two word boundaries. we use the \b position characters.
+
+The match() Method
+	The match() method is similar to search(), except that instead of returning a position at which a match was found, it returns an array. Each element of the array contains the text of a match made.
+		var myString = "The years were 1999, 2000 and 2001";
+
+	And you want to extract the years from this string, you could use the match() method. To match each year, you are looking for four digits in between word boundaries. So this would translate to
+		var myRegExp = /\b\d{4}\b/g;
+
+	To do the match and store the results, you use the match() method and store the Array object it returns in a variable
+		var resultsArray = myString.match(myRegExp);
+
+Using the RegExp Object's Constructor
+
+	So we don't usually use the full constcutor for a RegExp, but when we want to create one using the user's input, the constructor method is used.
+		var myRegExp = new RegExp("[a-z]");
+
+	So a problem is that the \ character in a string is an escape character, so if you put \b inside a string it actually means backspace. So to get around this we do \\b when inside a string, that gives us our RegExp \b
+	So this
+		var myRegExp = /\b/;
+	becomes this:
+		var myRegExp = new RegExp("\\b");
+
+	Remember when we used / and / to make a RegExp we put the gmi flags afterwards, to do this with a RegExp constructor we do:
+		var myRegExp = new RegExp("hello\\b","gi");

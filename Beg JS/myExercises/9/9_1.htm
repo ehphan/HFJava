@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>9 1</title>
+	<script language="JavaScript" type="text/JavaScript">
+
+		function splitAndReverseText(textAreaControl){
+			var textToSplit = textAreaControl.value;
+			//make textToSplit out of the textarea's value
+			var textArray = textToSplit.split('\n');
+			//create textArray that is the splitup of texttosplit
+			var numberOfParts = 0;
+			//init # of elements in the array
+			numberOfParts = textArray.length;
+			//our textArray's length is now our # of elements
+			var reversedString = "";
+			//init reversed string
+			var indexCount;
+			//i counter for forloop
+			for(indexCount = numberOfParts - 1; indexCount>=0;indexCount--){
+				//i counter is our # of elements - 1. So we start at the end of the array and decrement til we hit 0
+				reversedString = reversedString + textArray[indexCount];
+				//revstring keeps appending the latest part of the array.
+				if (indexCount > 0){
+					reversedString = reversedString + "\n";
+					//as long as it isn't the last line, finish our append with a new line char
+				}
+			}
+			textAreaControl.value=reversedString;
+			//changes the textbox we were given to the reversed strings.
+		}
+		
+	</script>
+</head>
+<body>
+	<form name="form1">
+		<textarea rows="20" cols="40" name="textarea1" wrap="soft">Line 1
+Line 2
+Line 3
+Line 4</textarea>
+		<br/>
+		<input type="button" value="Reversed Line Order" name="buttonSplit"
+			onclick="splitAndReverseText(document.form1.textarea1)">
+	</form>
+</body>
+</html>

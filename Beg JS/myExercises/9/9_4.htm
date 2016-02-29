@@ -1,0 +1,12 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<script type="text/javascript">
+var myListString = "apple, 0.99, banana, 0.50, peach, 0.25, orange, 0.75";
+var theRegExp = /[^a-z]+/i;
+var myFruitArray = myListString.split(theRegExp);
+document.write(myFruitArray.join("<br/>"));
+</script>
+</body>
+</html>

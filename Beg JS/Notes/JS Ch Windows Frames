@@ -1,0 +1,296 @@
+JS Ch 8
+
+Windows and Frames
+
+	Many web applications use frames to split up the browser's window.
+
+	JS enables the manipulation of frames and allows functions nad variables you create in one frame to be used from another frame
+
+	One advantage to this is that you can keep common variables and functions in one place, but use them from many places.
+
+	Being able to access variables and functions from other frames gives you two things
+	1. Makes your code modular
+	2. Ability to maintain information between pages
+
+	Modular: In other programming languages, like C/++ or VisBas, you can create a module - an area to hold general functions and variables - and reuse it from different places in your program. When using frames, you can put all of your general functions and variables into one aera, such as the top frame, which you can think of as your code module. Then you can call the functions repeatedly from different pages and different frames.
+
+	If you put the general functions and variables in a page that defines the frames that it contains, then if you need to make changes ot the pages inside the frames, any variables defined in the frameset page will retain their value. This provides a very useful means of holding information even when the user is navigating your web site. A further advantage is that any functions defined in the frameset-defining page can be called by subsequent pages and have to be loaded into the browser only once, making your page's loading faster.
+
+Frames and the window Object
+
+	Frames are a means of splitting up the browser window into various panes, into which you can then load different HTML documents. The frames are defined in a frameset-defining page by the <frameset/> and <frame/> elements.
+
+	Frameset elements contain frame elements and specifies how the frames should look on the page.
+
+	Frame elements are then used to specify each frame and to include the required documents in the page.
+
+	Window object represents the browser's frame on your page or document. If you have a page with no frames, there will be just one window object. However, if you have more than one frame, there will be one window object for each frame. Except for the very top-level window of a frameset, each window object is contained inside another.
+
+ex 8 1
+
+	<frameset rows="50%, *" id="topWindow">
+		<frame name="upperWindow" src="myUpper.htm"/>
+		<frame name="lowerWindow" src="myLower.htm"/>
+	</frameset>
+
+	The frameset is defined with the <frameset/> element. You use two attributes:
+	rows: takes the value "50%, *" meaning that the first frame should take up half of the height of the window, and the second frame should take up the rest of the room.
+	id: used to give a name that you can use to reference the page
+
+	Two child windows are created using <frame/> elements; each of which contains a name attribute by which the window objects will be known and a src attribute of the page that will be loaded into the newly created windows.
+
+	The parent property is very useful. It gives you access to the window object of the frame's parent. This means you can access all of the parent window object's properties and methods. Through these, you can access the document within the parent window as well as any other frames defined by the parent. Here, you display a message box giving details of the parent frame's file name or URL by using the href property of the location object (which itself is a property of the window object).
+
+	Parent property:
+		> Gives access to the window Object of that frame's parent.
+		> Gives access to the window Object's properties and methods.
+		> Means you can access the document within the parent window, as well as any other frames defined by the parent.
+
+Coding Between Frames
+
+	Each frame exists as a different window and gets its own window object.
+
+	When you access the window Object of a frame-set defining page from any of the frame pages it specifies, you can get to other frames through frame-set pages properties and methods.
+
+ex 8 2
+
+		function addPage(fileName){
+			var fileNameStart = fileName.lastIndexOf("/") + 1;
+			fileName = fileName.substr(fileNameStart);
+			pagesVisited[pagesVisited.length] = fileName;
+	
+			return true;
+		}
+
+	The fileName parameter passed to this function is the full file name and path of the visited page, like D:/myDirectory/etc..., and you just need the filename that comes after the final /. So in this first line you find the position of that character, and skip over it by 1 to avoid /.
+
+	Second line now that we have the position of our word we want, we turn fileName into a substring to get the name of the file.
+
+	Then you add the file name into the array at the index that we store globally.
+
+Code Access Between Frames
+
+	So say we have nested frame's inside frame's inside window's
+
+			Top Window
+		^            	^
+		frameMain			frameMenu
+		^
+		frameBottom
+
+	frameBottom has a parent frame called frameMain, which has a parent, the top window. So if you wanted to access a function in Top Window from frameBottom, you would have to go to the parent of the parent's window Object. 
+
+		window.parent.parent.myFunction();
+
+	would access myFunction in Top Window from frameBottom
+
+	What if you want to access frameMenu from fromaeBottom?
+	1. You can use its index in the frames collection property of the window object:
+		window.parent.parent.frames[0]
+	2. You can use its name in the frames collection
+		window.parent.parent.frames["frameMenu"]
+	3. You can reference it directly by using its name as you can with any window object:
+		window.parent.parent.frameMenu
+
+	The third method is generally the easiest unless you don't know the name of a frame and need to access it by its index value in the frames collection, or are looping through eah child frame in turn.
+
+	So if you needed to access myFunction/myVariable in frameMenu from frameBottom:
+		window.parent.parent.frameMenu.myFunction
+		window.parent.parent.frameMenu.myVariable
+
+	What if you want to access a control on a form on a page? Say you want to access, from frameBottom, a control myControl, on a form myForm in the frameMenu page:
+		window.parent.parent.frameMenu.document.myForm.myControl.value
+
+	Referencing other frames can be verbose, so it's a very good idea to store the reference in a variable.
+		var myFormRef = window.parent.parent.frameMenu.document.myForm;
+	So now you can just say
+		myFormRef.myControl.value;
+
+The top Property
+
+	Using parent property can get tedious when you want to access the very top window from a frame low down in the hierarchy. Alternatively you can use the window Object's top property. This returns a reference to the window object of the very top window in a frame hierarchy.
+
+	So instead of this:
+		window.parent.parent.frameMenu.document.myForm.myControl.value;
+	you would just:
+		top.frameMenu.document.myForm.myControl.value;
+
+	So when do you use which?
+	The top property is much more generic; top is always the very top window regardless. There will always be a top, but not necessarily a parent of a parent. But if someone else loads your website inside a frameset page, suddenly top becomes their window and not yours, so window.top is no longer valid.
+
+	One trick is to check to see whether the top window contains your page; if it doesn't, reload the top page again and specify that your top page is the one to be loaded. For example, cehck to see that the file name of the top page actually matches the name you expect. The window.top.location.href will give you the name and path - if they don't match what you want, use window.top.location.replace("myPagename.htm") to load the correct top page.
+
+Scripting IFrames
+
+	Inline frames (iframes), are a unique element in that you can add a frame to a web page without using a frameset, and they're much simpler to add to the page because of it:
+		<iframe name="myIFrame" src="child_frame.htm"/>
+	This HTML adds a frame with the name myIFrame to the page, which loads the child_frame.htm file.
+	Accessing the iframe's document object of the page loaded in is straightfwd:
+		window.myIFrame.document.bgColor="red";
+	It's very similar to conventional frames within a frameset. You can also use the frames collection like window.frames["myIFrame"]. Accessing the parent window from within the iframe is also similar, use the parent property:
+		window.parent.document.bgColor ="yellow";
+
+Opening New Windows
+
+	So why would you need a new window to be opened?
+	> You might want a page of links to web sites, in which clicking a link opens up a new window with that web site in it.
+	> Additional windows can be useful for displaying information. For example, if you had a page with products on it, the user could click a product image to bring up a new small window listing the details of that product. This can be less intrusive than navigating the existing window to a new page with product details, and then requiring the user to click Back to return to the list of products. You'll be creating an example demonstrating this later in the chapter.
+	> Dialog windows can be very useful for obtaining information from users, although overuse may annoy them.
+
+Opening a New Browser Window
+
+	The window object has an open() method that accepts 3 params:
+
+		1. URL of the page that you want to open in the new window. However, you can pass an empty string for this parameter and get a blank page and then use the document.write() method to insert HTML into the new window dynamically.
+
+		2. The name you want to allocate to the new window. This is not the name you use for scripting, but instead is used for the target attribute of such things as hyperlinks and forms. For example, if you set this parameter to myWindow and set the target attribute of a hyperlink on the original page to the same value, clicking that hyperlink will cause the hyperlink to act on the new window opened.
+
+			<a href="text3.htm" target="myWindow">Test3.htm</a>
+
+		This means that test3.htm loads into the new window and not the current window when the user clicks the link. The same applies to the <form/> element's target attribute. In this case, if a form is submitted from the original window, the response from the server can be made to appear in the new window.
+
+		When a new window is opened, it is opened (by default) with a certain set of properties, such as width and height, and with the normal browser-window features. Browser-window features include things such as a location entry field and a menu bar with navigation buttons.
+
+		3. OPTIONAL This can be used to specify values for the height and width properties. Also, because by default most of the browser window's features are switched off, you can switch them back on using the third parameter of the open() method.
+
+	Lets look at an example of the code you need to open a basic window. You'll name this window myWindow and give it a width and height of 250 pixels. You want the new window to open with the test.htm page inside.
+
+		var newWindow = window.open("test2.htm", "myWindow", "width=250,height=250");
+
+	Notice that you've set the variable newWindow to the return value returned by the open() method, which is a reference to the window object of the newly opened window. You can now use newWindow to manipulate the new window and gain access to the document contained inside it using the newWindow.document property. You can do everything with this reference that you did when dealing with frames and their window objects. For example, if you wanted to change the bg color of the document contained within the new window:
+
+		newWindow.document.bgColor = "red";
+
+	How would you close the window you just opened? easy with the window object's close() method.
+
+		newWindow.close();
+
+ex 4
+
+Adding HTML to a New Window
+
+	Remember that you can pass an empty string as the first parameter of the window object's open() method and then write to the page using HTML.
+
+	First, you need to open a blank window by passing an empty value to the first parameter that specifies the file name to load.
+
+		var newWindow = window.open("", "myNewWindow","width=150,height=150");
+
+	Now you can open the window's document to receive your HTML
+
+		newWindow.document.open();
+
+	This is not essential when a new window is opened, because the page is blank; but with a document that already contains HTML, it has the effect of clearing out all existing HTML and blanking the page, making it ready for writing.
+
+	Now you can write out any valid HTML using the document.write() method.
+
+		newWindow.document.write("<h4>Hello</h4>");
+		newWindow.document.write("<p>Welcome to the new window</p>");
+
+	Each time you use the write() method, the text is added to what's already there until you use the document.close() method.
+
+		newWindow.document.close();
+
+	If you then use the document.write() method again, the text passed will replace existing HTML rather than adding it.
+
+Adding Features to Your Windows
+
+	As you've seen window.open() has 3 params, these are some options for the third param.
+
+		copyHistory = yes,no
+			Copy the history of the new window doing the opening to the new window
+
+		directories = yes,no
+			Show directory buttons
+
+		height = integer
+			Height of new windows in pixels
+
+		left = integer
+			Window's offset from left of screen
+
+		location = yes,no
+			Show location text field
+
+		menubar = yes,no
+			Show menu bar
+
+		resizable = yes,no
+			Enable the user to resize the window after it has been opened
+
+		scrollbars = yes,no
+			Show scrollbars if the page is too large to fit in the window
+
+		status = yes,no
+			Show status bar
+
+		toolbar = yes,no
+			Show toolbar
+
+		top = integer
+			Window's offset from top of screen
+
+		width = integer
+			Width of new window in pixels
+
+	So for example, a 250x250px window with a location field and menu bar
+
+		var newWindow = window.open("","myWindow","width=250,height=250,location,menubar,resizable");
+	NOTE: Never include spaces inside the features string; otherwise some browsers will consider the string invalid and ignore your settings.
+
+
+Scripting Between Windows
+	
+	So we know how to manipulate the new window's properties and methods, and how to access its document object using the return value from the window.open() method. But now we're going to look at how the newly opened window can access the window that opened it. And just like how we do with frames, how to use functions there.
+
+	The key to accessing the window object of the window that opened the new window is the window object's opener property. This returns a reference to the window object of the window that opened the new window. So the following code would change the bg color of the opener to red:
+
+		window.opener.document.bgColor="red";
+
+EX 8.5
+	
+	we create a function btnOpenWin_onclick() which fires when the user clicks a button to open the new window. But rather than have it open anywhere on, we use the built-in screen object, which is a property of the window object, to find out the resolution of the user's display and place the window in the middle of the screen.
+
+		function btnOpenWin_onclick(){
+			var winTop = (screen.height/2) - 125;
+			var winLeft = (screen.width/2)-125;
+		}
+
+	Now we build up a string to put into the window features (3rd param for window.open()).
+
+		var windowFeatures = "width=250,height=250,";
+		windowFeatures = windowFeatures + "left="+winLeft
+
+	Remember that newWindow will contain a reference to the window object of the window opened. This means you can access the form in newWindow, just as you'd access a form on the page the script's running in, by using the document object inside the newWindow window object.
+
+		newWindow.document.form1.text1.value;
+
+Moving and Resizing Windows
+
+	In addition to opening and closing windows, it's also possible to move and resize windows.
+
+	After opening a window, you can change its onscreen position and its size using the window object's resizeTo() and moveTo() methods, both of which take an argument in pixels.
+
+	Consider the code that opens a new window:
+
+		var newWindow = window.open(myURL,'myWindow','width=125,height=150,resizable');
+
+	So if you want to make it 350px wide by 200px high and move it 100px from the left and 400px from the top
+
+		newWindow.resizeTo(350,200);
+		newWindow.moveTo(100,400);
+
+	resizeBy():
+		newWindow.resizeBy(100,200);
+	This will increase the size of newWindow by 100px width and 200px height.
+
+	moveBy():
+		newWindow.moveBy(20,50);
+	This moves the newWindow by 20px horiz and 50px vert
+
+	When using these methods, bear in mind that users can manually resize these windows.
+
+Security
+
+	Browsers put certain restrictions on what information scripts can access between frames and windows.
+
+	

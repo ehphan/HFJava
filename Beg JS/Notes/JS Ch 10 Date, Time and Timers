@@ -1,0 +1,82 @@
+JS Ch 10 Date, Time and Timers
+
+World Time
+
+	So as you make pages and shit for websites, international people accessing your sites are going to need to see time in a locale to themselves
+
+	Coordinated Universal Time (UTC) same thing as Greenwich Mean Time (GMT)
+
+		So you have methods like toUTCString() and toLocaleString(), which return the date and time in the Date object as a string based on either UTC or local time (duh).
+
+		If you want to find out the difference in minutes between the current locale's time and UTC, you can use the getTimezoneOffset() method. If the timezone is behind UTC, such as in the US, it will return a positive #. if its behind it returns a negative #.
+
+Setting and Getting a Date Object's UTC Date and Time
+
+	When you create a Date object, you can either initialize it with a value, or let JS set it to the current date/time. JS assumes you are setting the local time values. So if you wanna specify UTC time, you need to use the setUTC type methods
+
+	Methods to set UTC Date and Time:
+		setUTCDate()
+		setUTCFullYear()
+		setUTCHours()
+		setUTCMilliseconds()
+		setUTCMinutes()
+		setUTCMonth()
+		setUTCSeconds()
+
+	Pretty straightforward right Well you'll never guess how to
+
+	Get Methods for UTC Dates and Times:
+		getUTCDate()
+		getUTCDay()
+		getUTCFullYear()
+		getUTCHours()
+		getUTCMilliseconds()
+		getUTCMinutes()
+		getUTCMonth()
+		getUTCSeconds()
+
+	The only new one is getUTCDay(). This works in the same way as the getDay() method and returns the day of the week as a number, from 0 for sunday and 6 for saturday.
+
+Timers in a Web Page
+
+	There are two kinds of timers
+	> One-shot timers: triggers just once after a certain period of time
+	> Continually firing timers: continually triggers at set intervals
+
+	you can have however many timers you want, and you can set them going at any point in your code, such as at the window onload event, or the click of a button. 
+
+One-Shot Timer
+
+	Setting a one-shot timer is simple: you just use the window object's setTimeout() method.
+		window.setTimeout("Your JS code", milliseconds_delay)
+
+	The method setTimeout() takes two params
+		1. JS code you want executed
+		2. Delay, in millis, until code is executed
+
+	The method returns a value(integer), which is the timer's unique ID. If you decide later that you want to stop the timer firing, you use this ID to tell JS which timer you are referring to.
+
+	The setTimeout() method can also take a direct reference to a function instead of a JS string. so if you have myFunction:
+		window.setTimeout(myFunction, milliseconds_delay)
+
+	although setTimeout() is a method of the window object, you'll remember that because the window object is at the top of the hierarchy, you don't need to use its name when referring to its properties and methods. Hence, you can use setTimeout() instead of window.setTimeout().
+
+	Note that setting a timer does not stop the script from continuing to execute. The timer runs in the background and fires when its time is up. In the meantime the page runs as usual, and any script after you start the timer's countdown will run immediately. So, in this example, the alert box telling you that the timer has been set appears immediately after the code setting the timer has been executed.
+
+	So what if you want to stop the timer before it fires?
+
+	To clear a timer you use the windo object's clearTimeout() method. This takes one param, the unique timer ID that the setTimeout() method returns.
+
+Setting a Timer that Fires at Regular Intervals
+
+	Modern browsers saw new methods added to the window object for setting timers, namely the setInterval() and clearInterval() methods. These work in a very similar way to setTimeout() and clearTimeout(), excpet that the timer fires continually at regular intervals rather than just one.
+
+	The method setInterval() takes teh same params as setTimeout(), except that the second parameter now specifies the interval, in millis, between each firing of the timer, rather than just the length of time before the timer fires.
+
+	For example, to set a timer that fires the function myFunction() every five seconds, the code would be as follows:
+		var myTimerID = setInterval("myFunction()",5000);
+
+	as with setTimeout(), the setInterval() method returns a unique timer ID that you'll need if you want to clear the timer with clearInterval(), which works identically to clearTimeout(). So to stop the timer started in the preceding code, you would use the following:
+		clearInterval(myTimerID);
+
+	

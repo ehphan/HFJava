@@ -1,0 +1,83 @@
+Regular Expressions: Special Characters
+	You will be looking at three types of special characters in this section.
+
+Text, Numbers, and Punctuation.
+	The first group of special characters you'll look at contains the character class's special characters. Character class means digits, letters, and whitespace characters.
+
+	\d	Any digit from 0-9 
+		\d\d matches 72, but not aa or 7a
+
+	\D	Any character that is not a digit
+		\D\D\D matches abc, but not 123
+
+	\w	Any word character; that is,A-Z,a-z,0-9, and the underscore character
+		\w\w\w\w matches Ab_2 but not $$$%
+
+	\W	Any non-word character
+		\W matches @ but not a
+
+	\s	Any whitespace character
+		\s matches tab,return,formfeed,and vertical tab
+
+	\S	Any non-whitespace character
+		\S matches A, but not the tab character
+
+	.	Any single character other than the newline character
+		. matches a or 4 or @
+
+	[...]	Any one of the characters between the brackets[a-z] will match any character in the range a to z
+		[abc] will match a b or c, but nothing else
+
+	[^...]	Any one character, but not one of those inside the brackets
+		[^abc] will match any character except a b or c
+		[^a-z] will match any character that is not in the range a to z
+
+	So to match a telephone number in the format 1-800-000-0000
+		\d-\d\d\d-\d\d\d-\d\d\d\d
+
+Repetition Characters
+
+	RegExp include something called repetition characters, which are a means of specifying how many of the last item or character you want to match.
+
+	{n}	Match n of the previous item
+		x{2} matches xx
+
+	{n,}	Match n or more of the previous item
+		x{2,}matches xx, xxx, xxxx etc
+
+	{n,m}	Match at least n and at most m of the previous item
+		x{2,4} matches xx, xxx, and xxxx
+
+	?	Match the previous item zero or one time
+		x? matches nothing or x
+
+	+ Match the previous item one or more times
+		x+ matches x, xx, xxx
+
+	* Match the previous item zero or more times
+		x* matches nothing, or x, xx, xxx, and so on
+
+	So for a phone number what used to be
+		\d-\d\d\d-\d\d\d-\d\d\d\d
+	You could now do
+		\d-\d{3}-\d{3}-\d{4}
+	So to declare this regexp you would do
+		var myRegExp = /\d-\d{3}-\d{3}-\d{4}/
+
+	Remember that the first and last /'s tell JS what is in between those characters is a regular expression, so JS creates a RegExp object based on this expression
+
+Position Characters
+
+	These characters enable you to specify either WHERE the match should start or end, or WHAT will be on either side of the character pattern. For example, you might want your pattern to exist at the start or end of a string or line, or you might want it to be between two words. The following table lists some of the most common position characters and what they do.
+
+	^
+	The pattern must be at the start of the string, or if it's a multi-line string, then at the beginning of a line. For multi-line text (a string that contains carriage returns), you need to set the multi-line flag when defining the regular expression using /myreg ex/m. Note that this is only applicable to ie5.5 and later and nn6 and later
+
+	$
+	The pattern must be at the end of the string, or if it's a multi-line string, then at the end of a line. For multi-line text (a string that contains carriage returns), you need to set the multi-line flag when defining the regular expression using /myreg ex/m
+
+	\b
+	This matches a word boundary, which is essentially the point between a word character and a non-word character
+
+	\B
+	This matches a position that's not a word boundary

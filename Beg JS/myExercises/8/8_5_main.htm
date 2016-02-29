@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>8 5</title>
+	<script type="text/javascript">
+		var newWindow;
+		function btnOpenWin_onclick(){
+			var winTop = (screen.height / 2) - 125;
+			var winLeft = (screen.width / 2) - 125;
+			var windowFeatures = "width=250,height=250,";
+			windowFeatures = windowFeatures + "left=" + winLeft + ",";
+			windowFeatures = windowFeatures + "top=" + winTop;
+			newWindow = window.open("8_5_popup.htm","myWindow",windowFeatures);
+		}
+
+		function btnGetText_onclick(){
+//button that gets text from the window we created. but it also checks to see if a new window has been opened before it attempts to get the text.
+			if (typeOf(newWindow)=="undefined"||newWindow.closed==true){
+				alert("no window is open");
+			}	else {
+//If the window exists, we take our text1.value and set it to the new window's text1 value.
+				document.form1.text1.value = newWindow.document.form1.text1.value;
+			}
+		}
+
+		function window_onunload(){
+			if(typeof(newWindow)!="undefined" && newWindow.closed==false){
+				newWindow.close();
+			}
+		}
+
+	</script>
+</head>
+<body onunload="window_onunload()">
+	<form name="form1" action="">
+		<input type="button" value="Open newWindow" name="btnOpenWin" onclick="btnOpenWin_onclick()"/>
+		<p>
+			newWindow's Text:<br/>
+			<input type="text" name="text1"/>
+			<input type="button" value="Get Text" name="btnGetText" 
+				onclick="btnGetText_onclick()"/>
+		</p>
+	</form>
+</body>
+</html>
