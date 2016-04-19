@@ -1,0 +1,160 @@
+Ch 2
+
+JavaScript in HTML
+
+The <SCRIPT> Element
+
+	The primary method of inserting JS into na HTML page is via the <script> element. There are six attributes for the <script> element:
+		> async - Optional. Indicates that the script should begin downloading immediately but should not prevent other actions on the page such as downloading resources or waiting for other scripts to load. Valid only for external script files.
+
+		> charset - Optional. The character set of the code specified using the src attributes. This attribute is rarely used, because most browsers don't honor its value.
+
+		> defer - Optional. Indicates that the execution of the script can safely be deferred until after the document's content has been completely parsed and displayed. Valid only for external scripts. IE 7 and earlier also allow for inline scripts.
+
+		> language - Deprecated. Originally indicated teh scripting language being used by the code block (such as JavaScript or VBScript). Most browsers ignore this attribute; it should not be used.
+
+		> src - Optional. Indicates an external file that contains code to be executed.
+
+		> type - Optional. Replaces language; indicates the content type (also called MIME type) of the scripting language being used by the code block. Traditionally, this value has always been "text/javascript", though both "text/javascript" and "text/ecmascript" are deprecated. JS files are typically served witht he "application/x-javascript" MIME type even though setting this in the type attribute may cause the script to be ignored. 
+
+	There are two ways to use the <script> element.
+		> embed JS code directly into the page
+		> include JS from an external file
+
+	To include inline JS code, place JS code inside the <script> element directly, as follows:
+
+		<script type = "text/javascript">
+			function sayHi(){
+				alert ("Hi!");
+			}
+		</script>
+
+	The JS code contained inside a <script> element is interpreted from top to bottom. In the case of this example, a function definition is interpreted and stored inside the interpreter environment. The rest of the paeg content is not loaded and/or displayed until after all of the code inside the <script> element has been evaluated.
+
+	When using inline JS code, keep in mind that you cannot have the string "</script>" anywhere in your code, or else it sees it as the end of the script tag. So if you need to write </script> do so by escaping the / character, making it look like <\/script>
+
+	To include JS from an external file, the src attribute is required. The value of src is a URL linked toa  file containing JS code, like this:
+		<script type="text/javascript" src="example.js"></script>
+
+	It's important to note that a script element using the src attribute should not include additional JS code between the script tags. If both are provided, the script file is downloaded and executed while the inline code is ignored.
+
+	One of the most powerful and most controversial parts of the script element is its ability to include JS files from outside domains. Much like an <img> element, the <script> element's src attribute may be set to a full URL that exists outside th domain on which the HTML page exists.
+
+	Code from an external domain will be loaded and interpreted as if it were part of the page that is loading it. This capability allows you to serve up JS from various domains if necessary. Be careful, however, if you are referencing JS files located on a server that you dont' control.
+
+	Regardless of how the code is included, the <script> elements are interpreted in the order in which they appear in the page so long as the defer and async attributes are not present. The first <script> element's code must be completely interpreted before the second <script> element begins interpretation.
+
+Tag Placement
+
+	Traditionally, all <script> elements were placed within the <head> element on a apge, such as in this example:
+
+		<!DOTYPE html>
+		<html>
+			<head>
+				<title> ex </title>
+				<script type="text/javascript" src="ex1.js"></script>
+			</head>
+		</html>
+
+	The main purpose of this format was to keep external file references, both CSS files and JS files in the same area. However, including all JS files in the <head> of a document means that all of the JS code must be downloaded, parsed, and interpreted before the page begins rendering (rendering begins when the browser receives the opening <body> tag). For pages that require a lot of JS code, this can casue a noticeable delay in page rendering, during which time the browser will be completely blank. For this reason, modern web applications typically include all JS references in the <body> element, after the page content.
+
+	Using this approach, the page is completely rendered in the browser before the JS cdoe is processed.
+
+Deferred Scripts
+
+	HTML 4.01 defines an attribute named defer for the <script> element. The purpose of defer is to indicate that a script won't be changing the structure of the paeg as it executes. As such, the script can be run safely after the entire page has been parsed. Setting the defer attribute on a <script> element signals to the browser that download should begin immediately but execution should be deferred:
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<title></title>
+				<script type="text/javascript" defer src="ex1.js"></script>
+			</head>
+		</html>
+
+	Even though the <script> elements in this example are included in the document <head>, they will not be executed until after the browser has received the closing </html> tag. The HTML5 specification indicates that scripts will be executed in the order in which tye appear, so the first defrred script executes before the second deferred script, and both will execute before the DOMContentLoaded event. In reality, though, deferred scripts dont' always execute in order or before teh DOMContentLoaded event, so it's best to include just one when possible.
+
+	As mentioned previously, the defer attribute is supported only for external script files. This was a clarification made in HTML5, so browsers that support the HTML5 implementation will ignore defer when set on an inline script.
+
+Asynchronous Scripts
+
+	HTML introduces the async attribute for <script> elements. The async attribute is similar to defer in that it changes the way the script is processed. Also similar to defer, async applies only to external scripts and signals the browser to beign downloading the file immediately. Unlike defer, scripts marked as async are not guaranteed to execute in the order in which they are specified.
+
+	The second script file might execute before the first, so ti's important that there are no dependencies between teh two. The purpose of specifying an async script is to indicate that the page need not wait for the scrip to be donloaded and executed before continuing to load, and it also need nto wait for another script to load and execute before it can do the same. because of this, it's recommended that asynchronous scripts not modify the DOM as they are loading.
+
+	Asynchronous scripts are guaranteed to execute before the page's load event and may execute before or after the DOMContentLoaded thing goes.
+
+Changes in XHTML
+
+	Extensible HyperText Markup Language, or XHTML, is a reformulation of HTML as an application of XML. The rules for writing code in XHTML are stricter than those for HTML, which affects teh <script> element when using embedded JS code.
+
+	In HTML, the <script> element has special rules governing how its contents should be parsed; in XHTML, these special rules don't apply. This means that the less-than symbol in the statement a < b is interpreted as the beginning of a tag, which causes a syntax error because a less than symbol must not be followed by a space.
+
+	So instead of using a < symbol , you can put in its HTML identity which is &lt;
+
+	The second option for turning this code into a valid XHTML version is to wrap the JS code in a CDATA section. In XHTML (and XML), CDATA sections are used to indicate areas of the document that contain free-form text not intended to be parsed. This enables you to use any character, including the less-than symbol, without incurring a syntax error. The format is as follows:
+
+		<script type="text/javascript"><![CDATA[
+			function someShit (a,b){
+				//jadda jadda
+			}
+		]]>
+		</script>
+
+	In XHTML-compliant web browsers, this solves the problem. However, many browsers are still not XHTML-compliant and don't support the CDATA section. To work around this, the CDATA markup must be offset by JS comments:
+		<script type="text/javascript">
+		//<![CDATA[
+			function someShit (a,b){
+			//jadda jadda
+			}
+		//]]>
+		</script>
+
+	This format works in all modern browsers. Though a little bit of a hack, it validates as XHTML and degrades gracefully for pre-XHTML browsers.
+
+Deprecated Syntax
+
+	When <script> tags were initially introduced, some browsers didn't support it. So if you had script it would just print it to the page and look like shit. But there's a way to enclose script in an HTML comment
+
+		<script><!--
+			function sayHi(){
+				alert("hi");
+			}
+		//--></script>
+
+	Using this format, browsers like Mosaic would safely ignore the content inside of the <script> tag, and browsers that supported JS had to look for this pattern to recognize that there was indeed JS content to be parsed. 
+
+	Although this format is still recognized and interpreted correctly by all web browsers, it is no longer necessary and should not be used.
+
+Inline Code vs External Files
+
+	Although it's possible to embed JS in HTML files directly, it's generally considered a best practice to include as much JS as possible using external files. Keeping in mind that there are no hard and fast ruels regarding this practice, the arguments for using external files are as follows:
+		> Maintainability - JS code that is sprinkled throughout various HTML pages turns code maintenance into a problem. It is much easier to have a directory for all JS files so that devs can edit JS code independent of the markup in which it's used.
+
+		> Caching - Browsers cache all externally linked JS files according to specific settings, meaning that if two pages are using the same file, the file is downloaded only once. This ultimately means faster page-load times.
+
+		> Future-proof - By including JS using external fiels, there's no need to uset he XHTML or comment hacks mentioned previously. The syntax to include external files is the same for both HTML and XHTML.
+
+The <noscript> element
+	
+	Of particular concern to early browsers was the graceful degradation of pages when the browser didn't support JS. To that end, Zhou Tzuyuthe <noscript> element was created to provide alternate content for browsers without JS. This element can contain any HTML elements, aside from <script>, that can be included in the document <body>. Any content contained in a <noscript> element will be displayed under only the following two circumstances:
+		> The browser doesn't support scripting
+		> The browser's scripting support is turned off
+
+	If either of these conditions is met, then the content inside the <noscript> element is rendered. In all other cases, the browser does not render the content of <noscript>
+
+	This is useful for loading a page that requires scripts, and telling the user that they require scripts to use the page correctly. 
+
+SUMMARY
+
+	JS is inserted into HTML pages using the <script> element. This element can be used to embed JS into an HTML page, leaving it inline with the rest of the markup, or to include JS that exists in an external file.
+
+	> To include external JS files, the src attribute must be set to the URL of the file to include, which may be a file on the same server as the containin page or one that exists on a completely different domain.
+
+	> All <script> elements are interpreted in the order in which tey occur on the page. The code contained within a <script> element must be completely interpreted before code in the next <script> element can begin so long as defer and async attributes are not used.
+
+	> For nondeferred scripts, the browser must complete interpretation of the code inside a <script> element before it can continue rendering the rest of the page. For this reason, <script> elements are usually included toward the end of the page, after the main content and just before the closing </body> tag.
+
+	> You can defer a script's execution until after the document has rendered by using the defer attribute. Deferred scripts always exefcute in the order in which they are specified.
+
+	> You can indicate that a script need not wait for other scripts and also not block the document rendering by using the async attribute. Asynchronous scripts are not guaranteed to execuet in the order in which they occur in the page.

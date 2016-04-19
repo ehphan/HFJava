@@ -1,0 +1,47 @@
+Learn Ruby The Hard Way
+
+get input from users using gets.chomp, if you're getting an integer, use gets.chomp.to_i
+
+Formatting numbers
+
+	puts "Current amount: #{format("%.2f", amount)}"
+
+
+EX 13:
+
+Parameters, Unpacking, Variables
+
+	The ARGV IS the "argument variable" a very standard name in programming, that you will find used in many other languages. This variable holds the argument you pass to your Ruby script when you run it. In the exercises you will get to play with this more and see what happens.
+
+	Line 1 "unpacks" ARGV so that, rather than holding all the arguments, it gets assigned to three variables you can work with: first, second, and third. This may look strange, but "unpack" is probably the best word to describe what it does. It just says, "Take whatever is in ARGV, unpack it, and assign it to all of these variables on the left in order."
+
+EX 16: Reading and Writing files
+
+	Some commands to remember:
+	close - closes the file. Like file -> save in your editor
+	read - reads the contents of the file. you can assign teh results to a variable
+	readline - reads just one line of a text file
+	truncate - empties the file. watch out if you care about the file
+	write ('stuff') writes "stuff" to the file.
+
+	We start off the program with
+
+	filename = ARGV.first
+	this gives us our first ARGV, which we put after the whole 
+		ruby ex16.rb filename
+
+	txt = open(filename)
+
+	print txt.read
+
+EX 17: More Files
+
+	File.exist?(to_file)
+		File I want you to use your exist? function to tell me if to_file exists on the disk.
+
+ex 18:
+	you can create a function by using the word def in Ruby	
+
+ex 27: memorizing logic
+
+	

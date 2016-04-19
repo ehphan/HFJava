@@ -1,0 +1,45 @@
+Full Stack Developer Skills
+
+Back End
+
+	Server-side Scripting:
+		is using programs on a web server to provide dynamic responses to client requests.
+
+		Learning the concepts and design patterns that underlay all Server-side scripting.
+
+		Ruby on Rails.
+
+	Databases: 
+		Dynamic web apps are backed by dtabases, which allows users to create, read, update, and delete persistent data. 
+
+		For beginners its best to start with an established and well documented database.
+
+		Rails primarily uses SQLite or PostgreSQL for its database storage.
+
+
+Front End
+
+	HTML/CSS:
+		These give websites their structure and style.
+
+	JavaScript:
+		Language of choice for client-side scripting
+
+	JavaScript Libraries:
+		JS is so heavily used in modern web development that it ahs been extended through ane ver growing collection of JS libraries.
+
+		JQuery
+
+Other
+
+	Command-line:
+
+	Version Control:
+
+		Shit like Git
+
+	HTTP:
+		Understanding HTTP is critical.
+
+	Interacting with API's:
+		

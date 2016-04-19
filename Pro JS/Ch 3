@@ -1,0 +1,370 @@
+Ch 3
+
+Language Basics
+
+SYNTAX
+	
+	ECMAScript's syntax borrows ehavily from C and other C-like languages such as Java and Perl. Developers familiar with such languages should have an easy time picking up the somewhat looser syntax of ECMAScript.
+
+Case-sensitivity
+
+	The first concept to understand is that everything is case-sensitive; variables, function names, and operators are all case-sensitive, meaning that a variable named test is different from a variable named Test. Similarly, typeof can't be the name of a function, because it's a keyword; however, typeOf is a perfectly valid function name.
+
+Identifiers
+
+	An identifier is the name of a variable, function, property, or function argument. Identifiers may be one of or more characters in the following format:
+		> The first character must be a letter, an underscore, or dollar sign.
+		> All other characters may be letters, underscores, $'s, or numbers
+
+	Letters in an identifier may include extended ASCII or unicode letter characters such as weird letters.
+
+	By convention, ECMAScript identifiers use camel case, meaning that the first letter is lowercase and each additional word is offset by a capital letter, like this:
+		goFuckYourself
+
+	Although this is not strictly enforced, it is considered a best practice to adhere to the built-in ECMAScript functions and objects that follow this format.
+
+Comments
+
+	ECMAScript uses C-style comments for both single-line and block comments. A single line comment begins with two forward-slash characters, such as this:
+	 	//caca
+
+	A block comment begins with a forward slash and asterisk (/*) and ends with the opposite (*/), as in this example:
+
+		/*
+	   * This is a multi-line
+	   *	Comment you weenie
+	   */
+
+	Even though the second and third lines contain an asterisk, that's just for readability. This is the format preferredi n enterprise applications.
+
+Strict Mode
+
+	ECMAScript 5 introduced the concept of strict mode. Strict mode is a different parsing and execution model for JS, where some of the erratic behavior of ECMAScript 3 is addressed and errors are thrown for unsafe activities. To enable strict mode for an entire script, include the following at the top:
+
+		"use strict";
+
+	Although this may look like a string that isn't assigned to a variable, this is a pragma that tells supporting JS engines to change into strict mode. The syntax was chosen specifically so as not to break ECMAScript 3 syntax.
+
+	You may also specify just a function to execute in strict mode by including the pragma at the top of the function body:
+
+		function doSomething() {
+			"use strict";
+			// function body
+		}
+
+	Strict mode changes many parts of how JS is executed, and as such, strict mode distinctions are pointed throughout the book. IE 10+, FF 4+, Safari 5.1+, Opera 12+, and chrome support strict mode.
+
+Statements
+
+	Statements in ECMAScript are terminated by a semicolon, though omitting the semicolon makes the parser determine where the end of a statement occurs, as in the following examples:
+
+		var sum = a + b // valid even without a semicolon - not recommended
+		var diff = a - b; // valid - preferred
+
+	Even though a semicolon is not required at the end of statements, it is recommended to always include one. Including semicolons helps prevent errors of omission, sucha s not finishing what you were typing, and allows developers to compress ECMAScript code by removing extra white space (such compression causes syntax errors when lines do not end in a semicolon). Including semicolons also improves readability in certain situations, because parsers try to correct syntax errors by inserting semicolons where they appear to belong.
+
+	Multiple statements can be combined into a code block by using C-style syntax, beginning with a left curly brace and ending with a right curly brace.
+
+		if (test){
+			test = false;
+			alert (test);
+		}
+
+	Control statements, such as if, require code blocks only when executing multiple statements. However, it is considered a best practice to always use code blocks with control statements, even if there's only one statement to be executed, as in the following examples:
+
+		if (test)
+			alert(test);
+	This works but is error prone, should be avoided
+
+		if(test){
+			alert(test);
+		}
+	That's hot, use this one. Using code blocks for control statements makes the intent clearer, and there's less chance for errors when changes need to be made.
+
+Variables
+
+	ECMAScript variables are loosely typed, meaning that a variable can hold any type of data. Every variable is simply a named placeholder for a value. To define a variable, use the var operator followed by the variable name, like this:
+		var message;
+
+	This code defines a variable named message that can be used to hold any value. ECMAScript implements variable initialization, so it's possible to define the variable and set its value at the same time:
+		var message = "hi";
+
+	Here, message is defined to hold a string value of "hi". Doing this initialization doesn't mark the message as being a string type; it is simply the assignment of a value to the variable. It is still possible to not only change the value stored in the variable but also change the type of value, such as this:
+
+		var message = "hi";
+		message = 100; //legal but not recommended
+
+	It's important to note that using the var operator to define a variable makes it local to the scope in which it was defined. For example, definign a variable inside a function using var means that the variable is destroyed as soon as the function exits, as shown here:
+
+		function test(){
+			var message = "hi";
+		}
+
+		test();
+		alert(message);//error, message is only in the test function, so we can't use it out here.
+
+	Here, the message variable is defined within a function using var. The function is called test(), which creates the variables and assigns its value. Immediately after that, the variable is destroyed so the last line in this example causes an error. It is, however, possible to define a variable globally by simply omitting the var operator as follows:
+
+		function test(){
+			message = "hi";
+		}
+		test();
+		alert(message); //works
+
+	By removing the var operator from the example, the emssage becomes global. As soon as the function test() is called, the variable is defined and becomes accessible outside of the function once it has been executed.
+
+	Although it's possible to define global variabels by omitting the var operator, this approach is not recommended. Global variables defined locally are hard to maintain and cause confusion, because it's not immediately apparent if the omission of var was intentional. Strict mode throws a ReferenceError when an undeclared variable is assigned a value.
+
+	If you need to define more than one variable, you can do it usinga  single statement, separating each variable (and optional initialization) with a comma like this:
+
+		var message = "hi",
+				found = false,
+				age = 29;
+
+	Here, three variables are defined and initialized. Because ECMAScript is loosely typed, variable initializations using different data types may be combined into a single statement. Though inserting line breaks and indenting the variables isn't necessary, it helps to improve readability.
+
+	When you are running in strict mode, you cannot define variables named eval or arguments. Doing so results in a syntax error.
+
+Data Types
+
+	There are five simple data types (primitive types) in ECMAScript: Undefined, Null, Boolean, Number, and String. There is also one complex data type called Object, which is an unordered list of name-value pairs. Because tehre is no way to define your own data types in ECMAScript, all values can be represented as one of these six. Having only six data types may seem like too few to fully represent data; however, ECMAScript's data types have dynamic aspects taht make each single data type behave like several.
+
+The typeof Operator
+
+	Because ECMAScript is loosely typed, there needs to be a way to determine the data type of a given variable. The typeof operator provides that information. Using the typeof operator on a value returns one of the following strings:
+
+	undefined, boolean, string, number, object, function
+
+	The typeof operator is called like this:
+
+		var message = "some string";
+		alert(typeof message); //string
+		alert(typeof(message));//string
+		alert(typeof 95); //number
+
+	In this example, both a variable (message) and a numeric literal are passed into the typeof operator. Note that because typeof is an operator and not a function, no parentheses are required (although they can be used).
+
+	Be aware there are a few cases where typeof seemingly returns a confusing but technically correct value. Calling typeof null returns a value of "object", as the special value null is considered to be an empty object reference. Safare through v5 and chrome through v7 have a quirk where calling typeof on a regualr expression returns "function" while all other browsers return "object".
+
+	Technically functions are considered objects in ECMAScript and dont' represent another data type. However, they do have some special properties, which necessitates differentiating between functions and otehr objects via the typeof operator.
+
+The Undefined Type
+
+	The Undefined type has only one value, which is the special value undefined. When a variable is decalred using var but not initialized, it is assigned the value of undefined as follows:
+
+		var message;
+			alert(message == undefined); //true
+
+	In this example, the variable message is declared without initializing it. When compared with teh literla value of undefined, the two are equal. This example is identical to:
+
+		var message = undefined;
+		alert(message == undefined); //true
+
+	Here the variable message is explicitly initialized to be undefined. This is unnecessary because, by default, any uninitialized variable gets the value of undefined.
+
+	Note that a variable containing the value of undefined is different from a variable that hasn't been defined at all. Consider the following:
+
+		var message; //This var is declared but has a value of undefined
+
+		//var age
+		alert(message); //undefined
+		alert(age); // causes an error
+
+The Null Type
+
+	The Null type is the second data type that has only one value: the special value null. Logically, the null value is an empty object pointer, which is why typeof returns "object" when it's passed a null value in the following example:
+
+		var car = null;
+		alert(typeof car); //object
+
+	When defining a variable that is meant to later hold an object, it is advisable to initialize the variable to null as opposed to anything else. That way, you can explicitly check for the value null to determine if the variable has been filled with an object reference at a later time, such as in this example:
+
+		if (car!= null){
+			//do something with car
+		}
+
+	The value undefined is a derivative of null, so ECMA-262 defines them to be superficially equal as follows:
+
+		alert(null == undefined); //true
+
+	Using the equality operator between null and undefined always returns true, though keep in mind that this operator converts its operands for comparison purposes.
+
+	Even though null and undefined are related, they have very different uses. As mentioned previously, you should neever explicitly set the value of a variable to undefined, but the same does not hold true for null. Any time an object is expected but is not available, null should be used in its place. This helps to keep the paradigm of null as an empty object pointer and further differentiates it from undefined.
+
+The Boolaen Type
+
+	The Boolean type is one of the most requently used types in ECMAScript and has only two literal values: true and false. These values are distinct from numeric values, so true is not equal to 1, and false is not equal to 0. Assignment of Boolean values to variables is as follows:
+
+		var found = true;
+		var lost = false;
+
+	Note that the boolean literals true and false are case-sensitive, so True and False are valid identifiers but not as boolean values.
+
+	Though there are just two literal boolean values, all types of values have boolean equivalents in ECMAScript. To convert a value into its Boolean equivalent, the special Boolean() casting function is called, like this:
+
+		var message = "Hello world!";
+		var messageAsBoolean = Boolean(message);
+
+	In this example, the string message is converted into a Boolean value and stored in messageAsBoolean. THe Boolean() casting function can eb called on any type of data and will always return a boolean value. The rules for when a vlaue is converted to true or false depend on the data type as much as the actual value. The following table outlines various data types and their specific conversions.
+
+	These conversions are important to understand because flow-control statements, such as the if statement, automatically perform this Boolean conversion:
+
+		var message = "Hello world!";
+		if (message){
+			alert("Value is true");
+		}
+
+	In this example, the alert will be displayed because the string message is automatically converted into its Boolean equivalent. It's important to understand what variable you're using in a flow-control statement because o this automatic conversion. Mistakenly using an object instead of a Boolean can drastically alter the flow of your applications.
+
+The Number Type
+
+	Perhaps the msot interesting data type in ECMAScript is Number, which uses the IEEE-754 format to represent both integers and floating-point values (also called double-precision values in some languages). To suppor teh various types of numbers, therea re several different number literal formats.
+
+	The most basic number literal format is that of a decimal integer, which can be entered directly as shown here:
+
+		var intNum = 55; // integer
+
+	Integers can also be represented as either octal (base 8) or hexadecimal (base 16) literals. FOr an octal literal, the first digit must be a 0, followed by a sequence of octal digits, numbers 0 through 7. If a number out of this range is detected in the literal, then the leading zero is ignored and the number is treated as a decimal, as in the following examples:
+
+		var octalNum1 = 070; //octal for 56
+		var octalNum2 = 079 // invalid octal, interpreted as 79
+		var octalNum3 = 08 // invalid octal, interpreted as 8
+
+	Octal literals are invalid when running in strict mode and will cause the JS engine to throw a sytnax error.
+
+	To create a hexadecimal literal, you must make the first two characters 0x (case insensitive), followed by any number of hexadecimal digits (0-9, and A through F). Letter may be in uppercase or lowercase. Here's an example:
+
+		var hexNum1 = 0xA; //hexadecimal for 10
+		var hexNum2 = 0x1f; //hexadecimal for 31
+
+	Numbers created using hexadecimal format are treated as decimal numbers in all arithmetic operations.
+
+Floating-point values
+
+	To define a floating-point value, you must include a decimal point and at least one number after the decimal point. Although an integer is not necessary before a decimal point, it is recommended. Here are some examples:
+
+		var floatNum1 = 1.1;
+		var floatNum2 = 0.1;
+
+	For very large or very small numbers, floating-point values can be represented using e-notation. E-notation is used to indicate a number that should be multiplied by 10 raised to a given power. The format of e-notation in ECMAScript is to have a number followed by an uppercase or lowercase letter E, followed by the power of 10 to multiply by. Consider the following:
+
+		var floatNumb = 3.125e7; // equal to 31250000
+
+	In this example, floatNum is equal to 31,250,000 even though it is represented in a more compact form using e-notation.
+
+	Floating-point values are accurate upt o 17 decimal places but are far less accurate in arithmetic computations than whole numbers. 
+
+Range of Values
+
+	Not all numbers can be represented in ECMAScript, so if it's bigger than the biggest number it can do, it just gets turned into Infinity, if it's a negative number bigger than it can do, it is -Infinity.
+
+	If a calculation returns Infinity, that value cannot be used in any further calculations, because Infinity has no numeric representation with which to calculate
+
+NaN
+
+	There is a special numeric value called NaN, short for Not a Number, which is used to indicate when an operation intended to return a number has failed (as opposed to throwing an error). For example, dividing any number by 0 typically causes an error in other programming languages, halting code execution. In ECMAScript, dividing a number by 0 returns NaN, which allows other processing to continue.
+
+	NaN is not equal to any value, including NaN
+
+	ECMAScript provides the isNaN() function. This function accepts a single argument, which can be of any data type, to determine if the value is "not a number". When a value is passed into isNaN(), an attempt is made to convert it into a number. Any value that cannot be converted into a number causes the function to return true.
+
+Number Conversions
+
+	There are three functions to convert nonnumeric values into numbers:
+		> Number() casting function
+		> parseInt() function
+		> parseFloat() function
+
+	Number() can be used on any data type; the other two functions are used specifically for converting strings to numbers. Each of these functions reacts differently to the same input.
+
+	The Number() function performs conversions based on these rules:
+	> Booleans: true = 1, false = 0.
+	> Null: 0
+	> undefined: NaN
+	> Strings:
+		> If the string contains only numbers, optionally preceded by a plus or a minus sign, it is always converted to a decimal number, so "1" becomes 1, "123" becomes 123, and "011" becomes 11. leading 0's ignored
+
+		> If the string containsa  valid floating-point format, such as "1.1", it is converted into the appropriate floating-point numeric value.
+
+		> If the string contains a valid hexadecimal format, such as "0xf", it is converted into an integer that matches the hexadecimal value.
+
+		> If the string is empty, it is converted to 0
+
+		> If the string contains anything other than these previous formats, it is converted into NaN
+
+	> Objects: The valueOf() method is called and the returned value is converted based on the previously described rules. If that conversion results in NaN, the toString() method is called and the rules for converting strings are applied.
+
+The for-in Statement
+
+	The for-in statement is a strict iterative statement. It is used to enumerate teh properties of an object. Here's the syntax:
+
+		for (property in expression) statement
+
+	And here's an example of its usage:
+
+		for (var propName in window){
+			document.write(propName);
+		}
+
+	Here, the for-in statement is used to display all the properties of the BOM window object. Each time through the loop, the propName variable is filled with the name of a property that exists on the window object. This continues until all of the available properties have been enumerated over. As with the for statement, the var operator in the control statement is not necessary but is recommended for ensuring the use of a local variable.
+
+	Object properties in ECMAScript are unordered, so the order in which property names are returned in a for-in statement cannot necessarily be predicted. All enumerable properties will be returned once, but the order may differ across browsers.
+
+	For best cross-browser compatability, it's recommended to check that the object value isn't null or undefined before attempting to use a for-in loop.
+
+Labeled Statements
+
+	It is possible to label statements for later use with the following syntax:
+
+		label: statement
+
+	Example:
+
+		start: for (var i = 0; i < count; i++){
+			alert(i);
+		}
+
+	In this example, the label start can be referenced later using the break or continue statement. Labeled statements are typically uwed with nested loops.
+
+The break and continue Statements
+
+	The break and continue statements provide stricter control over the execution of code in a loop. The break statemetn exits the loop immediately, forcing execution to continue with the next statement after the loop. The continue statement on the otehr hand, exits the loop immediately, but execution continues from the top of the loop.
+
+	Both break and continue statements can eb used in conjunction with alebeld statements to return to a particular location in the code. This is typically used when there are loops inside of loops, as in the following example:
+
+		var num = 0;
+
+		outermost:
+		for (vari=0; i< 10; i++){
+			for (var j=0; j < 10; j++){
+				if (i==5 && j == 5){
+					break outermost;
+				}
+				num++;
+			}
+		}
+		alert(num); //55
+
+	In this example, the outermost lable indicates the first for statement.
+
+The with Statement
+
+	The with statement sets the scope of the code within a particular object. The syntax is as follows:
+
+		with (expression) statement;
+
+	The with statement was created as a convenience for times when a single object was being coded over and over again, such as in this example:
+
+		var qs = location.search.substring(1);
+		var hostName = location.hostname;
+		var url = location.href;
+
+	Here, the location object is used on every line. This code can be rewritten using the with statement as follows:
+
+		with(location){
+			var qs = search.substring(1);
+			var hostName = hostname;
+			var url = href;
+		}
+
+	

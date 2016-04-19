@@ -1,0 +1,122 @@
+JavaScript and Ruby
+
+	Ruby is the programming language you'll use when creating web applications that run on your local computer or a remote server using the Rails web application development framework.
+
+	JS is the programming language that controls every web browser. The companies that build web browsers agreed to use JS as the standard browser programming language. You might imagine an alternative univers in which Ruby was the browser programming language; then you would only have to learn one language for frotn-end and back-end programming. That's not the real world; plus it would be boring, as learning more than on language makes us smarter and better programmers.
+
+	Though most of the code in Rails apps is written in Ruby, developers add JS to Rails applications to implement features such as browser-based visual effects and user interaction. 
+
+	There is another univers where JS is used on servers to run webapps. System admins can install the Node.js code library to enable servers to run JS. Server-side JS web app frameworks are available, such as Express and Meteor, but none are as popular as RoR.
+
+What is Rails?
+
+	Rails is defined in two ways: as structures and conventions for building a web app, and as a library or collection of code.
+
+	To really understand Rails, and succeed in building Rails applications, we need to consider Rails
+
+STacks
+
+	To understand rails from the perspective of a professional Rails developer, you'll need to grasp the idea of a technology stack adn recognize that Rails can have more than one stack.
+
+	A technology stack is a set of technologies or software libraries taht are used to develop an application or deliver web pages. "stack" is a term that is used loosely and descriptively. There is no organization taht sets the rules about what goes into a stack. As at ehcnologist, your choice of stack reflects your experience, values, and personal preference, just like religion or favorite beverage.
+
+	For this tutorial, your application stack will be:
+	Windows
+	WEBrick (web server)
+	SQLite(databse)
+	Ruby on Rails(lang and framework)
+
+Chapter 5 : Plan your product
+
+User Stories
+
+	A product owner's principal tool for product planning is the user story.
+
+	In teh past, when software engineering primarily served government or large corporations, product planning started with requireemnts gathering defined as use cases, and cluminated in a requirements specification. User stories are a faster, more flexible approach to product planning that originated with an approach called Agile Software Development.
+
+	User stories are a way to discuss and describe the requirement for a software application. The process of writing user stories helps a product owner identify all the features that are needed for an application. Breaking down the application's functionality into discrete user stories helps organize the work and track progress toward completion.
+
+	User stories are often expressed in the following format:
+
+		as a <role>
+		I want <goal>
+		In order to <benefit>
+
+	Example:
+
+		*Join Mailing List*
+		As a visitor to the website
+		I want to join a mailing list
+		In order to receive news and announcements
+
+	A typical application has dozens of user tories, from basic sign-in requirements to the particular functionality that makes the application unique.
+
+Wireframes and Mockups
+
+	Often, before writing user stories, a product owner will make rough sketches of various web pages. Sketching is a phase where you try out ideas to clarify your vision for the application. Sketching can lead to a wirefram or a mockup. These terms are often use interchangeably but there are differences in meaning.
+
+	A wireframe is a drawing showing all functional elements of a web page. It should not depict a proposed graphic design for a website, rather it should be a diagram of a web page without color or graphics.
+
+	A mockup adds graphic design to a wireframe; including branding devices, color, and placeholder content. A mockup gives an impression of the website's "personality" as well as proposed functionality.
+
+	One of the most popular tools for creating wireframes is Balsamiq Mockups.
+
+Starter Applications
+
+	Rails provides a framework; taht is, a software library that provides utilities, conventions, and organizing principles to allow us to build complex web applications. Without a framework, we'd have to code everything from scratch. Rails gives us the basics we need for many websites.
+
+	Still, teh framework doesn't give us all the features we need for many common types of websites. For example, we might want users to register for an account and log in to access the website. We might want to restrict portions fo our website to just administrators. We also might want to add gems taht enhance Rails to aid development or improve the look and feel of our application. Developers often mix and match comopnents to make a customized Rails stack.
+
+Stopping the Web Server
+
+	As a rule of thumb, files that produce web pages can be changed without a restart. This includes any file in the app/folder which creates web pages, as well as the config/routes.rb file. Changes to files that create the environment for the web application, such as gems or configuration files, and are loaded at web server launch, won't be seen until the web server is restarted
+
+Important Folders and Files
+
+	Gemfile - Lists all the gems used by the application.
+	Gemfile.lock - Lists gem versions and dependencies.
+	README.rdoc - A page for documentation
+	app/ Application folders and files
+	config/ Configuration folders and files
+	db/ Database folders and files.
+	public/ Files for web pages that do not contain Ruby code, such as error pages.
+
+The App Directory
+
+	Most of the work developing a Rails application happens in the app/ folder.
+
+	Earlier we described Rails as a set of files organized with a specific structure. The app/ directory is a good example. The six folders in the app/ directory are teh same in every Rails application. This makes it easy to collaborate with other Rails developers, providing consistency and predictability.
+		assets
+		controllers
+		helpers
+		mailers
+		models
+		views
+
+	In this folder we have an example of the MVC Model View Controller. Three folders named models/ views/ and controllers/ enforce the software architect's "separation of concerns" and impart structure to our code. As you build the application, we'll explain the role of the MVC components in greater detail.
+
+	The mailers folder is for code that sends email messages.
+
+	The helpers folder is for Rails view helpers, snippets of reusable code that generate HTML. Later, when we learn more about views, we'll say view helpers are like "macros" taht expand a short command into a longer string of HTML tags and content.
+
+	As a Rails developer, you'll spend most of your time navigating this heirarchy of folders as you create and edit files. And because Rails provides a consistent structure, you'll quickly find your way on any unfamiliar project.
+
+GitIgnore
+
+	The hidden .git/ folder contains the Git repository with all the snapshots of your changing projects. THe snapshots are highly compressed, only containing records of changes, so the repository takes up very little file space relative to the project as a whole.
+
+	Not every file should be included in a Git snapshot. Here are some types of files that should be ignored:
+		- log files created by the web server
+		- database files
+		- configuration files that include passwords or API keys
+
+	Git gives us an easy way to ignore files. A hidden file in the project directory named .gitignore can specify a list of files that are never seen by Git. The rails new command creates a .gitignore file with defaults that include log files and database files. Later, when we add configuration files that include secrets, we'll update the .gitignore file.
+
+Configuration File
+
+	This tutorial app uses the figaro gem to set environment variables. The figaro gem uses a generator to set up the necessary files. Run:
+		$ rails generate figaro:install
+
+	rails provides the rails generate command to be used by gems taht need to modify Rails files or install configuration files.
+
+	The figaro gem generates a config/application.yml file and lists it in your .gitignore file. The .gitignore file prevents config/application.yml file from being saved in the Git repository so your credentials are kept private.

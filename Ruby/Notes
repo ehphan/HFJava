@@ -1,0 +1,462 @@
+Ruby on Rails
+
+	Ruby is an interpreted language which means it can't run on your processor directly, it has to be fed into a middleman called the VM
+
+	We can either run ruby from the command line or from IRB
+
+Running ruby from IRB
+
+	Ruby was one of the first languages to popularize what's called a "REPL":
+	READ
+	EVALUATE
+	PRINT
+	LOOP
+
+	Think of it like a calculator, as you put in each complete instruction, IRB executes that instruction and shows you the result
+
+	IRB is best used as a scratch pad for experimenting. Many devs keep an IRB window open while writing their real programs, using it to remember how a certain method works or debug a chunk of code.
+
+	to start up the IRB go into your terminal and type 'irb'
+
+Variables
+
+	In some languages you need to declare a variable before you assign a value to it. Ruby variables are automatically created when you assign a value to them.
+
+	Flexible typing:
+	Ruby variables can hold any kind of data and can even change the type of data they hold. So you can set c to 20, and then set c to hello, and c will come out as hello, changing from an int to a string.
+
+	Naming Variables:
+	Ruby variables must
+	> Always start with a lowercase letter or an underscore
+	> have no spaces
+	> does not contain most special characters
+
+	Generally you write your variables in_snake_case. notCamelCase.
+
+Strings
+
+	creating a string is as easy as
+		doing_this = "fuck my life"
+	and you can get substrings through
+		doing_this[0..4]
+			"fuck "
+	You can use a negative index to read from the end of the string
+		doing_this[0..-1]
+			"fuck my life"
+
+	.split:
+	using this will cut a string into an array, separated defaultly by " "
+
+	you can do my_string.split(",") to separate it by commas
+
+	concatenation:
+	The simplistic approach is called string concatenation, which joins strings together wtih the plus sign:
+		name = "frank"
+		puts "Good morning, " + name + "!"
+
+	Interpolation:
+	String interpolation sticks data into the middle of a string
+	This only works on a double-quoted string. Within the string we use the interpolation marker #{}. 
+
+	Inside {} we put any variables or ruby code which will be evaluated, converted to a string, and output in that spot of the outer string.
+		name = "frank"
+		puts "Good morning, #{name}!"
+
+	This does pretty much the same thing, except with less plus signs and fewer open/close quotes
+
+	Executing code inside interpolation:
+		You can also put any ruby code inside the brackets when interpolating
+			modifier = "very"
+			mood = "excited"
+			puts "I am #{modifier * 3 + mood} for today's class!"
+
+Symbols
+
+	Symbols are kinda halfway between a string and a number. You can recognize a symbol because it starts with a colon then one or more letter, like :flag or :best-friend
+
+	Symbols for beginners:
+		Think of a symbol as a stripped down string that has barely any methods and no string interpolation(#{}).
+
+	Symbols for the experienced:
+		Think of a symbol as a named integer. It doesn't matter what the actual value the symbol references. All we care about is that any reference to that value within the VM will give back the same value. Symbols are thus defined in a global symbol table and their value cannot change.
+
+Numbers
+
+	Two basic kinds of numbers: ints and floats
+
+	Repeating Instructions:
+		
+	for loop
+		for (var i = 0; i < 5; i ++){
+			console.log("Fuck my life");
+		}
+
+	While common, for loops are not very readable. Because Ruby's integers are objects they have methods. One of those is the times method to repeat an instruction a set number of times.
+
+	times method
+		5.times do
+			puts "hello, world!"
+		end
+
+Blocks
+
+	Blocks are a powerful concept used frequently in Ruby, Think of them as a way of bundling up a set of instructions for use elsewhere.
+
+	The block starts with the keyword do and ends with the keyword end
+
+	do/end
+
+	Bracket blocks:
+		When a block contains just a single instruction, we'll often use the alternate markers {} to begin and end the block
+
+	Blocks are passed to methods:
+		Blocks are a parameter passed into a method call.
+
+		If, for instance, we called 5.times, Ruby wouldn't know what to do 5 times, but when we pass in a block, we're telling it to do that block 5 times.
+
+		Many methods accept blocks. Like the .gsub method earlier
+			"this is a sentence".gsub("e"){puts "Found an E"}
+			Found an E
+			Found an E
+			Found an E
+			=> "this is a sntnc"
+
+		So it takes every E it finds, and puts Found an E for every instance, as well as removing the e's
+
+	Block parameters:
+		Often our instructions within a block need to reference the value that they're currently working with. When we write the block we can specify a block parameter inside pipe characters:
+			5.times do|i|
+				puts "Hello, world!"
+			end
+
+		What value gets put into that block parameter is up to the method we're calling. In this case, the times method puts in the number of the current run. Try the block as it is above, observe the output, then try this:
+			5.times do |i|
+				puts "#{i}: Hello, World!"
+			end
+
+Arrays
+
+	Usually when we're writing a program it's because we need to deal with a collection of data.
+
+	Arrays in code:
+		meals = ["Breakfast","Lunch","Dinner"]
+		=>["Breakfast","Lunch","Dinner"]
+		meals << "Dessert"
+		=>["Breakfast","Lunch","Dinner","Dessert"]
+		meals[2]
+		=> "Dinner"
+		meals.last
+		=> "Dessert"
+
+	Observe that:
+		> We created the array with the []'s
+		> Appended an element using the "shovel operator" <<
+		> Fetch the element at a specific index using []s
+		> convenience methods such as .last
+
+	Explanation of .sort
+		The sort method will return a new array where the elements are sorted. If the elements are strings they'll come back alphabetically. If they're numbers, they'll come back in ascending value order.
+			one = ["this","is","an","array"]
+			one.sort
+			one
+
+		You can rearrange the order of the elements using the sort method. You can iterate through each element using the each method. You can mash them together into one string using the join method. You can find the address of a specific element using the index method. You can ask an array if an element is present with the include? method.
+
+Hashes
+
+	A hash is a collection of data where each element of data is addressed by a name.
+
+	Key/Value Pairs:
+		A hash is an unordered collection where the data is organized into "key/value pairs". Hashes have a more complicated syntax that takes some getting used to:
+			produce = {"apples" => 3, "oranges" => 1, "carrots" => 12}
+			puts "There are #{produce['oranges']} oranges in the fridge."
+
+		The key is used as the address and the value is the data at that address. In the produce hash we have keys including apples and oranges. with values including 3 and 1. When creating a hash the key and value are linked by the => symbol which is called a rocket. 
+
+		So hashes:
+		> start with a curly bracket{
+		> have 0 or more entries made up of a key, a rocket => , and a value, separated by commas
+		> ends with a }
+
+	Simplified hash syntax:
+		We'll very commonly use symbols as the ekys of a hash. When all the keys are symbols, then there is a shorthand syntax which can be used:
+			produce = {apples: 3, oranges: 1, carrots: 12}
+			puts "There are #{produce[:oranges]} oranges in the fridge."
+
+		Notice that the keys end with a colon rather than beginning with one, even though these are symbols. This simplified syntax works with ruby v 1.9 or higher.
+
+Conditionals
+
+	Conditional statements evaluate to true or false. == >= etc.
+
+	Some objects also have methods which return a true or false, so they're used in conditional statements. Every object has method .nil? which returns true only when the object is nil. 
+
+Objects, Attributes, and methods
+
+	Defining a class:
+		Let's create a class called student!
+
+		class Student
+			attr_accessor :first_name, : last_name, :primary_phone_number
+
+			def introduction
+				puts "Hi, I'm #{first_name}!"
+			end
+		end
+
+	You haven't yet seen the attr_accessor method which is used to define attributes for instances of a class
+
+	Creating instances:
+		So we created the constructor for the student class, but now we need to make an instance of it
+
+			student_1 = Student.new
+			student_1.first_name = "Fucko"
+			student_1.introduction
+
+	
+
+Conversions
+
+	To get the string version of an object, we simply write
+		.to_s after it
+	so say we have
+		var1 = 23
+	and we want it to be a string so we can concatenate with
+		var2 = '45'
+	we just have to do
+		puts var1.to_s + var2
+
+	Inversely if we want a string to become an integer we just do
+		var2.to_i
+
+The Methods gets and chomp
+
+	gets will get a string from us
+		name = gets
+	will prompt you to type in a string, but when you hit enter to submit, it will also include a newline character. so to get around that we use chomp.
+		name = gets.chomp
+	chomp takes off any enters at the end of your  string.
+
+Strings
+
+	This won't work, because when you use .length it returns an integer, but puts will only put strings. so you convert it using .to_s
+		puts 'Whats your name'
+		name = gets.chomp
+		puts 'your name is ' + name.length + 'letters long'	
+	can be rectified with
+		puts 'your name is ' + name.length.to_s + 'letters long'
+
+	Some other thigns you can do are
+	.upcase : changes all characters to uppercase
+	.downcase : changes all characters to lowercase
+	.swapcase : switches the case of all letters in the string
+	.capitalize : capitalizes the first CHARACTER of a string, that character could be a space.
+
+	One method you use for visual formatting is .center
+	.center adds spaces to the beginning and end of the string to make it centered. however, you haev to tell center how wide you want your centered string to be.
+
+		line_width = 50
+		puts ('old mother hubbard'.center(linewidth))
+
+	If you don't want it to be centered, the other options are .ljust and .rjust
+
+Arithmetic
+
+	** is exponentiating, so 5 squared is 5**2
+	% is modulus, so it gives you remainder like other langs
+
+	.abs will give you the absolute value of something	
+
+	rand will give you random numbers
+		rand (5)
+	will give you numbers between 0-4
+
+	sometimes you want the same random numbers to happen, so you want the 'seed' so for this you would use srand
+
+Flow control
+
+	When strings are compared, they compare their lexicographical ordering, which basically means their dictionary ordering, so cat comes before dog, so:
+		puts 'cat' < 'dog'
+	would return true
+	but as well as being alphabetically ordered, there is a difference between capitals and lower cases, CAPS > lows. so Zoo > ant but zoo < ant.
+
+	One last note before branching: the comparison methdos aren't giving us the strings 'true' and 'false'; they are giving us the special objects true and false. but also true.to_s gives us 'true'
+
+Branching
+
+	Branching is a simple concept.
+		puts 'Hello, what\'s your name?'
+		name = gets.chomp
+		puts 'Hello, ' + name + '.'
+		if name == 'Chris'
+			puts 'What a nice name, faggo'
+		end
+
+	So if you put a name other than chris, it just says hi, but if you put chris it calls you a faggo. this is branching.
+
+	If what comes after the if is true, we run the code between the if and the end. If what comes after is false, we don't.
+
+if
+	
+	so your if statements can be 
+		if name == 'fucko'
+	but say you want multiple answers, you can
+		if (name == 'fucko' or name =='don cheadle')
+
+The method each
+
+	each allows us to do something to each object the array points to.
+
+	languages = ['1','2','3']
+
+	languages.each do |lang|
+		puts 'I love ' + lang + '!'
+		puts' Don\'t you?'
+	end
+
+	For each object in languages, point the variable lang to the object and then do everything i tell you to, until the end.
+
+	It may look like the loops we use, but this is a method, for loops and shit aren't methods, they're just part of the language.
+
+Array Methods
+
+	Methods like each which act like loops are often called iterators
+
+	Iterators are always followed by do...end. but while and if never had a do near them; we only use do with iterators.
+
+	array.to_s
+		doing this will turn your array into
+		["1","2,"3"]
+
+	array.join(', ')
+		does
+		1, 2, 3
+
+	array.join (' :) ') + ' xD'
+		does
+		1 :) 2 :) 3 xD
+		The parenths get used inbetween elements, the last one is appended to the final element
+
+		push pop and last
+
+			push and pop are like opposites.
+			push ADDS an object to the end of your array
+			pop REMOVES an object from the end of your array
+
+			last tells you what's at the end of the array
+
+Making METHods
+
+	To add a parameter to sayMoo, we would do:
+		def sayMoo numOfMoos
+			puts "moooo" * numOfMoos
+		end
+
+		sayMoo 3
+
+	Remember that after you add the param to the function, you must always feed it valid param for it to work.
+
+Local variables
+
+	if you declare a variable inside of a method, you can't use that variable outside of that method.
+
+Return Values
+
+	It's important to understand the difference between methods returning a value to where the method was called, and your program outputting information to your screen, like puts does. 5+3 returns 8; it does not output 8
+
+	puts always returns nil, every method has to return something, even if it's just nil.
+
+	The value returned from a method is simply the last line of the method.
+
+The Time class
+
+		time = Time.new # The moment you generated the value
+		time2 = time + 60 # One minute later
+
+	You can also make time for a specific moment using Time.mktime
+		puts Time.mktime(2000,1,1) # y2k
+
+The Hash class
+
+	Hashes are good for when you have a bunch of things to keep track of, but they don't really fit into an ordered list.
+
+		colorArray = []
+		colorHash = {}
+
+		colorArray[0] = 'red'
+		colorArray[1] = 'green'
+		colorArray[2] = 'blue'
+		colorHash['strings'] = 'red'
+		colorHash['numbers'] = 'green'
+		colorHash['keywords'] = 'blue'
+
+		colorArray.each do |color|
+			puts color
+		end
+		colorHash.each do |codeType, color|
+			puts codeType + ': ' +color
+		end
+
+Creating Classes
+
+	Make a die class:
+		class Die
+			def roll
+				1 + rand(6)
+			end
+		end
+
+		dice = [Die.new, Die.new]
+
+		dice.each do |die|
+			puts die.roll
+		end
+
+		If we wanted to store our dice roll in a local variable, the value would be gone as soon as roll is finished. So we need a more permanent way to store variables
+
+Instance variables
+
+	Normally when we want to talk about a string, we will just call it a string. However, we could call it a string object. Sometimes programmers might call it an instance of the class String, but this is just a fancy way of saying string. An instance of a class is just an object of that class.
+
+	So IVs are just an object's variables. A method's local variables last until the method is finished. An object's IVs, on the other hand, will last as long as the object does. To tell IVs from local variables, they have @ in front of their names.
+
+	When an object is created, its initialize method (if it has one) is always called.
+
+	
+Classes
+
+	classes in Ruby have names beginning with a capital letter.
+
+	The keyword def is what we use to create a method called perimeter. you will observe that Ruby follows a two0space indentation convention and sections of code are typically closed using the keyword end. Both the class and the method are closed in this manner. 
+
+	If a variable is an IV of the class, start it with an @
+
+		@length
+	This means that every instance of the class Rectangle will have its own unique copies of these variables and is in effect, a distinct rectangle.
+
+Methods
+
+	All objects in Ruby expose the eponymous method method that can be used to get hold of any of its methods as an object.
+
+	Parameters can have default values. Let's say we usually add three numbers, but occasionally just add two. We can default the last parameter to 0 like so
+
+		def add (a_number, another_number, yet_another_number = 0)
+
+Arraying your arguments
+
+	The list of parameters passed to an object is available as a list. To do this, all you have to do is use the splat operator *.
+
+	The splat operator is used to handle methods which have a variable parameter list.
+
+	We use the inject method to iterate over arguments, which is covered in the chapter on collections.
+
+		def add (*numbers)
+			numbers.inject(0) {|sum, number| sum + number}
+		end
+
+		puts add(1)
+		puts add(1,2)
+
+	The splat operator works both ways, you can use it to convert arrays to parameter lists as easily as we just converted a parameter list to an array.
+
+	

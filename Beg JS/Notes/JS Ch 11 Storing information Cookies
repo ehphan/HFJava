@@ -1,0 +1,162 @@
+JS Ch 11 Storing information: Cookies
+
+Baking your first cookie
+
+	The key to cookies is using the DOM's cookie property. Using this, you can create and retrieve cookie data from within your JS code.
+
+The Cookie String
+
+	When you create a cookie there are six parts you can set:
+	1. name
+	2. value
+	3. expires
+	4. path
+	5. domain
+	6. secure
+
+	The last 4 are optional
+
+Name and Value
+
+	The first part of the cookie string consists of the name and value of the cookie. The name is used so taht you can reference the cookie later, and hte value is the information part of the cookie
+
+	The value for a cookie is a primitive string, although the string can hold number characters if it is numerical data that you want to store.
+
+		document.cookie = "UserName=Paul;";
+
+	This cookie has a limited lifespan, it will expire when the user closes their browser, so we need to give it an expiration date.
+
+expires
+
+	If you want a cookie to exist for longer than just a single user session, you need to set an expiration date using the second part of the cookie string, expires:
+
+		document.cookie = "UserName=Paul;expires=Tue, 28 Dec 2020 00:00:00 GMT;";
+
+	The format of the expiration date is very important, especially for IE browsers. It should be the same format the cookie is given by the toGMTString() method. This method is similar to the toUTCString() method that you just saw in ch10.
+
+	So in practice, you'll probably use the Date object to get the current date, and then set a cookie to expire 3-6 months from that date. Like this
+
+		var expireDate = new Date();
+		expireDate.setMonth(expireDate.getMonth() + 6);
+		//gets your current month epxireDate adds 6 to it
+		document.cookie="UserName=Paul;expires="+expireDate.toGMTString()+";";
+
+path
+
+	For the most part you're only going to need to set name, value, and expires for your cookies but sometimes you may need path.
+
+	When cookies get stored in your browser they are stored by domain directory. so if you had cookies from the webpage
+		www.mywebsite.com/store/books
+	you wouldn't be able to access the cookies from that directory, say from
+		www.mywebsite.com/store/pens
+
+	But what if your checkout needed cookies from both books and pens? 
+
+	To get around this you can either set cookies only in the /store directory, since tehse can eb read by that directory and any of its subdirectories, or you can use the path part of the cookie string to specify that the path of the cookie is /store even if it's being set in the /pens subdirectory
+
+		document.cookie="UserName=Paul;expires YADA;path=/store;";
+
+	Now, even if the cookie is set by a page in the directory /books, it will still be accessible to filesi n the /store directory and its subdirectories, such as /books and /pens
+
+	If you want to specify that the cookie is available to all subdirectories of the domain it is set in, you can specify a path of the root directory using the / character
+
+		document.cookie = "UserName=Paul;expires= YADA;path=/;";
+
+	Now, the cookie will be available to all directories on the domain it is set from. If the web site is just one of many at that domain, it's best not to dot his because everyone else will also have access to your cookie information.
+
+	Important to note is that Windows computers don't have case-sensitive directory names, while many other OS's do. Unix/Linux based servers have case-sensitive path properties.
+
+domain
+
+	Pretty unlikely you're going to use this but
+
+	Say you have two websites
+		myPersonalWebsite.domain.com
+	and
+		myBusinessWebsite.domain.com
+
+	If you have a cookie set in one website, it will not be accessible by the other. You can use the domain part of the cookie string to specify that a cookie is available to all subdomains of the specified domain.
+
+		document.cookie="YADAYADA; domain=domain.com;";
+
+	Note that the domain must be the same: you can't share www.JoesDomain.com with www.TomsDomain.com
+
+secure
+
+	The final part of the cookie string is the secure part. This is simply a Boolean value; if it's set to true the cookie will be sent only to a web server tha tries to retrieve it using a secure channel. The default value, which is false, means the cookie will always be sent, regardless of security. This is only applicable where you have set up a server with SSL (Secure Sockets Layer).
+
+Creating a Cookie
+
+	To make life easier, you'll write a function that enables you to create a new cookie and set certain of its attributes with more ease. This is the first of a number of useful functions you'll create and add to a separate .js file so you can easily re-use the code in your future projects. You'll look at the code first and create an example using it shortly. First createa a file called cookiefunctions.js and add the following to it.
+
+	The first line of the function introduces the escape() function.
+		cookieValue = escape(cookieValue);
+
+	When we talked about setting the value of a cookie, we mentioned that certain characters cannot be used directly, such as a semicolon. To get around this problem, you can use the built-in escape() and unescape() functions. The escape() function converts characters taht are not text or numbers into a hexadecimal equivalent of their character in the Latin-1 character set, preceded by a % character.
+
+	When retrieving cookie values, you can use the unescape() function to convert from the encoded version to plain text.
+
+	The names you use can be only alphanumeric characters, with no spaces, punctuation, or special characters.
+
+	So say you've made the cookie, and you want to change the value of one you've already made. You can just use the setCookie function, using the same name, but this time with a different value.
+
+	If you want to delete an existing cookie, you simply change it's expiration date to a date in the past.
+
+Getting a Cookie's Value
+
+	So you used document.cookie to retrieve a string containing information about the cookies taht have been set. However, this string has two limitations.
+
+	1. The cookies are retrieved in name/value pairs, with each individual cookie separated by a semi-colon. The expires, path, domain, and secure parts of the cookie are not available to you and cannot be retrieved.
+
+	2. The cookie property enables you to retrieve only all the cookies set for a particular path and, when they are hosted on a web server, that web server. So, for example, there's no simple way of just getting the value of a cookie with the name Age. To do this you'll have to use the string manipulation techniques you learned in previous chapters to cut the information you want out of the returned string.
+
+	Now you know how to create and retrieve cookies. Let's use this knowledge in an example in which you check tos ee if any changes have been made to a web site since the user last visited it.
+
+	You'll be creating two pages for this example. The first is the main page for a web site; the second is the page with details of new additions and changes to the web site. A link to the second page will appear on the first page only if the user has visited the page before (that is, if a cookie exists) but has not visited since the page was last updated.
+
+EX 4
+
+	Whenever you make a change to the web site, this variable needs to be changed. A better alternative for live pages would be the document.lastModified property, which returns the date on which the page was last changed.
+
+Cookie Limitations
+A user may disable cookies
+
+	Although all modern browsers support cookies, the user may have disabled them. Most users have session cookies enabled by default. However, third party cookies, those from a third party site, are usually disabled. Thesea re teh cookies used for tracking people from site to site and hence the ones that raise the most privacy concerns.
+
+	Both the functions that you've made for creating and getting cookies will cause no errors when cookies are disabled, but of course the value of any cookie set will be null and you need to make sure your code can cope with this.
+
+	You can let the user know that your web site needs cookies to function by putting a message to that effect in the web page.
+
+	Another tactic is to actively check to see whether cookies are enabled and, if not, to take some action to cope with this, such as by directing the user to a page with less functionality that does not need cookies. How do you check to see if cookies are enabled?
+
+	In this script, you set a test cookie and then read back its value. If the value is null, you know cookies are disabled
+
+		setCookie("TestCookie","yes","","");
+		if (getCookieValue ("TestCookie") == null){
+			alert("Turn on cookies fucko");
+		}
+
+Number and Information Limitation
+
+	So most browsers let a site have a certain # of cookies. like 20 or so, some have up to 50 limitation, but they can't be more than 4096 characters in size.
+
+	To get around the cookie limits, you can store more than one piece of info per cookie
+
+	So instead of this
+		setCookie("Name","Karen","","")
+		setCookie("Age","44","","")
+		setCookie("LastVisit","10 Jan 2001","","")
+	you could combine into a single cookie, with each detail separated by a ;
+		setCookie("UserDetails","Karen;44;10 Jan 2001","","")
+
+	Since the setCookie() function escapes the value of the cookie, there is no confusion between the semicolons separating pieces of data in the value of the cookie, and the semicolons separating the parts of the cookie. When you get the cookie value back by using getCookieValue(), you just split it into its constituent parts; however you must remember the order you stored it in.
+
+		var cookieValues=getCookieValue("UserDetails");
+		cookieValues = cookieValues.split(";");
+		alert("Name = " + cookieValues[0]);
+		alert("Age = " + cookieValues[1]);
+		alert("Last Visit = " + cookieValues[2]);
+
+	So from 1 cookie we got 3 pieces of information, instead of each individually.
+
+	

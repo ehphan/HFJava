@@ -1,0 +1,13 @@
+Ch 4
+
+Variables, Scope, and Memory
+
+Copying values
+
+	Aside from differences in how they are stored, primitive and reference values act differently when copied from one variable to another. When a primitive value is assigned from one variable to another, the value stored on the variable object is created and copied into the location for the new variable.
+
+	When a reference value is assigned from one variable to another, the value stored on the variable object is also copied into the location for the new variable. The difference is taht this value is actually a pointer to an object stored on the heap. Once the operation is complete, two variables point to exactly the same object, so changes to one are reflected on the other.
+
+Execution context and scope
+
+	The concept of execution context, referred to as context for simplicity, 

@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="mystyle.css">
+<script type="text/javascript">
+function chooseHero_onchange(){
+	var choosePage = document.currentHeroSelect.chooseHero.value;
+	alert(choosePage);
+	document.parent.heroInfo.src = choosePage;
+}
+
+</script>
+
+</head>
+<body>
+<form name="currentHeroSelect" action="">
+	Select Hero
+	<br/>
+	<select name="chooseHero" onchange="chooseHero_onchange">
+		<option value="axe.html">Axe</option>
+		<option value="pudge.html">Pudge</option>
+		<option value="earthshaker.html">Earthshaker</option>
+	</select>
+<!--
+<div align="left" class="hero_select_box">
+	<button onclick="heroSelect_onclick()" class="hero_icon" value="axe"><img src="Axe.png"></button>
+	<button class="hero_icon"><img src="Earthshaker.png"></button>
+	<button class="hero_icon"><img src="Pudge.png"></button>
+	<button class="hero_icon"><img src="Sand_King.png"></button>
+</div>
+-->
+</body>
+</html>
