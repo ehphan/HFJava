@@ -1,0 +1,78 @@
+Update
+	A value can be updated by assignment too.
+		stooge['first-name'] = 'Jerome';
+	If the object does not already have that property name, the object is augmented:
+		stooge['middle-name'] = 'Lester';
+		stooge.nickname = 'Curly';
+		flight.equipment = {
+			model: 'Boeing 777'
+		};
+		flight.status = 'overdue';
+
+Reference
+	Objects are passed around by reference. They are never copied:
+		var x = stooge;
+		x.nickname = 'Curly';
+		var nick = stooge.nickname; //nick = curly
+
+Prototype
+	Every object is linked to a prototype object from which it can inherit properties. All objects created from object literals are linked to Object.prototype, an objet that comes standard with JS.
+
+	So when you create a new object, you can select the object that should be its prototype. How JS provides this is kind of coplex, but it can be simplified significantly. We will add a create method to the Object function. The create emthod creates a new object taht uses an old object as its prototype.
+
+		if (typeof Object.create !== 'function') {
+			Object.create = function (o) {
+				var F = function (){};
+				F.prototype = o;
+				return new F();
+			};
+		}
+		var another_stooge = Object.create(stooge);
+
+	The prototype link has no effect on updating. When we make changes to an object, the object's prototype is not touched:
+	
+		another_stooge['first-name'] = 'Harry';
+		another_stooge['middle-name'] = 'Moses';
+		another_stooge.nickname = 'Moe';
+
+	The prototype link is used only in retrieval. If we try to retrieve a property value from an object, and if the object lacks the property name, then JS attempts to retrieve the property value from the prototype object. And if that object is lacking the property, then it goes to its prototype, and so on until the process finally bottoms out with Object.prototype.  If the desired property exists nowhere in the prototype chain, then the result is the undefined value. This is called delegation.
+
+Reflection
+	It's easy to inspect an object and finding what properties it has. As well as the type of the values obtained. Using the typeof operator can be helpful in determining the type of a property:
+
+		typeof flight.number //'number'
+
+	Be careful because any property on the prototype chain can produce a value:
+		typeof flight.toString // 'function'
+		typeof flight.constructor //'function'
+
+	You can have your program look for and reject function values. Usually when you are reflecting, you are interested in the data you are pulling. So be aware that some values you pull could be functions.
+
+	Alternatively, you can use the hasOwnProperty method, which returns true if the object has a particular property. The hasOwnProperty method does not look at the prototype chain.
+		flight.hasOwnProperty('number') //true
+		flight.hasOwnProperty('constructor') //false
+
+Enumeration
+	Enumeration is when you go over all properties in an object with some function. Like the for in statement. Since for in goes over all properties, including functions and prototype properties, it is necessary to filter out the values you don't want. Most commonly using hasOwnProperty and typeof to exclude functions:
+
+		var name;
+		for (name in another_stooge){
+			if (typeof another_stooge[name] !== 'function'){
+			document.writeln(name + ': ' + another_stooge[name]);
+			}
+		}
+
+	But by using this method, ther is no guarantee of the order of the names, so they may appear in any order. If you want your properties to appear in a specific order, you should avoid the for in statement entirely, and instead make ban array containing the names of the properties in the correct order:
+
+		var i;
+		var properties = [
+			'first-name',
+			'middle-name',
+			'last-name',
+			'profession'
+		];
+		for (i = 0; i < properties.length; i += 1) {
+			document.writeln(properties[i] + ': ' + another_stooge[properties[i]]);
+		}
+
+		By using for, instead of for in, we are able to get the properties we wanted without worrying about what might be dredged up from the prototype chain, and we got them in the correct order.
